@@ -51,6 +51,7 @@ namespace SpaMerkeziSablon.Controllers
             // Kullanıcı kimliğini int'e çevir
             if (int.TryParse(adminUserId, out int userId))
             {
+                var now = DateTime.Now;
                 // Blog nesnesi oluştur
                 Blog s = new Blog();
 
@@ -75,6 +76,7 @@ namespace SpaMerkeziSablon.Controllers
                 s.Title = p.Title;
                 s.SubTitle = p.Description;
                 s.Content = p.DetailDescription;
+                s.Created = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
                 s.AppUserID = userId;
 
                 try
@@ -130,6 +132,7 @@ namespace SpaMerkeziSablon.Controllers
                 Title = blog.Title,
                 Description = blog.SubTitle,
                 DetailDescription = blog.Content,
+
                 ImageUrl = blog.ImagePath // Mevcut resim dosyası yolunu sakla
             };
 

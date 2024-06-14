@@ -42,9 +42,8 @@
                             <h2 class="post-title">@item.Title</h2>
                             <h3 class="post-subtitle">@item.SubTitle</h3>
                         </a>
-                        <p class="post-meta mb-0">
-                            <a href="#!">@item.AppUser.name</a>
-                            (Admin) tarafından @item.Created.ToString("dd MMMM yyyy")'de yayınlandı
+                        <p class="post-meta mb-0 text-end">
+                            @item.Created.ToString("dd MMMM yyyy")'de yayınlandı
                         </p>
                     </div>
                     <hr class="my-4" style="border-top: 1px solid #000000;" />
