@@ -1,0 +1,45 @@
+﻿@model List<Service>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<body class="kart-body">
+    <section class="kart-section">
+        <div class="satir-kart">
+            <h2 class="mb-3">Tüm Hizmetler</h2>
+            <div class=" row d-flex justify-content-center w-100 m-auto">
+                @if (Model != null)
+                {
+                    @foreach (var item in Model)
+                    {
+                        <div class="kart"
+                             onmouseover="kartUzerineGelindi(this)"
+                             onmouseout="kartUzerindenCikti(this)">
+                            <a href="/Service/ServiceDetails/@item.ServiceID">
+                                <img src="/uploads/@item.ImgUrl"
+                                     alt="@item.ServiceName" />
+                            </a>
+                            <div class="icerik">
+                                <h3>@item.ServiceName</h3>
+                                <p>
+                                    @item.ServiceDescription
+                                </p>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+    <script>
+        function kartUzerineGelindi(element) {
+            element.style.transform = "scale(0.9)";
+        }
+
+        function kartUzerindenCikti(element) {
+            element.style.transform = "scale(1)";
+        }
+    </script>
+</body>
+

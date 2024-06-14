@@ -1,0 +1,50 @@
+﻿@using EntityLayer.Concrete
+@model List<Service>
+
+@{
+    ViewData["Title"] = "Hizmetler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Hizmetlerimiz</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>#</th>
+        <th>Hizmet Adı</th>
+        <th>Hizmet Açıklaması</th>
+        <th>Detaylı Hizmet Açıklaması</th>
+        <th>Resim</th>
+        <th>Sitede Gör</th>
+        <th>Sil</th>
+    </tr>
+
+    @{ var i = 1; }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@i</td>
+            <td>@item.ServiceName</td>
+            <td style="word-break: break-all;">@item.ServiceDescription</td>
+            <td style="word-break: break-all;">@item.ServiceDetails</td>
+            <td><img style="height:50px;" src="/uploads/@item.ImgUrl" /></td>
+            <td><a href="/Service/ServiceDetails/@item.ServiceID" class="btn btn-outline-info">Sitede Gör</a></td>
+            @if (item.ServiceName == "Fiyat Listesi")
+            {
+
+            }
+            else
+            {
+                <td>
+                    <form class="" asp-controller="AdminService" asp-action="DeleteService" asp-route-id="@item.ServiceID" method="post" onsubmit="return confirm('Servisi silmek iştediğinize Eminmisiniz')">
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </td>
+
+            }
+            <td><a href="/AdminService/UpdateService/@item.ServiceID" class="btn btn-outline-warning">Güncelle</a></td>
+        </tr>
+        i++;
+    }
+</table>
+<a href="/AdminService/AddService/" class="btn btn-outline-warning">Hizmeti Ekle</a>

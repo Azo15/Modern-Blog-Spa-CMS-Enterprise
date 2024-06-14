@@ -1,0 +1,55 @@
+﻿@using EntityLayer.Concrete
+@model List<About>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Hakkımızda Bilgileri</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>#</th>
+        <th>Baslık1</th>
+        <th>Açıklama1</th>
+
+        <th>Baslık2</th>
+        <th>Açıklama2</th>
+
+        <th>Baslık3</th>
+        <th>Açıklama3</th>
+
+        <th>Sil</th>
+        <th>Güncelle</th>
+    </tr>
+
+    @{ var i = 1; }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@i</td>
+            <td style="word-break: break-all;">@item.Title1</td>
+            <td style="word-break: break-all;">@item.Description1</td>
+            <td style="word-break: break-all;">@item.Title2</td>
+            <td style="word-break: break-all;">@item.Description2</td>
+            <td style="word-break: break-all;">@item.Title3</td>
+            <td style="word-break: break-all;">@item.Description3</td>
+            @if (Model.Count == 1)
+            {
+            }
+            else
+            {
+                <td><a href="/AdminAbout/DeleteAbout/@item.AboutID" class="btn btn-outline-danger">Sil</a></td>
+
+            }
+            <td><a href="/AdminAbout/UpdateAbout/@item.AboutID" class="btn btn-outline-warning">Güncelle</a></td>
+        </tr>
+        i++;
+    }
+</table>
+@if (Model.Count > 1)
+{
+    <h1 style="color:red;">BU ALANDA YALNIZCA 1 TANE SATIR OLABİLİR. ESKİ VERİYİ SİLİN !!!</h1>
+
+}

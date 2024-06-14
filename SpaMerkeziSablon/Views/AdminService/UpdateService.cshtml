@@ -1,0 +1,39 @@
+﻿@model SpaMerkeziSablon.Models.UpdateSerice
+
+@{
+    ViewData["Title"] = "Hizmet Güncelle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Hizmet Ekle</h1>
+
+@*<input type="hidden" asp-for="ServiceID" />*@
+
+<form asp-action="UpdateService" enctype="multipart/form-data">
+    <div class="form-group">
+        @Html.Label("Hizmet Adı")
+        <input type="text" asp-for="ServiceName" class="form-control" />
+    </div>
+    <br />
+    <div class="form-group">
+        @Html.Label("Hizmet Açıklaması")
+        <input type="text" asp-for="ServiceDescription" class="form-control" />
+    </div>
+    <br />
+
+    <div class="form-group">
+        @Html.Label("Detaylı hizmet açıklaması")
+        <input type="text" asp-for="ServiceDetails" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Resim Seçiniz</label>
+        <input type="file" asp-for="NewImageFile" />
+    </div>
+
+    <br />
+    <br />
+    <br />
+
+    <button class="btn btn-outline-warning" onclick="alert('Hizmet Güncellendi');">Güncelle</button>
+</form>

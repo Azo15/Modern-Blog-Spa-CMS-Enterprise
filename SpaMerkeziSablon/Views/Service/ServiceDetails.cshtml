@@ -1,0 +1,26 @@
+﻿@model EntityLayer.Concrete.Service
+@{
+    ViewData["Title"] = "DestinationDetails";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<style>
+</style>
+<div class="row w-100 d-flex justify-content-center mb-3">
+    <div class="col-sm-5 mt-3">
+        <div class="card">
+            <div class="card-body">
+                <img class="w-100" sty=ServicDetailsImage src="~/uploads/@Model.ImgUrl" />
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-5 mt-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@Model.ServiceName</h5>
+                <p class="card-text">@Model.ServiceDetails</p>
+            </div>
+        </div>
+    </div>
+</div>
+@await Component.InvokeAsync("_RezervasyonButton")

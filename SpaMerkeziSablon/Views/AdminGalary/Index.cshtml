@@ -1,0 +1,38 @@
+﻿@using EntityLayer.Concrete
+@model List<Galary>
+
+@{
+    ViewData["Title"] = "GAlary Sayfası";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Galery</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>#</th>
+        <th>Resim</th>
+        <th>Sitede Gör</th>
+        <th>Sil</th>
+    </tr>
+
+    @{ var i = 1; }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@i</td>
+            <td style="display: flex; justify-content: space-around;">
+                <img src="/galary/@item.GalaryImg" style="height:100px;"/>
+            </td>
+            <td><a href="/Galary/Index/" class="btn btn-outline-info">Sitede Gör</a></td>
+            <td><a href="/AdminGalary/DeleteGalary/@item.GalaryID" class="btn btn-outline-danger">Sil</a></td>
+        </tr>
+        i++;
+    }
+</table>
+</br>
+</br>
+</br>
+<a href="/AdminGalary/AddGalary/" class="btn btn-outline-warning">Resim Ekle</a>
+
+

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<Home>
+
+@foreach (var item in Model)
+{
+    <div class="d-flex mb-3">
+        <a href="tel:@item.HomePhone" id="link" target="_blank" class="btn btn-danger mb-3 m-auto p-3">REZERVASYON İÇİN ARA</a>
+    </div>
+}
