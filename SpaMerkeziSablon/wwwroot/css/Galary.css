@@ -5,17 +5,6 @@
     font-size: 16px;
 }
 
-#demo {
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-}
-
-
-.green {
-    background-color: #6fb936;
-}
-
 .thumb {
     margin-bottom: 30px;
 }

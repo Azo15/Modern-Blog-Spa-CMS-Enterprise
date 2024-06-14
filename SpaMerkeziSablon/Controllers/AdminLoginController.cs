@@ -35,39 +35,79 @@ namespace SpaMerkeziSablon.Controllers
             return View();
         }
 
-        [Authorize]
+        //[Authorize]
+        //[HttpPost]
+        //public async Task<IActionResult> SignUp(UserRegisterViewModel p, string password)
+        //{
+        //    AppUser appUser = new AppUser()
+        //    {
+        //        UserName = p.UserName,
+        //        name = p.name,
+        //        Email = p.mail
+        //    };
+        //    if (string.IsNullOrEmpty(password))
+        //    {
+        //    }
+        //    else
+        //    {
+        //        if (p.Password == p.ConfirmPassword)
+        //        {
+        //            var result = await _userManager.CreateAsync(appUser, p.Password);
+        //            if (result.Succeeded)
+        //            {
+        //                return RedirectToAction("Index","AdminLogin");
+        //            }
+        //            else
+        //            {
+        //                foreach (var item in result.Errors)
+        //                {
+        //                    ModelState.AddModelError("", item.Description);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return View(p);
+        //}
+
+
         [HttpPost]
-        public async Task<IActionResult> SignUp(UserRegisterViewModel p, string password)
+        public async Task<IActionResult> SignUp(UserRegisterViewModel model)
         {
-            AppUser appUser = new AppUser()
+            if (!ModelState.IsValid)
             {
-                UserName = p.UserName,
-                name = p.name,
-                Email = p.mail
-            };
-            if (string.IsNullOrEmpty(password))
-            {
+                return View(model);
             }
-            else
+
+            // Kullanıcı adı kontrolü
+            var existingUser = await _userManager.FindByNameAsync(model.UserName);
+            if (existingUser != null)
             {
-                if (p.Password == p.ConfirmPassword)
-                {
-                    var result = await _userManager.CreateAsync(appUser, p.Password);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index","AdminLogin");
-                    }
-                    else
-                    {
-                        foreach (var item in result.Errors)
-                        {
-                            ModelState.AddModelError("", item.Description);
-                        }
-                    }
-                }
+                ModelState.AddModelError("", "Bu kullanıcı adı zaten alınmış.");
+                return View(model);
             }
-            return View(p);
+
+            var appUser = new AppUser { name = model.name, UserName = model.UserName, Email = model.mail };
+
+            if (model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("", "Şifreler aynı değil.");
+                return View(model);
+            }
+
+            var result = await _userManager.CreateAsync(appUser, model.Password);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "AdminLogin");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
         }
+
 
         [AllowAnonymous]
         [HttpGet]
@@ -104,7 +144,8 @@ namespace SpaMerkeziSablon.Controllers
                 var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index","AdminLogin");
+                    await _signInManager.SignOutAsync();
+                    //return RedirectToAction("Index","AdminLogin");
                 }
                 else
                 {
