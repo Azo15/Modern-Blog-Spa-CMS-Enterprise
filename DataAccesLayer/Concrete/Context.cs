@@ -13,8 +13,8 @@ namespace DataAccesLayer.Concrete
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("server=77.245.159.27\\MSSQLSERVER2019;database=wellnes;user=DevletPolat;password=9*B45lf0h");
-            optionsBuilder.UseSqlServer("server=KOZLOW\\MSSQLSERVER01;database=WellnessSpa; integrated security=true;");
+            optionsBuilder.UseSqlServer("server=77.245.159.27\\MSSQLSERVER2019;database=wellness_;user=Welness;password=&r481v7cI");
+            //optionsBuilder.UseSqlServer("server=KOZLOW\\MSSQLSERVER01;database=WellnessSpa; integrated security=true;");
         }
         public DbSet<About> Abouts { get; set; }
         public DbSet<Home> Homes { get; set; }

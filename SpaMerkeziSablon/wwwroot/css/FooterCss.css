@@ -10,7 +10,7 @@ footer {
         color: #ffc107; /* Bootstrap'in warning rengini kullanarak */
     }
 
-    footer p, footer a, {
+    footer p, footer a{
         color: #fff;
         text-decoration: none;
     }

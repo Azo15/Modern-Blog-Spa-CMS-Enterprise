@@ -29,6 +29,19 @@ namespace SpaMerkeziSablon.Controllers
         }
 
         [HttpGet]
+        public IActionResult CreateAbout()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateAbout(About about)
+        {
+            aboutManager.TAdd(about);
+            return RedirectToAction("Index", "AdminAbout");
+        }
+
+        [HttpGet]
         public IActionResult UpdateAbout(int id)
         {
             var values = aboutManager.TGetByID(id);

@@ -38,6 +38,15 @@
             </li>
         </ul>
     </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a href="~/Admin/Dashboard/Index" class="btn btn-info">
+            <span class="symbol-input100">
+                <i class="fa fa-user-circle" aria-hidden="true"></i>
+            </span>
+            Admin Profilim
+        </a>
+    }
     @foreach (var item in Model)
     {
         <a href="https://www.instagram.com/@item.instagramURl/">

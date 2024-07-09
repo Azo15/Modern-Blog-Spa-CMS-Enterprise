@@ -1,13 +1,20 @@
-﻿@using EntityLayer.Concrete
-@model List<About>
+﻿@model List<About>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
+<style>
+    td {
+        word-break: break-all;
+    }
+</style>
 <h1>Hakkımızda Bilgileri</h1>
+@if (Model.Count < 1)
+{
+    <td><a href="/AdminAbout/CreateAbout" class="btn btn-success">Ekle</a></td>
 
+}
 <table class="table table-bordered">
     <tr>
         <th>#</th>
@@ -53,3 +60,15 @@
     <h1 style="color:red;">BU ALANDA YALNIZCA 1 TANE SATIR OLABİLİR. ESKİ VERİYİ SİLİN !!!</h1>
 
 }
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const limitTextLength = (element, maxLength) => {
+            if (element.textContent.length > maxLength) {
+                element.textContent = element.textContent.substring(0, maxLength) + '...';
+            }
+        };
+
+        const tableCells = document.querySelectorAll('td');
+        tableCells.forEach(cell => limitTextLength(cell, 100));
+    });
+</script>
