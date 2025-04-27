@@ -9,6 +9,7 @@ namespace SpaMerkeziSablon.Models
 {
     public class AddBlogModel
     {
+        // test
         public string Title { get; set; }
         
         public string Description { get; set; }
