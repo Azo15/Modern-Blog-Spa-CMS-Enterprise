@@ -18,5 +18,6 @@ namespace EntityLayer.Concrete
         public string ServiceDescription { get; set; }
         public string ServiceDetails { get; set; }
         public string ImgUrl { get; set; }
+        public DateTime ServiceDate { get; set; }
     }
 }

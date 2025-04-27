@@ -10,9 +10,9 @@ namespace SpaMerkeziSablon.ViewComponents
 {
     public class _WelCome:ViewComponent
     {
-        private readonly Context _context;
+        private readonly AppDbContext _context;
 
-        public _WelCome(Context context)
+        public _WelCome(AppDbContext context)
         {
             _context = context;
         }

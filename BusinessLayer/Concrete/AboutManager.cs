@@ -20,7 +20,7 @@ namespace BusinessLayer.Concrete
 
         public void TAdd(About t)
         {
-            throw new NotImplementedException();
+            _aboutDal.Insert(t);
         }
 
         public void TDelete(About t)

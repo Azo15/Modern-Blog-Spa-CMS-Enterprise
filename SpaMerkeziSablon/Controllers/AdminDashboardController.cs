@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +16,16 @@ namespace SpaMerkeziSablon.Controllers
     [Authorize]
     public class AdminDashboardController : Controller
     {
-        HomeManager homeManager = new HomeManager(new EFHomeDal());
+        private readonly IHomeService _homeService;
+
+        public AdminDashboardController(IHomeService homeService)
+        {
+            _homeService = homeService;
+        }
 
         public IActionResult Index()
         {
-            var values = homeManager.TGetList();
+            var values = _homeService.TGetList();
             return View(values);
         }
 
@@ -48,7 +54,7 @@ namespace SpaMerkeziSablon.Controllers
             s.HomePhone = p.HomePhone;
             s.instagramURl = p.instagramURl;
             s.BannerUrl = p.BannerUrl;
-            homeManager.TAdd(s);
+            _homeService.TAdd(s);
             return RedirectToAction("Index", "AdminDashboard");
         }
 
@@ -56,7 +62,7 @@ namespace SpaMerkeziSablon.Controllers
         [HttpGet]
         public IActionResult UpdateHome(int id)
         {
-            var service = homeManager.TGetByID(id);
+            var service = _homeService.TGetByID(id);
             if (service == null)
             {
                 return NotFound();
@@ -82,7 +88,7 @@ namespace SpaMerkeziSablon.Controllers
         {
             if (ModelState.IsValid)
             {
-                var service = homeManager.TGetByID(model.Id);
+                var service = _homeService.TGetByID(model.Id);
                 if (service == null)
                 {
                     return NotFound();
@@ -120,7 +126,7 @@ namespace SpaMerkeziSablon.Controllers
                     service.HomeImage = newImageName;
                 }
 
-                homeManager.TUpdate(service);
+                _homeService.TUpdate(service);
 
                 return RedirectToAction("Index", "AdminDashboard");
             }
@@ -131,7 +137,7 @@ namespace SpaMerkeziSablon.Controllers
 
         public IActionResult DeleteHome(int id)
         {
-            var service = homeManager.TGetByID(id);
+            var service = _homeService.TGetByID(id);
             if (service == null)
             {
                 return NotFound();
@@ -148,7 +154,7 @@ namespace SpaMerkeziSablon.Controllers
             }
 
             // Servis silinir
-            homeManager.TDelete(service);
+            _homeService.TDelete(service);
 
             return RedirectToAction("Index", "AdminDashboard");
         }

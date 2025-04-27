@@ -32,6 +32,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\galary\" />
     <Folder Include="wwwroot\home\" />
+    <Folder Include="wwwroot\galary\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 

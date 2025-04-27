@@ -12,5 +12,6 @@ namespace EntityLayer.Concrete
         [Key]
         public int GalaryID { get; set; }
         public string GalaryImg { get; set; }
+        public DateTime GalaryDate { get; set; }
     }
 }

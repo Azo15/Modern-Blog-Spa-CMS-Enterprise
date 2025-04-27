@@ -10,9 +10,9 @@ namespace SpaMerkeziSablon.ViewComponents.Default
 {
     public class _RezervasyonButton: ViewComponent
     {
-        private readonly Context _context;
+        private readonly AppDbContext _context;
 
-        public _RezervasyonButton(Context context)
+        public _RezervasyonButton(AppDbContext context)
         {
             _context = context;
         }

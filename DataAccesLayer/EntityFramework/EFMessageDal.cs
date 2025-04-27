@@ -1,4 +1,5 @@
 ﻿using DataAccesLayer.Abstract;
+using DataAccesLayer.Concrete;
 using DataAccesLayer.Repository;
 using EntityLayer.Concrete;
 using System;
@@ -11,5 +12,8 @@ namespace DataAccesLayer.EntityFramework
 {
     public class EFMessageDal : GenericRepository<Message>, IMessageDal
     {
+        public EFMessageDal(AppDbContext context) : base(context)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,13 @@ namespace SpaMerkeziSablon.Controllers
     [AllowAnonymous]
     public class ContactController : Controller
     {
-        MessageManager messageManager = new MessageManager(new EFMessageDal());
+
+        private readonly IMessageService _messageService;
+
+        public ContactController(IMessageService messageService)
+        {
+            _messageService = messageService;
+        }
 
         [HttpGet]
         public IActionResult Index()
@@ -25,7 +32,7 @@ namespace SpaMerkeziSablon.Controllers
         public IActionResult Index(Message c)
         {
             c.MessageDate = DateTime.Parse(DateTime.Now.ToShortTimeString());
-            messageManager.TAdd(c);
+            _messageService.TAdd(c);
             return View();
         }
     }

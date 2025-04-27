@@ -89,7 +89,8 @@ namespace DataAccesLayer.Migrations
                 {
                     GalaryID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GalaryImg = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    GalaryImg = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GalaryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,6 +114,20 @@ namespace DataAccesLayer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Homes", x => x.HomeID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Links",
+                columns: table => new
+                {
+                    LinlID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LinlName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LinlUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Links", x => x.LinlID);
                 });
 
             migrationBuilder.CreateTable(
@@ -141,7 +156,8 @@ namespace DataAccesLayer.Migrations
                     ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ServiceDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ServiceDetails = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImgUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ImgUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServiceDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -355,6 +371,9 @@ namespace DataAccesLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Homes");
+
+            migrationBuilder.DropTable(
+                name: "Links");
 
             migrationBuilder.DropTable(
                 name: "Messages");

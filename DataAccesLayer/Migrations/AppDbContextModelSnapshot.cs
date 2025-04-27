@@ -4,16 +4,14 @@ using DataAccesLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccesLayer.Migrations
 {
-    [DbContext(typeof(Context))]
-    [Migration("20240607070432_mig-create")]
-    partial class migcreate
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,6 +217,9 @@ namespace DataAccesLayer.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("GalaryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("GalaryImg")
                         .HasColumnType("nvarchar(max)");
 
@@ -260,6 +261,24 @@ namespace DataAccesLayer.Migrations
                     b.ToTable("Homes");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.Link", b =>
+                {
+                    b.Property<int>("LinlID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("LinlName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinlUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LinlID");
+
+                    b.ToTable("Links");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Message", b =>
                 {
                     b.Property<int>("MessageID")
@@ -296,6 +315,9 @@ namespace DataAccesLayer.Migrations
 
                     b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ServiceDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ServiceDescription")
                         .HasColumnType("nvarchar(max)");

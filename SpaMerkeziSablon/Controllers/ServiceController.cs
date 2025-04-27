@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
@@ -15,18 +16,26 @@ namespace SpaMerkeziSablon.Controllers
     [AllowAnonymous]
     public class ServiceController : Controller
     {
-        ServiceManager _serviceManager = new ServiceManager(new EFServiceDal());
+        private readonly AppDbContext _context;
+        private readonly IServiceService _serviceService;
+
+        public ServiceController(AppDbContext context, IServiceService serviceService)
+        {
+            _context = context;
+            _serviceService = serviceService;
+        }
 
         public IActionResult Index()
         {
-            var data = _serviceManager.TGetList();
+            var data = _serviceService.TGetList().OrderByDescending(x=>x.ServiceDate).Take(8).ToList();
+            ViewBag.TotalBlogs = _context.Services.Count();
             return View(data);
         }
 
         [HttpGet]
         public IActionResult ServiceDetails(int id)
         {
-            var values = _serviceManager.TGetByID(id);
+            var values = _serviceService.TGetByID(id);
             if (values == null)
             {
                 return NotFound();
@@ -34,10 +43,16 @@ namespace SpaMerkeziSablon.Controllers
             return View(values);
         }
 
-        [HttpPost]
-        public IActionResult ServiceDetails(Service s)
+
+        [HttpGet]
+        public IActionResult GetMoreBlogs(int page)
         {
-            return View();
+            int pageSize = 8;
+            var blogs = _context.Services.Skip(page * pageSize)
+                                      .Take(pageSize)
+                                      .ToList();
+
+            return PartialView("_BlogPartial", blogs);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,11 +11,16 @@ namespace SpaMerkeziSablon.ViewsComponents.Default
 {
     public class _Footer : ViewComponent
     {
-        ContactManager contactManager = new ContactManager(new EFContactDal());
+        private readonly IContactService _contactService;
+
+        public _Footer(IContactService contactService)
+        {
+            _contactService = contactService;
+        }
 
         public IViewComponentResult Invoke()
         {
-            var data = contactManager.TGetList();
+            var data = _contactService.TGetList();
             return View(data);
         }
     }

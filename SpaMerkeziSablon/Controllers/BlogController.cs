@@ -16,16 +16,16 @@ namespace SpaMerkeziSablon.Controllers
     public class BlogController : Controller
     {
 
-        private readonly Context _context;
+        private readonly AppDbContext _context;
 
-        public BlogController(Context context)
+        public BlogController(AppDbContext context)
         {
             _context = context;
         }
         public IActionResult Index()
         {
             // İlk 8 blogu çekiyoruz
-            var values = _context.Blogs.Include(x => x.AppUser).Take(8).ToList();
+            var values = _context.Blogs.Include(x => x.AppUser).OrderByDescending(x=>x.Created).Take(8).ToList();
             ViewBag.TotalBlogs = _context.Blogs.Count(); // Toplam blog sayısını ViewBag'e koyuyoruz
             return View(values);
         }

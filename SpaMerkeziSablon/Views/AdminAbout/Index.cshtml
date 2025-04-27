@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
 }
 <style>
     td {
@@ -12,63 +13,48 @@
 <h1>Hakkımızda Bilgileri</h1>
 @if (Model.Count < 1)
 {
-    <td><a href="/AdminAbout/CreateAbout" class="btn btn-success">Ekle</a></td>
-
+    <td><a href="/AdminAbout/CreateAbout" class="btn btn-success mb-3">Ekle</a></td>
 }
-<table class="table table-bordered">
-    <tr>
-        <th>#</th>
-        <th>Baslık1</th>
-        <th>Açıklama1</th>
 
-        <th>Baslık2</th>
-        <th>Açıklama2</th>
-
-        <th>Baslık3</th>
-        <th>Açıklama3</th>
-
-        <th>Sil</th>
-        <th>Güncelle</th>
-    </tr>
-
-    @{ var i = 1; }
-    @foreach (var item in Model)
-    {
+<div class="table-responsive">
+    <table class="table table-bordered">
         <tr>
-            <td>@i</td>
-            <td style="word-break: break-all;">@item.Title1</td>
-            <td style="word-break: break-all;">@item.Description1</td>
-            <td style="word-break: break-all;">@item.Title2</td>
-            <td style="word-break: break-all;">@item.Description2</td>
-            <td style="word-break: break-all;">@item.Title3</td>
-            <td style="word-break: break-all;">@item.Description3</td>
-            @if (Model.Count == 1)
-            {
-            }
-            else
-            {
-                <td><a href="/AdminAbout/DeleteAbout/@item.AboutID" class="btn btn-outline-danger">Sil</a></td>
+            <th>#</th>
+            <th>Baslık1</th>
+            <th>Açıklama1</th>
 
-            }
-            <td><a href="/AdminAbout/UpdateAbout/@item.AboutID" class="btn btn-outline-warning">Güncelle</a></td>
+            <th>Baslık2</th>
+            <th>Açıklama2</th>
+
+            <th>Baslık3</th>
+            <th>Açıklama3</th>
+
+            <th>Sil</th>
+            <th>Güncelle</th>
         </tr>
-        i++;
-    }
-</table>
-@if (Model.Count > 1)
-{
-    <h1 style="color:red;">BU ALANDA YALNIZCA 1 TANE SATIR OLABİLİR. ESKİ VERİYİ SİLİN !!!</h1>
 
-}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const limitTextLength = (element, maxLength) => {
-            if (element.textContent.length > maxLength) {
-                element.textContent = element.textContent.substring(0, maxLength) + '...';
-            }
-        };
+        @{ var i = 1; }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@i</td>
+                <td>@item.Title1</td>
+                <td>@item.Description1</td>
+                <td>@item.Title2</td>
+                <td>@item.Description2</td>
+                <td>@item.Title3</td>
+                <td>@item.Description3</td>
+                @if (Model.Count == 1)
+                {
+                }
+                else
+                {
+                    <td><a href="/AdminAbout/DeleteAbout/@item.AboutID" class="btn btn-outline-danger">Sil</a></td>
 
-        const tableCells = document.querySelectorAll('td');
-        tableCells.forEach(cell => limitTextLength(cell, 100));
-    });
-</script>
+                }
+                <td><a href="/AdminAbout/UpdateAbout/@item.AboutID" class="btn btn-outline-warning">Güncelle</a></td>
+            </tr>
+            i++;
+        }
+    </table>
+</div>

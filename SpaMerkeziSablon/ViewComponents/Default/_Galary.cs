@@ -10,16 +10,16 @@ namespace SpaMerkeziSablon.ViewComponents.Default
 {
     public class _Galary: ViewComponent
     {
-        private readonly Context _context;
+        private readonly AppDbContext _context;
 
-        public _Galary(Context context)
+        public _Galary(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public IViewComponentResult Invoke()
         {
-            var images = await _context.Galaries.ToListAsync();
+            var images =  _context.Galaries.OrderByDescending(x=> x.GalaryDate).Take(16).ToList();
             return View(images);
         }
     }

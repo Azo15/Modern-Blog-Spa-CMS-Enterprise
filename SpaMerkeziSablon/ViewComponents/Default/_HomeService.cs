@@ -10,16 +10,16 @@ namespace SpaMerkeziSablon.ViewComponents.Default
 {
     public class _HomeService : ViewComponent
     {
-        private readonly Context _context;
+        private readonly AppDbContext _context;
 
-        public _HomeService(Context context)
+        public _HomeService(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public IViewComponentResult Invoke()
         {
-            var data = await _context.Services.ToListAsync();
+            var data = _context.Services.ToList().OrderByDescending(x => x.ServiceDate).Take(4).ToList();
             return View(data);
         }
     }

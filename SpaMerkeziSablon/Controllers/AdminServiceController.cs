@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +16,17 @@ namespace SpaMerkeziSablon.Controllers
     [Authorize]
     public class AdminServiceController : Controller
     {
-        ServiceManager serviceManager = new ServiceManager(new EFServiceDal());
+        private readonly IServiceService _serviceService;
+
+        public AdminServiceController(IServiceService serviceService)
+        {
+            _serviceService = serviceService;
+        }
 
         public IActionResult Index()
         {
-            var values = serviceManager.TGetList();
+            var values = _serviceService.TGetList().OrderByDescending(x=>x.ServiceDate).ToList();
+            ViewBag.serviceCount = _serviceService.TGetList().Count();
             return View(values);
         }
 
@@ -45,14 +52,15 @@ namespace SpaMerkeziSablon.Controllers
             s.ServiceName = p.ServiceName;
             s.ServiceDetails = p.ServiceDetails;
             s.ServiceDescription = p.ServiceDescription;
-            serviceManager.TAdd(s);
+            s.ServiceDate = DateTime.Now;
+            _serviceService.TAdd(s);
             return RedirectToAction("Index", "AdminService");
         }
 
         [HttpGet]
         public IActionResult UpdateService(int id)
         {
-            var service = serviceManager.TGetByID(id);
+            var service = _serviceService.TGetByID(id);
             if (service == null)
             {
                 return NotFound();
@@ -75,7 +83,7 @@ namespace SpaMerkeziSablon.Controllers
         {
             if (ModelState.IsValid)
             {
-                var service = serviceManager.TGetByID(model.Id);
+                var service = _serviceService.TGetByID(model.Id);
                 if (service == null)
                 {
                     return NotFound();
@@ -110,7 +118,7 @@ namespace SpaMerkeziSablon.Controllers
                     service.ImgUrl = newImageName;
                 }
 
-                serviceManager.TUpdate(service);
+                _serviceService.TUpdate(service);
 
                 return RedirectToAction("Index", "AdminService");
             }
@@ -121,7 +129,7 @@ namespace SpaMerkeziSablon.Controllers
 
         public IActionResult DeleteService(int id)
         {
-            var service = serviceManager.TGetByID(id);
+            var service = _serviceService.TGetByID(id);
             if (service == null)
             {
                 return NotFound();
@@ -138,7 +146,7 @@ namespace SpaMerkeziSablon.Controllers
             }
 
             // Servis silinir
-            serviceManager.TDelete(service);
+            _serviceService.TDelete(service);
 
             return RedirectToAction("Index", "AdminService");
         }

@@ -7,15 +7,12 @@ using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpaMerkeziSablon
 {
@@ -31,34 +28,56 @@ namespace SpaMerkeziSablon
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDbContext<Context>();
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<Context>();
-            services.AddControllersWithViews();
+            services.AddIdentity<AppUser, AppRole>()
+                .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddScoped<IBlogDal, EFBlogDal>();
             services.AddScoped<IBlogService, BlogManager>();
 
-            services.AddMvc(config =>
-            {
+            services.AddScoped<IAboutDal, EFAboutDal>();
+            services.AddScoped<IAboutService, AboutManager>();
 
+            services.AddScoped<IContactDal, EFContactDal>();
+            services.AddScoped<IContactService, ContactManager>();
+
+            services.AddScoped<ICatagoryDal, EFCatagoryDal>();
+            services.AddScoped<ICatagoryService, CatagoryManager>();
+
+            services.AddScoped<IGalaryDal, EFGalaryDal>();
+            services.AddScoped<IGalaryService, GalaryManager>();
+
+            services.AddScoped<IHomeDal, EFHomeDal>();
+            services.AddScoped<IHomeService, HomeManager>();
+
+            services.AddScoped<ILinkDal, EFLinkDal>();
+            services.AddScoped<ILinkService, LinkManager>();
+
+            services.AddScoped<IMessageDal, EFMessageDal>();
+            services.AddScoped<IMessageService, MessageManager>();
+
+            services.AddScoped<IServiceDal, EFServiceDal>();
+            services.AddScoped<IServiceService, ServiceManager>();
+
+            services.AddControllersWithViews(config =>
+            {
                 var policy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
+                    .RequireAuthenticatedUser()
+                    .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             });
-            services.AddMvc();
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/AdminLogin/Login/";
+                options.LoginPath = "/Authority/index";
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -68,11 +87,13 @@ namespace SpaMerkeziSablon
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseAuthentication();
+
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -81,7 +102,6 @@ namespace SpaMerkeziSablon
                     name: "default",
                     pattern: "{controller=Default}/{action=Index}/{id?}");
             });
-
         }
     }
 }

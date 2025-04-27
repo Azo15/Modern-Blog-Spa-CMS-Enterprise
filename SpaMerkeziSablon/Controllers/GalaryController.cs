@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,16 @@ namespace SpaMerkeziSablon.Controllers
     [AllowAnonymous]
     public class GalaryController : Controller
     {
-        GalaryManager galaryManager = new GalaryManager(new EFGalaryDal());
+        private readonly IGalaryService _galaryService;
+
+        public GalaryController(IGalaryService galaryService)
+        {
+            _galaryService = galaryService;
+        }
 
         public IActionResult Index()
         {
-            var data = galaryManager.TGetList();
+            var data = _galaryService.TGetList().OrderByDescending(x=> x.GalaryDate).ToList();
             return View(data);
         }
     }

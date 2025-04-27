@@ -1,4 +1,6 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
+using DataAccesLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -6,17 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 using SpaMerkeziSablon.Models;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace SpaMerkeziSablon.Controllers
 {
     [Authorize]
     public class AdminGalaryController : Controller
     {
-        GalaryManager galaryManager = new GalaryManager(new EFGalaryDal());
+        private readonly IGalaryService _galaryService;
+
+        public AdminGalaryController(IGalaryService galaryService)
+        {
+            _galaryService = galaryService;
+        }
 
         public IActionResult Index()
         {
-            var values = galaryManager.TGetList();
+            var values = _galaryService.TGetList().OrderByDescending(x=>x.GalaryDate).ToList();
+            ViewBag.galaryCount = _galaryService.TGetList().Count();
             return View(values);
         }
 
@@ -44,13 +53,14 @@ namespace SpaMerkeziSablon.Controllers
 
                 s.GalaryImg = newimagename;
             }
-            galaryManager.TAdd(s);
+            s.GalaryDate = DateTime.Now;
+            _galaryService.TAdd(s);
             return RedirectToAction("Index", "AdminGalary");
         }
 
         public IActionResult DeleteGalary(int id)
         {
-            var service = galaryManager.TGetByID(id);
+            var service = _galaryService.TGetByID(id);
             if (service == null)
             {
                 return NotFound();
@@ -78,7 +88,7 @@ namespace SpaMerkeziSablon.Controllers
             }
 
             // Servis silinir
-            galaryManager.TDelete(service);
+            _galaryService.TDelete(service);
 
             return RedirectToAction("Index", "AdminGalary");
         }

@@ -1,4 +1,5 @@
 ﻿using DataAccesLayer.Abstract;
+using DataAccesLayer.Concrete;
 using DataAccesLayer.Repository;
 using EntityLayer.Concrete;
 using System;
@@ -11,5 +12,8 @@ namespace DataAccesLayer.EntityFramework
 {
     public class EFHomeDal: GenericRepository<Home>, IHomeDal
     {
+        public EFHomeDal(AppDbContext context) : base(context)
+        {
+        }
     }
 }

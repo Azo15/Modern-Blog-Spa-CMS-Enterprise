@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,18 +13,24 @@ namespace SpaMerkeziSablon.Controllers
     [Authorize]
     public class AdminMessageController : Controller
     {
-        MessageManager messageManager = new MessageManager(new EFMessageDal());
+        private readonly IMessageService _messageService;
+
+        public AdminMessageController(IMessageService messageService)
+        {
+            _messageService = messageService;
+        }
 
         public IActionResult Index()
         {
-            var values = messageManager.TGetList().OrderByDescending(m=> m.MessageDate).ToList();
+            var values = _messageService.TGetList().OrderByDescending(m=> m.MessageDate).ToList();
+            ViewBag.messageCount = _messageService.TGetList().Count();
             return View(values);
         }
 
         public IActionResult DeleteMessage(int id)
         {
-            var values = messageManager.TGetByID(id);
-            messageManager.TDelete(values);
+            var values = _messageService.TGetByID(id);
+            _messageService.TDelete(values);
             return RedirectToAction("Index", "AdminMessage");
         }
     }

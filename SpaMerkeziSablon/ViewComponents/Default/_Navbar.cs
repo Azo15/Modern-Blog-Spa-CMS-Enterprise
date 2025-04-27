@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,16 @@ namespace SpaMerkeziSablon.ViewComponents.Default
 {
     public class _Navbar: ViewComponent
     {
-        HomeManager homeManager = new HomeManager(new EFHomeDal());
+        private readonly IHomeService _homeService;
+
+        public _Navbar(IHomeService homeService)
+        {
+            _homeService = homeService;
+        }
 
         public IViewComponentResult Invoke()
         {
-            var data = homeManager.TGetList();
+            var data = _homeService.TGetList();
             return View(data);
         }
     }

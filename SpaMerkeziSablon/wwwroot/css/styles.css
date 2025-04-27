@@ -1,5 +1,5 @@
 ﻿
-@import url('https://fonts.googleapis.com/css2?family=Exo:wght@300&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Exo:wght@300&display=swap');
 * {
     font-family: 'Exo', sans-serif;
 }
@@ -11,7 +11,7 @@
     margin: 0;
     padding: 0;
     height: 100vh;
-}
+}*/
 
 .icerik h2, .icerik h3, .icerik p {
     text-align: center;
@@ -165,9 +165,3 @@ a.phone {
 .icon{
     width:60px;
 }
-/*.ServicDetailsImage {
-    border: 5px solid black;
-    object-fit: cover;
-    width: 370px;
-    height: 300px;
-}*/

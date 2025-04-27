@@ -1,5 +1,4 @@
-﻿@using EntityLayer.Concrete
-@model List<Contact>
+﻿@model List<Contact>
 
 @{
     ViewData["Title"] = "İletişim";
@@ -8,40 +7,39 @@
 
 <h1>İletişim Bilgileri</h1>
 
-<table class="table table-bordered">
-    <tr>
-        <th>#</th>
-        <th>Adres</th>
-        <th>Telefon Numarası</th>
-        <th>E-Mail Adresi</th>
-        <th>Sil</th>
-        <th>Güncelle</th>
-    </tr>
 
-    @{ var i = 1; }
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@i</td>
-            <td style="word-break: break-all;">@item.Adres</td>
-            <td style="word-break: break-all;">@item.Phone</td>
-            <td style="word-break: break-all;">@item.Mail</td>
-            @if (Model.Count == 1)
-            {
-            }
-            else
-            {
-                <td><a href="/AdminContact/DeleteContact/@item.ContactID" class="btn btn-outline-danger">Sil</a></td>
-
-            }
-            <td><a href="/AdminContact/UpdateContact/@item.ContactID" class="btn btn-outline-warning">Güncelle</a></td>
-        </tr>
-        i++;
-    }
-</table>
-
-@if (Model.Count > 1)
+@if (Model.Count < 1)
 {
-    <h1 style="color:red;">BU ALANDA YALNIZCA 1 TANE SATIR OLABİLİR. ESKİ VERİYİ SİLİN !!!</h1>
-
+    <a href="/AdminContact/AddContact/" class="btn btn-success mb-3">Ekle</a>
 }
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <tr>
+            <th>#</th>
+            <th>Adres</th>
+            <th>Telefon Numarası</th>
+            <th>E-Mail Adresi</th>
+            <th>Sil</th>
+            <th>Güncelle</th>
+        </tr>
+
+        @{ var i = 1; }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@i</td>
+                <td style="word-break: break-all;">@item.Adres</td>
+                <td style="word-break: break-all;">@item.Phone</td>
+                <td style="word-break: break-all;">@item.Mail</td>
+                <td>
+                    <form class="" asp-controller="AdminContact" asp-action="DeleteContact" asp-route-id="@item.ContactID" method="post" onsubmit="return confirm('İletişim bilgilerini silmek iştediğinize eminmisiniz!')">
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </td>
+                <td><a href="/AdminContact/UpdateContact/@item.ContactID" class="btn btn-outline-warning">Güncelle</a></td>
+            </tr>
+            i++;
+        }
+    </table>
+</div>

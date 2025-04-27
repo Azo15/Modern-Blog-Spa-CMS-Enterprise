@@ -1,75 +1,27 @@
 ﻿
 @model IEnumerable<Service>
 
-<div class=" row d-flex justify-content-center w-100 m-auto">
-    @{ int i = 0;}
-    @if (Model != null)
-    {
-        foreach (var item in Model)
-        {
-            if (item.ServiceName == "Fiyat Listesi")
-            {
+<div class="p-4 mx-3 mb-3" style=" text-align: center; background-color:black; color: white;">
+    <h5 class="mb-0">HİZMETLERİMİZ</h5>
+</div>
 
-            }
-            else
-            {
-                <div class="kart"
-                     onmouseover="kartUzerineGelindi(this)"
-                     onmouseout="kartUzerindenCikti(this)">
-                    <a href="/Service/ServiceDetails/@item.ServiceID">
-                        <img src="/uploads/@item.ImgUrl"
-                             alt="@item.ServiceName" />
-                    </a>
-                    <div class="icerik">
-                        <h3>@item.ServiceName</h3>
-                        <p>
-                            @item.ServiceDescription
-                        </p>
+@* Depolar *@
+<div class="row mx-2 justify-content-between mb-3">
+    @foreach (var item in Model)
+    {
+        <div class="px-2 mb-3 col-lg-3 col-md-3 col-sm-12 p-0">
+            <div class="card" style="background: linear-gradient(to right, #fff8dc 0%, #efcc83 100%); border: 1px solid; padding: 10px; box-shadow: 5px 10px; border: none; ">
+                <div class="card-body p-0" style="height:75px;">
+                    <div style="max-height: 75px; overflow-y: auto;">
+                        <h4 class="card-title font-weight-bold text-center p-3">@item.ServiceName</h4>
                     </div>
                 </div>
-            }
-            if (i == 1)
-            {
-                break;
-            }
-            i++;
-        }
-    }
-
-    @if (Model != null)
-    {
-        @foreach (var item in Model)
-        {
-            if (item.ServiceName == "Fiyat Listesi")
-            {
-                <div class="kart"
-                     onmouseover="kartUzerineGelindi(this)"
-                     onmouseout="kartUzerindenCikti(this)"
-                     onclick="sayfayaYonlendir()">
-                    <a href="/Service/ServiceDetails/@item.ServiceID">
-                        <img src="/uploads/@item.ImgUrl" />
-                    </a>
-                    <div class="icerik">
-                        <h3>Fiyat Listesi</h3>
-                    </div>
-                </div>
-                break;
-            }
-
-        }
+                <a href="/Service/ServiceDetails/@item.ServiceID">
+                    <img class="card-img-top" style="height: 200px;" src="/uploads/@item.ImgUrl" alt="Card image cap">
+                </a>
+            </div>
+        </div>
     }
 </div>
 
-<div class="d-flex mb-3">
-    <a href="/Service/Index" class="btn btn-danger mb-3 m-auto p-3">Tüm Hizmetleri Gör</a>
-</div>
-
-<script>
-    function kartUzerineGelindi(element) {
-        element.style.transform = "scale(0.9)";
-    }
-
-    function kartUzerindenCikti(element) {
-        element.style.transform = "scale(1)";
-    }
-</script>
+<a href="/Service/Index" class="btn btn-danger p-3 mb-3 mx-auto d-block but">Hizmetlerimize Git</a>

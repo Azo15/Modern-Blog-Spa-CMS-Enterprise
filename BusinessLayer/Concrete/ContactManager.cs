@@ -20,7 +20,7 @@ namespace BusinessLayer.Concrete
 
         public void TAdd(Contact t)
         {
-            throw new NotImplementedException();
+            _contactDal.Insert(t);
         }
 
         public void TDelete(Contact t)

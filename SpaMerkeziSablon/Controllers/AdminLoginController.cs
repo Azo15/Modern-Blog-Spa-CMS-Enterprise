@@ -35,41 +35,7 @@ namespace SpaMerkeziSablon.Controllers
             return View();
         }
 
-        //[Authorize]
-        //[HttpPost]
-        //public async Task<IActionResult> SignUp(UserRegisterViewModel p, string password)
-        //{
-        //    AppUser appUser = new AppUser()
-        //    {
-        //        UserName = p.UserName,
-        //        name = p.name,
-        //        Email = p.mail
-        //    };
-        //    if (string.IsNullOrEmpty(password))
-        //    {
-        //    }
-        //    else
-        //    {
-        //        if (p.Password == p.ConfirmPassword)
-        //        {
-        //            var result = await _userManager.CreateAsync(appUser, p.Password);
-        //            if (result.Succeeded)
-        //            {
-        //                return RedirectToAction("Index","AdminLogin");
-        //            }
-        //            else
-        //            {
-        //                foreach (var item in result.Errors)
-        //                {
-        //                    ModelState.AddModelError("", item.Description);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return View(p);
-        //}
-
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> SignUp(UserRegisterViewModel model)
         {

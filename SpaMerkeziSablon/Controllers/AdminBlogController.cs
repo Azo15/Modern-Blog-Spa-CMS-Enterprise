@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccesLayer.Concrete;
 using DataAccesLayer.EntityFramework;
 using EntityLayer.Concrete;
@@ -19,19 +20,19 @@ namespace SpaMerkeziSablon.Controllers
     [Authorize]
     public class AdminBlogController : Controller
     {
-        private readonly Context _context;
+        private readonly AppDbContext _context;
+        private readonly IBlogService _blogService;
 
-        BlogManager _blogManager = new BlogManager(new EFBlogDal());
-
-
-        public AdminBlogController(Context context)
+        public AdminBlogController(AppDbContext context, IBlogService blogService)
         {
             _context = context;
+            _blogService = blogService;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var values = await _context.Blogs.Include(x => x.AppUser).ToListAsync();
+            var values = _context.Blogs.Include(x => x.AppUser).ToList().OrderByDescending(x=>x.Created).ToList();
+            ViewBag.blogCount = _context.Blogs.Count();
             return View(values);
         }
 
@@ -51,8 +52,6 @@ namespace SpaMerkeziSablon.Controllers
             // Kullanıcı kimliğini int'e çevir
             if (int.TryParse(adminUserId, out int userId))
             {
-                var now = DateTime.Now;
-                // Blog nesnesi oluştur
                 Blog s = new Blog();
 
                 // Eğer resim varsa işle
@@ -76,12 +75,12 @@ namespace SpaMerkeziSablon.Controllers
                 s.Title = p.Title;
                 s.SubTitle = p.Description;
                 s.Content = p.DetailDescription;
-                s.Created = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
+                s.Created = DateTime.Now;
                 s.AppUserID = userId;
 
                 try
                 {
-                    _blogManager.TAdd(s);
+                    _blogService.TAdd(s);
                     return RedirectToAction("Index", "AdminBlog");
                 }
                 catch (Exception ex)
@@ -97,7 +96,7 @@ namespace SpaMerkeziSablon.Controllers
         [HttpPost]
         public IActionResult DeleteBlog(int id)
         {
-            var blog = _blogManager.TGetByID(id);
+            var blog = _blogService.TGetByID(id);
             if (blog == null)
             {
                 return NotFound();
@@ -113,14 +112,14 @@ namespace SpaMerkeziSablon.Controllers
                 }
             }
 
-            _blogManager.TDelete(blog);
+            _blogService.TDelete(blog);
             return RedirectToAction("Index", "AdminBlog");
         }
 
         [HttpGet]
         public IActionResult UpdateBlog(int id)
         {
-            var blog = _blogManager.TGetByID(id);
+            var blog = _blogService.TGetByID(id);
             if (blog == null)
             {
                 return NotFound();
@@ -147,7 +146,7 @@ namespace SpaMerkeziSablon.Controllers
                 var adminUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (int.TryParse(adminUserId, out int userId))
                 {
-                    var _bM = _blogManager.TGetByID(model.Id);
+                    var _bM = _blogService.TGetByID(model.Id);
                     if (_bM == null)
                     {
                         return NotFound();
@@ -182,7 +181,7 @@ namespace SpaMerkeziSablon.Controllers
                         _bM.ImagePath = newImageName;
                     }
 
-                    _blogManager.TUpdate(_bM);
+                    _blogService.TUpdate(_bM);
                 }
                 return RedirectToAction("Index", "AdminBlog");
             }
