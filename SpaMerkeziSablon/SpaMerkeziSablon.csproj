@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include=".github\workflows\deploy.yml" />
     <None Include="Views\Shared\Components\_Footer\Default.cshtml" />
     <None Include="Views\Shared\Components\_Galary\Default.cshtml" />
     <None Include="Views\Shared\Components\_HomeService\Default.cshtml" />

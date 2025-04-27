@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1  # .NET ortamýný ayarlýyor
       with:
-        dotnet-version: '7.0'   # Kullanmak istediðiniz .NET sürümünü belirtin
+        dotnet-version: '5.0'   # Kullanmak istediðiniz .NET sürümünü belirtin
 
     - name: Restore dependencies
       run: dotnet restore  # Projenin baðýmlýlýklarýný geri yükler
@@ -29,6 +29,7 @@ jobs:
 
     - name: Deploy to FTP Server
       run: |
-        curl -T ./publish/* ftp://ftp.yourdomain.com/ --user yourftpusername:yourftppassword --ftp-create-dirs
+        curl -T ./publish/* ftp://ftp.yourdomain.com/ --user ${{ secrets.FTP_USER }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs
       env:
         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}  # FTP þifresini GitHub Secrets'tan alýr
+        FTP_USER: ${{ secrets.FTP_USER }}  # FTP kullanýcý adýný GitHub Secrets'tan alýr
