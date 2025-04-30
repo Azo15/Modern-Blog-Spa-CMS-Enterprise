@@ -4,9 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace SpaMerkeziSablon.Controllers
 {
     [AllowAnonymous]
-    public class AuthorityController : Controller
+    public class ErrorController : Controller
     {
-        public IActionResult Index()
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        public IActionResult PageNotFound()
         {
             return View();
         }

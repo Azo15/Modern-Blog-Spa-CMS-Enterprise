@@ -29,7 +29,7 @@ jobs:
 
     - name: Deploy to FTP Server
       run: |
-        curl -T ./publish/* ftp://ftp.yourdomain.com/ --user ${{ secrets.FTP_USER }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs
+        curl -T ./publish/* ftp://ftp.websitem.me/httpdocs/ --user ${{ secrets.FTP_USER }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs
       env:
         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}  # FTP þifresini GitHub Secrets'tan alýr
         FTP_USER: ${{ secrets.FTP_USER }}  # FTP kullanýcý adýný GitHub Secrets'tan alýr

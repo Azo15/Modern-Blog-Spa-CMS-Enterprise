@@ -71,8 +71,9 @@ namespace SpaMerkeziSablon
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Authority/index";
+                options.LoginPath = "/Error/AccessDenied";
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -101,7 +102,15 @@ namespace SpaMerkeziSablon
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Default}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "404-CatchAll",
+                    pattern: "{*url}",
+                    defaults: new { controller = "Error", action = "PageNotFound" });
+
             });
+
+
         }
     }
 }
