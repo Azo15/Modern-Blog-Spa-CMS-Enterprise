@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class Galary
+    public class Galary : BaseEntity
     {
-        [Key]
-        public int GalaryID { get; set; }
-        public string GalaryImg { get; set; }
-        public DateTime GalaryDate { get; set; }
+        [Display(Name = "Galeri Medya Dosyası")]
+        public string? Image { get; set; }
+
+        [Display(Name = "Başlık")]
+        public string? Title { get; set; }
     }
 }

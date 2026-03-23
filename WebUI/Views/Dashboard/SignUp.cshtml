@@ -1,0 +1,58 @@
+@model SignUpViewModel
+
+@{
+    ViewData["Title"] = "Kayýt Ol";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%;">
+        <h3 class="text-center mb-4">Kayýt Ol</h3>
+        <form asp-action="SignUp" method="post" id="registerForm" novalidate>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="mb-3">
+                <input asp-for="FirstName" class="form-control" placeholder="Ad" />
+                <span asp-validation-for="FirstName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="LastName" class="form-control" placeholder="Soyad" />
+                <span asp-validation-for="LastName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="BirthDate" type="date" class="form-control"/>
+                <span asp-validation-for="BirthDate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="Email" type="email" class="form-control" placeholder="E-posta" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+
+            <div class="mb-3 position-relative">
+                <input asp-for="Password" type="password" class="form-control" placeholder="Þifre" id="passwordInput" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+                <i class="fa fa-eye password-toggle cursor-pointer"
+                   onclick="togglePassword('passwordInput', this)"></i>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Þifre Tekrarý" id="confirmPasswordInput" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                <i class="fa fa-eye password-toggle cursor-pointer"
+                   onclick="togglePassword('confirmPasswordInput', this)"></i>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">Kayýt Ol</button>
+            <div class="d-flex">
+                <a asp-controller="AdminUserList" asp-action="UserList" class="exitSignUp">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Vazgeç ve Geri Dön
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

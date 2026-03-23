@@ -1,33 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityLayer.Concrete
 {
-    public class Blog
+    public class Blog : BaseEntity
     {
-        [Required]
-        public int Id { get; set; }
-        [Required]
-        public string Title { get; set; }
-        [Required]
-        public string SubTitle { get; set; }
-        [Required]
-        public string Content { get; set; }
-        public string ImagePath { get; set; }
-        public string isPublish { get; set; }
-        public DateTime Created { get; set; }
+        [Display(Name = "Başlık")]
+        public string? Title { get; set; }
+
+        [Display(Name = "Alt Başlık")]
+        public string? SubTitle { get; set; }
+
+        [Display(Name = "İçerik")]
+        public string? Content { get; set; }
+        
+        //[Display(Name = "Slug")]
+        //public string? Slug { get; set; }
+
+        [Display(Name = "Fotoğraf")]
+        public string? Image { get; set; }
+
+
+        //----------------------------------
 
         [ForeignKey("AppUser")]
-        public int AppUserID { get; set; }
-        public AppUser AppUser { get; set; }
+        [Display(Name = "Kullanıcı ID")]
+        public int? AppUserId { get; set; }
+        [Display(Name = "Kullanıcı")]
+        public AppUser? AppUser { get; set; }
 
-        //public int CatagoryID { get; set; }
-        //public Catagory Catagory { get; set; }
-
+        [ForeignKey("Catagory")]
+        [Display(Name = "Kategori ID")]
+        public int? CatagoryId { get; set; }
+        [Display(Name = "Kategori")]
+        public Catagory? Catagory { get; set; }
     }
 }

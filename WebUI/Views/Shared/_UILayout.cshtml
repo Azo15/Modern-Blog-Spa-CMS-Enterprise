@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+
+<html lang="tr">
+
+@await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
+    @await RenderSectionAsync("Styles", required: false)
+
+<body>
+
+    <div class="animated-bg"></div>
+
+    @await Component.InvokeAsync("_Navbar")
+
+    @RenderBody()
+
+    @await Component.InvokeAsync("_Footer")
+
+    @await Html.PartialAsync("/Views/LayoutPartial/_Script.cshtml")
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

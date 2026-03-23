@@ -1,0 +1,97 @@
+﻿@model Galary
+
+@{
+    ViewData["Title"] = "Resim Yükle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-center text-primary mb-4">📸 Galeriye Resim Ekle</h2>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <form asp-action="Create" class="px-0 px-md-3 dropzone stylish-dropzone" id="imageDropzone" enctype="multipart/form-data" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+
+        <div class="text-center mt-4">
+            <button type="button" class="btn btn-success px-4 py-2 shadow-lg" onclick="submitDropzone()">📤 Resimleri Yükle</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        Dropzone.autoDiscover = false;
+        var myDropzone;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            myDropzone = new Dropzone("#imageDropzone", {
+                paramName: "Images",
+                maxFilesize: 50,
+                acceptedFiles: "image/*",
+                autoProcessQueue: false,
+                parallelUploads: 10,
+                addRemoveLinks: false,
+                dictRemoveFile: "🗑️ Sil",
+                dictDefaultMessage: "<i class='fas fa-cloud-upload-alt fa-3x mb-3'></i> <br> Resimleri buraya sürükleyin veya tıklayın",
+                previewTemplate: `
+                    <div class="dz-preview dz-file-preview col-4 col-md-3 col-xl-2 p-2">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-img-top dz-image-wrapper">
+                                <img data-dz-thumbnail class="dz-image-cover"/>
+                            </div>
+                            <div class="card-body p-2">
+                                <p class="card-text text-truncate mb-1" data-dz-name></p>
+                                <strong class="text-muted d-block mb-2" data-dz-size></strong>
+                                <div class="dz-progress progress mb-2">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+                                </div>
+                                <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                                <div class="dz-description mt-2">
+                                    <input type="text" placeholder="Etiket ekle (ör. Manzara)" class="form-control form-control-sm"/>
+                                </div>
+                                <button class="btn btn-danger btn-sm w-100 mt-2" data-dz-remove>🗑️ Sil</button>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function () {
+                    this.on("addedfile", function (file) {
+                        const descriptionInput = file.previewElement.querySelector(".dz-description input");
+                        if (descriptionInput) {
+                            descriptionInput.addEventListener("input", function () {
+                                file.description = descriptionInput.value;
+                            });
+                        }
+                    });
+
+                    this.on("sending", function (file, xhr, formData) {
+                        formData.append("Descriptions", file.description || "");
+                    });
+
+                    this.on("queuecomplete", function () {
+                        alert("✅ Tüm resimler başarıyla yüklendi!");
+                        window.location.href = "/AdminGalary/Index";
+                    });
+
+                    this.on("error", function(file, message) {
+                        console.error("Dropzone Error:", message);
+                        // Hata mesajını kullanıcıya göstermek için ek bir işlem yapılabilir.
+                    });
+                }
+            });
+        });
+
+        function submitDropzone() {
+            if (myDropzone.getQueuedFiles().length === 0) {
+                alert("⚠️ Lütfen en az bir resim seçin.");
+                return;
+            }
+
+            if (confirm("📁 Seçilen resimleri gerçekten kaydetmek istiyor musunuz?")) {
+                myDropzone.processQueue();
+            }
+        }
+    </script>
+}

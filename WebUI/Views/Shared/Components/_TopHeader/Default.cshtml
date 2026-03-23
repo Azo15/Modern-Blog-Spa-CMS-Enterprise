@@ -1,0 +1,74 @@
+﻿@model TopHeaderViewModel
+
+<div class="px-xxl-5">
+    <nav class="layout-navbar container-fluid navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
+        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
+            <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+                <i class="fa-solid fa-bars icon-md"></i>
+            </a>
+        </div>
+
+        <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
+            <ul class="navbar-nav flex-row align-items-center ms-md-auto">
+                <!-- Theme Toggle -->
+                <li class="nav-item me-4">
+                    <button class="btn btn-link nav-link px-0 hide-arrow" id="theme-toggle" title="Toggle Theme">
+                        <i class="fa-solid fa-moon icon-md"></i>
+                        <span class="visually-hidden">Toggle Theme</span>
+                    </button>
+                </li>
+
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+                        <div class="avatar avatar-online">
+                            <img src="~/@Model.ImagePath" class="w-100 h-100 object-fit-cover rounded-circle" />
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar avatar-online">
+                                            <img src="~/@Model.ImagePath" class="w-100 object-fit-cover h-100 rounded-circle" />
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">@Model.FullName</h6>
+                                        <small class="text-body-secondary">@Model.Email</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li><div class="dropdown-divider my-1"></div></li>
+
+                        <li>
+                            <a class="dropdown-item" href="/admin/setting/profiledit">
+                                <i class="fa-solid fa-user icon-md me-3"></i><span>Profilim</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="SiteInfo" asp-action="Index">
+                                <i class="fa-solid fa-gear icon-md me-3"></i><span>Ayarlar</span>
+                            </a>
+                        </li>
+
+                        <li><div class="dropdown-divider my-1"></div></li>
+
+                        <li>
+                            <form method="post" asp-controller="dashboard" asp-action="logout">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fa-solid fa-right-from-bracket icon-md me-3"></i><span>Çıkış Yap</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                <!--/ User -->
+            </ul>
+        </div>
+    </nav>
+</div>

@@ -1,0 +1,36 @@
+﻿@{
+    var toastMessage = TempData["ToastMessage"]?.ToString();
+    var toastType = TempData["ToastType"]?.ToString()?.ToLower();
+
+    var bgClass = toastType switch
+    {
+        "success" => "bg-success",
+        "error" => "bg-danger",
+        "warning" => "bg-warning",
+        "info" => "bg-info",
+        _ => "bg-secondary"
+    };
+}
+
+@if (!string.IsNullOrWhiteSpace(toastMessage))
+{
+    <div class="bs-toast toast toast-placement-ex m-2 fade show @bgClass top-0 start-50 translate-middle-x" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+        <div class="toast-header">
+            <i class="icon-base bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">Bildirim</div>
+            <small>Şimdi</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">@toastMessage</div>
+    </div>
+
+    <script>
+        setTimeout(function () {
+            var toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.hide();
+            }
+        }, 4000);
+    </script>
+}

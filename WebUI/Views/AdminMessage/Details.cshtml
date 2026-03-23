@@ -1,0 +1,96 @@
+﻿@using EntityLayer.Enum
+@model ContactForm
+
+@{
+    ViewData["Title"] = "Rezervasyon Detayı";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/css/rezervationTime.css" rel="stylesheet" />
+}
+
+<div class="card">
+    <div class="card-header d-md-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Rezervasyon Detayı</h5>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left me-2"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="card-body">
+        <div class="mb-3 d-md-flex justify-content-between">
+            <div class="mb-2">
+                <strong>Gönderen:</strong> @Model.FullName &lt;@Model.Email&gt;
+            </div>
+            <div>
+                <strong>Tarih:</strong> @Model.CreatedDate.ToString("dd MMMM yyyy HH:mm")
+            </div>
+        </div>
+
+
+        <div class="mb-3">
+            <strong>Durumu:</strong>
+            @switch (Model.Status)
+            {
+                case ReservationStatus.SoforBeklemede:
+                    <span class="badge bg-warning text-dark">Şoför Beklemede</span>
+                    break;
+                case ReservationStatus.SoforYolda:
+                    <span class="badge bg-primary">Admin Onaylı</span>
+                    break;
+                case ReservationStatus.SoforAraciAldi:
+                    <span class="badge bg-info text-dark">Şoför Yolda</span>
+                    break;
+                case ReservationStatus.MusteriOnayBeklemede:
+                    <span class="badge bg-secondary">Müşteri Onay Bekliyor</span>
+                    break;
+                case ReservationStatus.MusteriOnayladi:
+                    <span class="badge bg-success">Onaylandı</span>
+                    break;
+            }
+        </div>
+
+        <div>
+            <strong>Bekleme Süresi:</strong>
+            <table class="mb-3 mt-1">
+                <tbody>
+                    <tr>
+                        <td data-created-date="@Model.CreatedDate.ToString("o")">
+                            @* ISO 8601 formatında tarih *@
+                            <div class="reservation-timer-container">
+                                <div class="reservation-timer-progress" style="width: 0%; background-position: 0%;"></div>
+                                <span class="reservation-timer-text">Yükleniyor...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <strong>Konu:</strong>
+                    <input type="text" class="form-control" value="@Model.Subject" readonly />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <strong>Telefon:</strong>
+                    <input type="text" class="form-control" value="@Model.Phone" readonly />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <strong>Mesaj:</strong>
+                <textarea class="form-control" rows="10" readonly>@Model.Message</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/rezervationTime.js"></script>
+}

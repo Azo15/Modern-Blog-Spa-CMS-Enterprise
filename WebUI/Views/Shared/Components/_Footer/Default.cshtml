@@ -1,0 +1,71 @@
+﻿@model FooterViewModel
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="logo me-3">
+                        <img src="@Model.Logo" alt="Logo" />
+                    </div>
+                    <h3 class="footer-title mb-0">@Model.SiteTitle</h3>
+                </div>
+                <p class="text-light">
+                    Huzur, güzellik ve sağlığın buluştuğu özel mekanınız.
+                    Uzman ekibimizle size en iyi spa deneyimini sunuyoruz.
+                </p>
+                <div class="social-icons">
+                    <a href="@Model.Contact.FacebookUrl" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="@Model.Contact.InstagramUrl" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="@Model.Contact.TwitterUrl" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="@Model.Contact.YoutubeUrl" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h4 class="footer-title">Hızlı Linkler</h4>
+                <a href="/Default" class="footer-link">Ana Sayfa</a>
+                <a href="/About" class="footer-link">Hakkımızda</a>
+                <a href="/Service" class="footer-link">Hizmetlerimiz</a>
+                <a href="/Blog" class="footer-link">Blog</a>
+                <a href="/Contact" class="footer-link">İletişim</a>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h4 class="footer-title">Hizmetlerimiz</h4>
+                @if (Model != null && Model.Services != null)
+                {
+                    @foreach (var item in Model.Services)
+                    {
+                        <a href="/Service/serviceDetails/@item.Id" class="footer-link">@item.Title</a>
+                    }
+                }
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h4 class="footer-title">İletişim Bilgileri</h4>
+                <p class="text-light">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    @Model.Contact.Adres
+                </p>
+                <a href="tel:@Model.Contact.Phone" class="text-light me-2 mb-3 d-block">
+                    <i class="fas fa-phone me-2"></i>@Model.Contact.Phone
+                </a>
+                <a href="mailto:@Model.Contact.Mail" class="text-light me-2 d-block">
+                    <i class="fas fa-envelope me-2"></i>@Model.Contact.Mail
+                </a>
+
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255, 255, 255, 0.2);">
+
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-light mb-0">
+                    &copy; 2025 X Spa. Tüm hakları saklıdır.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

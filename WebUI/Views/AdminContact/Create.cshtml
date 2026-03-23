@@ -1,0 +1,72 @@
+﻿@model Contact
+@{
+    ViewData["Title"] = "İletişim Bilgisi Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>İletişim Bilgisi Ekle</h5>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Phone" class="form-label">Telefon Numarası</label>
+                    <input type="text" asp-for="Phone" class="form-control" placeholder="90 *** *** ** **">
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Mail" class="form-label">E-Mail Adresi</label>
+                    <input type="email" asp-for="Mail" class="form-control" placeholder="ornek@mail.com">
+                    <span asp-validation-for="Mail" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="InstagramUrl" class="form-label">Instagram</label>
+                    <input type="text" asp-for="InstagramUrl" class="form-control" placeholder="Instagram URL">
+                    <span asp-validation-for="InstagramUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FacebookUrl" class="form-label">Facebook</label>
+                    <input type="text" asp-for="FacebookUrl" class="form-control" placeholder="Facebook URL">
+                    <span asp-validation-for="FacebookUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TwitterUrl" class="form-label">Twitter</label>
+                    <input type="text" asp-for="TwitterUrl" class="form-control" placeholder="Twitter URL">
+                    <span asp-validation-for="TwitterUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="YoutubeUrl" class="form-label">YouTube</label>
+                    <input type="text" asp-for="YoutubeUrl" class="form-control" placeholder="YouTube URL">
+                    <span asp-validation-for="YoutubeUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Adres" class="form-label">Adres</label>
+                    <textarea rows="4" asp-for="Adres" class="form-control" placeholder="Adres giriniz"></textarea>
+                    <span asp-validation-for="Adres" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary ">
+                    <i class="bi bi-check-circle"></i> Kaydet
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+</div>

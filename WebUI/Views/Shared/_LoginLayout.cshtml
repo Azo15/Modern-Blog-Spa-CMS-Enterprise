@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - xSpa</title>
+    <link href="~/css/login.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+</head>
+<body>
+
+    <div class="container">
+
+        @RenderBody()
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+            const rememberCheckbox = document.getElementById('RememberMe');
+            const emailInput = document.getElementById('Email');
+
+            window.addEventListener('load', () => {
+                const rememberedEmail = localStorage.getItem('rememberedEmail');
+                if (rememberedEmail) {
+                    emailInput.value = rememberedEmail;
+                    rememberCheckbox.checked = true;
+                }
+            });
+
+            document.getElementById('loginForm').addEventListener('submit', function () {
+                const btn = document.getElementById('loginBtn');
+                btn.disabled = true;
+                btn.textContent = "Giriş yapılıyor...";
+
+                if (rememberCheckbox.checked) {
+                    localStorage.setItem('rememberedEmail', emailInput.value);
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                }
+            });
+
+        function togglePassword(id, icon) {
+            const input = document.getElementById(id);
+            const isPassword = input.type === "password";
+            input.type = isPassword ? "text" : "password";
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
+        }
+
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

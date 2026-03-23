@@ -1,0 +1,36 @@
+@model IEnumerable<Blog>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+
+<div id="blog" >
+    <section class="section section-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="section-title font-playfair" data-aos="fade-up">Blog</h1>
+                    <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Sağlık, güzellik ve wellness hakkında faydalı bilgiler
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                @await Html.PartialAsync("_BlogPartial", Model)
+            </div>
+            
+            @if (ViewBag.PaginationInfo != null)
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        @await Component.InvokeAsync("Pagination", new { paginationInfo = ViewBag.PaginationInfo })
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+

@@ -1,0 +1,134 @@
+﻿@model ContactPageViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<div id="contact" >
+    <section class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="section-title font-playfair text-white" data-aos="fade-up">İletişim</h1>
+                    <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
+                        Bizimle iletişime geçin ve randevunuzu alın
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="glass-light p-5" data-aos="fade-up" data-aos-delay="200">
+                        <form asp-controller="Contact" asp-action="SendMessage" method="post" class="contact-form">
+
+                            @Html.AntiForgeryToken()
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.FullName" class="form-label"></label>
+                                    <input asp-for="ContactForm.FullName" type="text" class="form-control">
+                                    <span asp-validation-for="ContactForm.FullName" class="text-danger"></span>
+                                </div>
+
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.Email" class="form-label"></label>
+                                    <input asp-for="ContactForm.Email" type="email" class="form-control">
+                                    <span asp-validation-for="ContactForm.Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.Phone" class="form-label"></label>
+                                    <input asp-for="ContactForm.Phone" type="tel" class="form-control">
+                                    <span asp-validation-for="ContactForm.Phone" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.Subject" class="form-label"></label>
+                                    <input asp-for="ContactForm.Subject" type="text" class="form-control">
+                                    <span asp-validation-for="ContactForm.Subject" class="text-danger"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ContactForm.Message" class="form-label"></label>
+                                <textarea class="form-control" asp-for="ContactForm.Message" rows="5"
+                                          placeholder="Özel isteklerinizi belirtiniz..."></textarea>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-end mb-4">
+                                <div class="g-recaptcha" data-sitekey="@ViewData["SiteKey"]"></div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary-custom" id="formButton">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Randevu Talebi Gönder
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="glass p-4 text-center text-white">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h4>Adres</h4>
+                        <p>Atatürk Caddesi No:123<br>Beşiktaş, İstanbul</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="glass p-4 text-center text-white">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4>Telefon</h4>
+                        <p>+90 212 555 0123<br>+90 532 555 0123</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="glass p-4 text-center text-white">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h4>Çalışma Saatleri</h4>
+                        <p>Pazartesi - Cumartesi<br>09:00 - 21:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var message = @Html.Raw(Json.Serialize(TempData["Swal_Message"] ?? ""));
+            var title = @Html.Raw(Json.Serialize(TempData["Swal_Title"] ?? ""));
+            var icon = @Html.Raw(Json.Serialize(TempData["Swal_Icon"] ?? "info"));
+
+            if (message) {
+                Swal.fire({
+                    title: title || '',
+                    text: message,
+                    icon: icon,
+                    confirmButtonText: 'Tamam',
+                    timer: 5000,
+                    timerProgressBar: true,
+                    position: 'top',
+                });
+            }
+        });
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+}

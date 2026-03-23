@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class Catagory
+    public class Catagory : BaseEntity
     {
-        public int Catagoryid { get; set; }
-        public string CatagoryName { get; set; }
+        [Display(Name = "Blog Kategori Adı")]
+        public string? Title { get; set; }
 
-        //public ICollection<Blog> Blogs { get; set; }
+        public ICollection<Blog>? Blogs { get; set; }
     }
 }

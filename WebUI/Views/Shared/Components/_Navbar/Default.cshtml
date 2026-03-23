@@ -1,0 +1,61 @@
+﻿@model SiteTable
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand" asp-controller="Default" asp-action="Index">
+            <div class="logo">
+                <img src="@(!string.IsNullOrEmpty(Model?.SiteLogo) ? Model.SiteLogo : "/img/logo.png")" alt="Logo" />
+            </div>
+        </a>
+
+        <!-- Mobil Menü Butonu -->
+        <button class="menu-btn d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Menüyü Aç/Kapat">
+            <span class="bar top"></span>
+            <span class="bar middle"></span>
+            <span class="bar bottom"></span>
+        </button>
+
+        <!-- Menü Öğeleri -->
+        <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="Default" asp-action="Index">Ana Sayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="About" asp-action="Index">Hakkımızda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Service" asp-action="Index">Hizmetlerimiz</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Blog" asp-action="Index">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Galary" asp-action="Index">Galeri</a>
+                </li>
+            </ul>
+
+            <!-- Sağ Taraf (İletişim, Tema ve Admin Butonları) -->
+            <div class="d-flex align-items-center">
+                <!-- İletişim Butonu -->
+                <a class="btn contact-btn me-2" asp-controller="Contact" asp-action="Index">
+                    <i class="fas fa-message me-2"></i>Rezervasyon
+                </a>
+
+                <!-- Tema Değiştirici -->
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-sun"></i>
+                </button>
+
+                <!-- Admin Panel Butonu (Sadece Giriş Yapmışsa Görünsün) -->
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <a class="theme-toggle adminButton ms-2" asp-controller="AdminUserList" asp-action="UserList">
+                        <i class="fa fa-user-circle" aria-hidden="true"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="navbar-height"></div>

@@ -1,0 +1,123 @@
+@model IEnumerable<Blog>
+
+@{
+    ViewData["Title"] = "Blog Listesi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int sayac = 1;
+}
+
+<div class="card">
+    <div class="justify-content-between d-flex align-items-center px-4">
+        <h5 class="card-header">Hakkımızda Bilgileri</h5>
+
+        <form asp-action="Index" method="get" class="p-4">
+
+            @Html.AntiForgeryToken()
+
+            <div class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label for="categoryId" class="col-form-label">Kategori:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="categoryId" id="categoryId" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tümü</option>
+                        @if (ViewBag.Categories is List<SelectListItem> categoryList)
+                        {
+                            foreach (var cat in categoryList)
+                            {
+                                <option value="@cat.Value" selected="@(ViewBag.SelectedCategory?.ToString() == cat.Value ? "selected" : null)">
+                                    @cat.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Yeni Bilgi Ekle</a>
+    </div>
+
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Content)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Image)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UpdatedDate)
+                    </th>
+                    <th>Eylemler</th>
+                </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+                @foreach (var item in Model)
+                {
+
+                    <tr>
+                        <td>
+                            @sayac
+                        </td>
+
+                        <td>
+                            @item.Title
+                        </td>
+
+                        <td style="font-size:0.85rem; line-height: 1.4;">
+                            @{
+                                var plain = System.Text.RegularExpressions.Regex.Replace(item.Content ?? "", "<.*?>", "");
+                                var decoded = System.Web.HttpUtility.HtmlDecode(plain);
+                                var preview = decoded.Length > 150 ? decoded.Substring(0, 150) + "..." : decoded;
+                            }
+                            @preview
+                        </td>
+
+                        <td>
+                            @{
+                                var imgPath = string.IsNullOrEmpty(item.Image) ? "img/default-image.jpg" : item.Image;
+                            }
+                            <img src="@Url.Content("~/" + imgPath)"
+                                 alt="blog görseli"
+                                 class="table-image" />
+                        </td>
+
+                        <td>
+                            @item.UpdatedDate.ToString("dd MMMM yyyy")
+                        </td>
+
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item text-warning" asp-action="Edit" asp-route-id="@item.Id">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i>Düzenle
+                                    </a>
+                                    <a class="dropdown-item text-danger" 
+                                       asp-action="Delete" 
+                                       asp-route-id="@item.Id">
+                                        <i class="fa-solid fa-trash me-1"></i>Sil
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    sayac++;
+                }
+            </tbody>
+        </table>
+        <hr class="mt-0" />
+        <div class="px-5">
+            <p><small>Tabloda</small><span class="mx-2">@ViewBag.blogCount</span><small>adet veri var</small></p>
+        </div>
+    </div>
+</div>

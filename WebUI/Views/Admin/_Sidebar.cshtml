@@ -1,0 +1,115 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+    <!-- Logo ve Toggle -->
+    <div class="app-brand demo">
+        <a asp-controller="Default" asp-action="Index" target="_blank" class="app-brand-link">
+            <span class="app-brand-text demo menu-text fw-bold ms-2">
+                <span class="app-brand-text-full">X Spa</span>
+                <span class="app-brand-text-collapsed">XS</span>
+            </span>
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-none d-xl-block px-2 py-1" style="z-index: 100;">
+            <i class="fa-solid fa-bars text-white w-100 h-100"></i>
+        </a>
+    </div>
+
+    <div class="menu-divider mt-0"></div>
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-5">
+
+        <!-- ADMIN -->
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Admin</span></li>
+
+        <li class="menu-item @(Html.IsActive("AdminUserList"))">
+            <a asp-controller="AdminUserList" asp-action="UserList" class="menu-link">
+                <i class="menu-icon fa-solid fa-users-gear"></i>
+                <div class="text-truncate">Admin Listesi</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminSiteInfo"))">
+            <a asp-controller="AdminSiteInfo" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-sliders"></i>
+                <div class="text-truncate">Site Ayarları</div>
+            </a>
+        </li>
+
+        <!-- GENEL PANEL -->
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Genel Panel</span></li>
+
+        <li class="menu-item @(Html.IsActive("AdminAbout"))">
+            <a asp-controller="AdminAbout" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-building-user"></i>
+                <div class="text-truncate">Hakkımızda</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminAboutCard")) d-none">
+            <a asp-controller="AdminAboutCard" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-id-card-clip"></i>
+                <div class="text-truncate">Hakkımızda Kartları</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminContact"))">
+            <a asp-controller="AdminContact" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-location-dot"></i>
+                <div class="text-truncate">İletişim Bilgileri</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminMessage"))">
+            <a asp-controller="AdminMessage" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-inbox"></i>
+                <div class="text-truncate">Gelen Mesajlar</div>
+            </a>
+        </li>
+
+        <!-- BLOG YÖNETİMİ -->
+        <li class="menu-header small text-uppercase mt-4"><span class="menu-header-text">Blog Yönetimi</span></li>
+
+        <li class="menu-item @(Html.IsActive("AdminBlog"))">
+            <a asp-controller="AdminBlog" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-newspaper"></i>
+                <div class="text-truncate">Bloglar</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminCatagory"))">
+            <a asp-controller="AdminCatagory" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-tags"></i>
+                <div class="text-truncate">Blog Kategorileri</div>
+            </a>
+        </li>
+
+        <!-- GÖRSEL İÇERİKLER -->
+        <li class="menu-header small text-uppercase mt-4"><span class="menu-header-text">Görsel İçerikler</span></li>
+
+        <li class="menu-item @(Html.IsActive("AdminSlider"))">
+            <a asp-controller="AdminSlider" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-film"></i>
+                <div class="text-truncate">Slider</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminGalary"))">
+            <a asp-controller="AdminGalary" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-images"></i>
+                <div class="text-truncate">Galeri</div>
+            </a>
+        </li>
+
+        <!-- HİZMETLER -->
+        <li class="menu-header small text-uppercase mt-4"><span class="menu-header-text">Hizmetler</span></li>
+
+        <li class="menu-item @(Html.IsActive("AdminService"))">
+            <a asp-controller="AdminService" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-hand-sparkles"></i>
+                <div class="text-truncate">Sunulan Hizmetler</div>
+            </a>
+        </li>
+
+    </ul>
+</aside>

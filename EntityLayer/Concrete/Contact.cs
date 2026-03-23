@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class Contact
+    public class Contact : BaseEntity
     {
-        [Key]
-        public int ContactID { get; set; }
-        public string Mail { get; set; }
-        public string Adres { get; set; }
-        public string Phone { get; set; }
+        [Display(Name = "E-posta")]
+        public string? Mail { get; set; }
+
+        [Display(Name = "Adres")]
+        public string? Adres { get; set; }
+
+        [Display(Name = "Telefon")]
+        public string? Phone { get; set; }
+
+        [Display(Name = "Instagram URL")]
+        public string? InstagramUrl { get; set; }
+
+        [Display(Name = "Facebook URL")]
+        public string? FacebookUrl { get; set; }
+
+        [Display(Name = "Twitter URL")]
+        public string? TwitterUrl { get; set; }
+
+        [Display(Name = "Youtube URL")]
+        public string? YoutubeUrl { get; set; }
     }
 }

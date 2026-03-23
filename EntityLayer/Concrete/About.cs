@@ -1,22 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class About
+    public class About : BaseEntity
     {
-        [Key]
-        public int AboutID { get; set; }
-        public string Title1 { get; set; }
-        public string Description1 { get; set; }
-        public string Title2 { get; set; }
-        public string Description2 { get; set; }
-        public string Title3 { get; set; }
-        public string Description3 { get; set; }
-        
+        [Display(Name = "Başlık")]
+        public string? Title { get; set; }
+
+        [Display(Name = "Açıklama")]
+        public string? Content { get; set; }
+
+        [Display(Name = "Kart Başlık 1")]
+        public string? CardTitle1 { get; set; }
+
+        [Display(Name = "Kart Başlık 2")]
+        public string? CardTitle2 { get; set; }
+
+        [Display(Name = "Kart İçeriği 1")]
+        public string? CardContent1 { get; set; }
+
+        [Display(Name = "Kart İçeriği 2")]
+        public string? CardContent2 { get; set; }
+
+        [Display(Name = "Hakkımızda Fotoğrafı")]
+        public string? Image { get; set; }
     }
 }

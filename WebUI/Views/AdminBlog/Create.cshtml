@@ -1,0 +1,76 @@
+@using BusinessLayer.Dtos
+@model BlogCreateDto
+
+@{
+    ViewData["Title"] = "Blog Oluşturma";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Blog Ekleme Formu</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" asp-action="Create">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="Title" class="form-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="SubTitle" class="form-label"></label>
+                        <input asp-for="SubTitle" class="form-control" />
+                        <span asp-validation-for="SubTitle" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="CatagoryId" class="form-label"></label>
+                        <select asp-for="CatagoryId" asp-items="ViewBag.Categories" class="form-control">
+                            <option value="">Kategori seçiniz</option>
+                        </select>
+                        <span asp-validation-for="CatagoryId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Görsel -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Görsel</label>
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
+                        <div class="mt-2">
+                            <img id="imagePreview" src="@Url.Content("~/img/default-image.jpg")" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-12">
+                    <div class="form-group">
+                        <label asp-for="Content" class="form-label"></label>
+                        <textarea asp-for="Content" class="form-control" id="tinymce"></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

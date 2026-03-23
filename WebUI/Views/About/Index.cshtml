@@ -1,0 +1,89 @@
+@model About
+
+@{
+    ViewData["Title"] = "Hakkımızda";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+
+<!-- Hero Section -->
+<section class="section py-5 position-relative overflow-hidden hero-about">
+    <div class="container" style="z-index: 2;">
+
+        <div class="badge bg-gold about-hero-badge mb-3 px-3 py-2 rounded-pill" data-aos="fade-right">
+            Hikayemiz
+        </div>
+
+        <h1 class="display-3 font-playfair about-hero-title mb-4 fw-bold" data-aos="fade-right">
+            Hakkımızda
+        </h1>
+
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="position-relative">
+                    <div class="about-image-wrapper p-2 glass-light shadow-2xl">
+                        <img src="~/@Model.Image"
+                             alt="Hakkımızda"
+                             class="img-fluid rounded w-100 about-image-frame">
+                    </div>
+                    <div class="experience-badge glass shadow-lg p-3 text-center border-gold animate-bounce-slow">
+                        <h2 class="text-gold mb-0 fw-bold">15+</h2>
+                        <p class="mb-0 small fw-bold">Yıllık Deneyim</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-hero-desc" data-aos="fade-up">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Misyon & Değerler -->
+<section class="section section-light py-5">
+    <div class="container py-4">
+
+        <div class="row mb-5 justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="badge bg-soft-gold text-gold about-hero-badge mb-3 px-3 py-2 rounded-pill">
+                    Vizyonumuz
+                </div>
+                <h2 class="display-5 font-playfair fw-bold mb-3" data-aos="fade-up">
+                    Misyonumuz &amp; Değerlerimiz
+                </h2>
+                <p class="lead mx-auto about-mission-desc"
+                   data-aos="fade-up" data-aos-delay="100">
+                    İnsanların yaşam kalitesini artırmak ve iç huzurlarını bulmalarına
+                    yardımcı olmak için tutkuyla çalışıyoruz.
+                </p>
+            </div>
+        </div>
+
+
+        <div class="row g-4 mt-2">
+            <div class="col-sm-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="glass p-4 h-100 border-gold-light">
+                    <div class="icon-circle mb-3">
+                        <i class="fas fa-star text-gold"></i>
+                    </div>
+                    <h4 class="text-white font-playfair fw-bold mb-2">@Model.CardTitle1</h4>
+                    <p class="text-white about-card-text mb-0 small">@Model.CardContent1</p>
+                </div>
+            </div>
+            <div class="col-sm-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="glass p-4 h-100 border-gold-light">
+                    <div class="icon-circle mb-3">
+                        <i class="fas fa-gem text-gold"></i>
+                    </div>
+                    <h4 class="text-white font-playfair fw-bold mb-2">@Model.CardTitle2</h4>
+                    <p class="text-white about-card-text mb-0 small">@Model.CardContent2</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</div>

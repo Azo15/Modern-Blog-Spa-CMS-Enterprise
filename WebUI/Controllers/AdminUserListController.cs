@@ -1,0 +1,95 @@
+﻿using BusinessLayer.Abstract;
+using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebUI.Models;
+
+namespace WebUI.Controllers
+{
+    [Authorize]
+    public class AdminUserListController : BaseController
+    {
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IFileHelper _fileHelper;
+
+        public AdminUserListController(UserManager<AppUser> userManager, IFileHelper fileHelper)
+        {
+            _userManager = userManager;
+            _fileHelper = fileHelper;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UserList()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                SetToastMessage("Kullanıcı bulunamadı", "error");
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            var users = await _userManager.Users
+                .Where(u => u.Id != currentUser.Id) // Giriş yapan hariç
+                .Select(u => new UserListViewModel
+                {
+                    Id = u.Id.ToString(),
+                    FullName = $"{u.FirstName} {u.LastName}",
+                    Email = u.Email,
+                    Image = u.Image
+                })
+                .ToListAsync();
+
+            ViewBag.Count = users.Count();
+
+            return View(users);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                SetToastMessage("Kullanıcı bulunamadı", "error");
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            if (id == currentUser.Id.ToString())
+            {
+                SetToastMessage("Kendi hesabınızı silemezsiniz.", "error");
+                return RedirectToAction(nameof(UserList));
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                SetToastMessage("Kullanıcı bulunamadı", "error");
+                return RedirectToAction(nameof(UserList));
+            }
+
+            if (!string.IsNullOrEmpty(user.Image))
+            {
+                _fileHelper.Delete(user.Image);
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                SetToastMessage("Kullanıcı silinemedi", "error");
+            }
+            else
+            {
+                SetToastMessage("Kullanıcı başarıyla silindi", "success");
+            }
+
+            return RedirectToAction(nameof(UserList));
+        }
+
+    }
+}

@@ -1,0 +1,39 @@
+@model WebUI.Models.PaginationInfo
+
+@{
+    int maxVisiblePages = 5;
+    int startPage = Math.Max(1, Model.CurrentPage - (maxVisiblePages / 2));
+    int endPage = Math.Min(Model.TotalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1)
+    {
+        startPage = Math.Max(1, endPage - maxVisiblePages + 1);
+    }
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@string.Format(Model.UrlFormat, Model.CurrentPage - 1)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@string.Format(Model.UrlFormat, i)">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@string.Format(Model.UrlFormat, Model.CurrentPage + 1)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

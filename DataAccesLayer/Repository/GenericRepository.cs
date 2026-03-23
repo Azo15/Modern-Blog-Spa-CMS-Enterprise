@@ -1,8 +1,6 @@
-﻿using DataAccesLayer.Abstract;
 using DataAccesLayer.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using EntityLayer.Concrete;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DataAccesLayer.Repository
@@ -10,43 +8,172 @@ namespace DataAccesLayer.Repository
     public class GenericRepository<T> : IGenericDal<T> where T : class
     {
         private readonly AppDbContext _context;
+        private readonly DbSet<T> _dbSet;
 
         public GenericRepository(AppDbContext context)
         {
             _context = context;
+            _dbSet = _context.Set<T>();
         }
 
-        public void Delete(T t)
+        public async Task<List<T>> TGetListAsync(
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            int? take = null,
+            bool tracking = true,
+            params Expression<Func<T, object>>[] includes)
         {
-            _context.Remove(t);
-            _context.SaveChanges();
+            IQueryable<T> query = _dbSet;
+
+            // Filtre
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // Include işlemleri
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            // Sıralama
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            // Take (kaç adet veri alınacak)
+            if (take.HasValue)
+            {
+                query = query.Take(take.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
-        public T GetByID(int id)
+
+        // ID'ye göre getir + Include destekli
+        public async Task<T> TGetByIDAsync(
+            int id,
+            params Expression<Func<T, object>>[] includes)
         {
-            return _context.Set<T>().Find(id);
+            IQueryable<T> query = _dbSet;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
 
-        public List<T> GetList()
+        public async Task TInsert(T entity)
         {
-            return _context.Set<T>().ToList();
+            if (entity is BaseEntity baseEntity)
+            {
+                baseEntity.UpdatedDate = DateTime.Now;
+                baseEntity.CreatedDate = DateTime.Now;
+            }
+
+            await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public List<T> GetListFiltre(Expression<Func<T, bool>> filter)
+        public async Task TInsertRange(IEnumerable<T> entities)
         {
-            return _context.Set<T>().Where(filter).ToList();
+            foreach (var entity in entities)
+            {
+                if (entity is BaseEntity baseEntity)
+                {
+                    baseEntity.UpdatedDate = DateTime.Now;
+                    baseEntity.CreatedDate = DateTime.Now;
+                }
+            }
+            await _dbSet.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
         }
 
-        public void Insert(T t)
+        public async Task TUpdate(T entity)
         {
-            _context.Add(t);
-            _context.SaveChanges();
+            if (entity is BaseEntity baseEntity)
+            {
+                baseEntity.UpdatedDate = DateTime.Now;
+            }
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(T t)
+        public async Task TUpdateRange(IEnumerable<T> entities)
         {
-            _context.Update(t);
-            _context.SaveChanges();
+            foreach (var entity in entities)
+            {
+                if (entity is BaseEntity baseEntity)
+                {
+                    baseEntity.UpdatedDate = DateTime.Now;
+                }
+            }
+            _dbSet.UpdateRange(entities);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task TDelete(T entity)
+        {
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task TDeleteRange(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<T> TFirstOrDefaultAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool tracking = true, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (!tracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+            // Sıralama
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            return await query?
+                .Where(predicate)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> TAnyAsync(Expression<Func<T, bool>>? filter = null)
+        {
+            if (filter == null)
+            {
+                return await _dbSet.AnyAsync();
+            }
+
+            return await _dbSet.AnyAsync(filter);
+        }
+
+        public IQueryable<T> TGetQueryable()
+        {
+            return _dbSet.AsQueryable();
         }
     }
 }

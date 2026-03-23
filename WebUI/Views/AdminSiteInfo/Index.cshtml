@@ -1,0 +1,145 @@
+﻿@model SiteTable
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>@ViewData["Title"] Formu</h5>
+    </div>
+    <div class="card-body">
+
+
+        <form asp-action="Index" method="post" enctype="multipart/form-data" novalidate>
+
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.Id)
+
+            <input type="hidden" asp-for="@Model.SiteLogo" />
+            <input type="hidden" asp-for="@Model.SocialImage" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <!-- Başlık -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Host" class="form-label"></label>
+                        <input asp-for="Host" class="form-control" />
+                        <span asp-validation-for="Host" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Port" class="form-label"></label>
+                        <input asp-for="Port" class="form-control" />
+                        <span asp-validation-for="Port" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Mail" class="form-label"></label>
+                        <input asp-for="Mail" type="email" class="form-control" />
+                        <span asp-validation-for="Mail" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="SiteTitle" class="form-label"></label>
+                        <input asp-for="SiteTitle" class="form-control" placeholder="Instagram adresinizi giriniz" />
+                        <span asp-validation-for="SiteTitle" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="SiteUrl" class="form-label"></label>
+                        <input asp-for="SiteUrl" class="form-control" placeholder="Instagram adresinizi giriniz" />
+                        <span asp-validation-for="SiteUrl" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="GoogleSearch" class="form-label"></label>
+                        <textarea asp-for="GoogleSearch" class="form-control" rows="6" placeholder="google searach konsoldaki kodu giriniz"></textarea>
+                        <span asp-validation-for="GoogleSearch" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Site Logosu -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="SiteLogo" class="form-label"></label>
+                        <input type="file" name="NewImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" data-preview-target="logoPreview" />
+                        <small class="text-muted">Yeni bir görsel yüklemezseniz mevcut görsel kullanılacaktır.</small>
+                        <div class="mt-2">
+                            @if (!string.IsNullOrEmpty(Model.SiteLogo))
+                            {
+                                <img id="logoPreview" src="~/@Model.SiteLogo" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            }
+                            else
+                            {
+                                <img id="logoPreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Site Sosyal Medya Fotoğrafı -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="SocialImage" class="form-label"></label>
+                        <input type="file" name="NewSocialMediaFile" class="form-control" accept="image/*" onchange="previewImage(this)" data-preview-target="socialPreview" />
+                        <small class="text-muted">Yeni bir görsel yüklemezseniz mevcut görsel kullanılacaktır.</small>
+                        <div class="mt-2">
+                            @if (!string.IsNullOrEmpty(Model.SocialImage))
+                            {
+                                <img id="socialPreview" src="~/@Model.SocialImage" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            }
+                            else
+                            {
+                                <img id="socialPreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">@ViewData["Submit"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var previewId = input.getAttribute('data-preview-target');
+                var previewImg = document.getElementById(previewId);
+                if (!previewImg) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}

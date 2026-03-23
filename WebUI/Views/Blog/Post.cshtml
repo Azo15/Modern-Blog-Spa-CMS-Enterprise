@@ -1,0 +1,70 @@
+@model Blog
+
+@{
+    ViewData["Title"] = "Post";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+<section class="blog-detail-header" style="background-image: url('~/blogImage/@Model.Image')">
+    <div class="container">
+        <div class="blog-detail-category" data-aos="fade-up">
+            Spa & Wellness
+        </div>
+        <h1 class="blog-detail-title font-playfair" data-aos="fade-up" data-aos-delay="100">
+            @Model.Title
+        </h1>
+        <div class="blog-detail-meta" data-aos="fade-up" data-aos-delay="200">
+            <span>
+                <i class="fas fa-calendar-alt"></i>
+                @Model.CreatedDate.ToString("dd MMMM yyyy")
+            </span>
+            <span>
+                <i class="fas fa-user"></i>
+                @Model?.AppUser?.FirstName @Model?.AppUser?.LastName
+            </span>
+            <span>
+                <i class="fas fa-clock"></i>
+                @ViewBag.ReadingTime dk okuma
+            </span>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Content -->
+<section class="blog-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Navigation Buttons -->
+                <div class="blog-navigation" data-aos="fade-up">
+                    <a asp-controller="Blog" asp-action="Index" class="nav-btn back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Tüm Blog Yazıları
+                    </a>
+                </div>
+
+                <div class="blog-content-wrapper" data-aos="fade-up" data-aos-delay="100">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Posts -->
+@if (ViewBag.RelatedBlogs != null)
+{
+    var relatedBlogs = (IEnumerable<Blog>)ViewBag.RelatedBlogs;
+    if (relatedBlogs.Any())
+    {
+        <section class="related-posts">
+            <div class="container">
+                <h2 class="section-title font-playfair" data-aos="fade-up">İlgili Yazılar (@relatedBlogs.First().Catagory?.Title)</h2>
+                
+                <div class="row">
+                    @await Html.PartialAsync("_BlogPartial", relatedBlogs)
+                </div>
+                
+            </div>
+        </section>
+    }
+}

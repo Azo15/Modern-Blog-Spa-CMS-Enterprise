@@ -1,0 +1,40 @@
+﻿@model Catagory
+@{
+    ViewData["Title"] = "Blog Kategorisi Güncelleme";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Blog Kategorisi Güncelleme</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" asp-action="Edit">
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <label asp-for="Title" class="form-label">Kategori Başlığı</label>
+                    <input type="text" asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                </a>
+                <button type="submit" class="btn btn-success">Güncelle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+

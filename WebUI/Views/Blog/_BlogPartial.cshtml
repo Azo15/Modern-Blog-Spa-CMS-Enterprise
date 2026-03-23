@@ -1,0 +1,38 @@
+@model IEnumerable<Blog>
+
+@{
+    int index = 0;
+}
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        int delay = 200 + ((index % 4) * 200);
+        var imgPath = string.IsNullOrEmpty(item.Image) ? "img/default-image.jpg" : item.Image;
+
+        <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="@delay">
+            <div class="blog-card">
+                <a href="/Blog/Post/@item.Id">
+                    <div class="blog-image"
+                         style="background-image: url('@Url.Content("~/" + imgPath)')">
+                        <div class="blog-date">@item?.Catagory?.Title</div>
+                    </div>
+                    <div class="blog-content">
+                        <h3 class="blog-title">@item.Title</h3>
+                        <p class="blog-excerpt">
+                            @item.SubTitle
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="blog-author">
+                                <i class="fas fa-user-circle me-2"></i>
+                                @item?.AppUser?.FullName
+                            </div>
+                            <div>@item.CreatedDate.ToString("dd MMMM yyyy")</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        index++;
+    }
+}

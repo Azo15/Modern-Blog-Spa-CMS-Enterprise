@@ -1,0 +1,262 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), #9b80b7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+.text-danger {
+    color: darkred;
+}
+
+h2, h3 {
+    text-align: center;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.form-group,
+.mb-3 {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px 40px 12px 12px; /* padding-right eklendi göz simgesi için */
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    background: #f8f8f8;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: #fff;
+}
+
+input.input-validation-error {
+    border-color: #e74c3c;
+    background: #fdf2f2;
+}
+
+.field-validation-error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+    button:hover {
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+.alert {
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 15px;
+}
+
+    .form-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #333;
+}
+
+@media (max-width: 480px) {
+    .container {
+        margin: 0 20px;
+    }
+}
+
+/* Modern Spinner Stilleri */
+.modern-spinner {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 30px;
+}
+
+.spinner-ring {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 6px solid transparent;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+    .spinner-ring:nth-child(1) {
+        animation-delay: -0.45s;
+        border-top-color: #667eea;
+    }
+
+    .spinner-ring:nth-child(2) {
+        animation-delay: -0.3s;
+        border-top-color: #764ba2;
+    }
+
+    .spinner-ring:nth-child(3) {
+        animation-delay: -0.15s;
+        border-top-color: #9b80b7;
+    }
+
+    .spinner-ring:nth-child(4) {
+        border-top-color: #667eea;
+        opacity: 0.6;
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Countdown Stilleri */
+.countdown-container {
+    text-align: center;
+}
+
+.countdown-number {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #667eea;
+    line-height: 1;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.countdown-label {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.me-2 {
+    margin-inline-end: 6px;
+}
+
+.modelErrorText {
+    color: red;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.exitSignUp {
+    margin: 10px auto 0;
+    text-decoration: none;
+}
+
+    .exitSignUp:active {
+        color: #000000;
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive tasarım */
+@media (max-width: 480px) {
+    .countdown-number {
+        font-size: 3rem;
+    }
+
+    .countdown-label {
+        font-size: 1rem;
+    }
+
+    .modern-spinner {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 20px;
+    }
+
+    .spinner-ring {
+        width: 48px;
+        height: 48px;
+        margin: 6px;
+        border-width: 4px;
+    }
+}

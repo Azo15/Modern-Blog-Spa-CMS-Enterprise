@@ -1,0 +1,42 @@
+﻿@model List<Galary>
+@{
+    int delay = 200;
+    int delayIncrement = 200;
+}
+
+<section class="section section-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="section-title font-playfair" data-aos="fade-up">Galeri</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Spa merkezimizden görüntüler
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="@delay">
+                    <div class="gallery-item">
+                        <a href="/@item.Image" data-fancybox="gallery" data-caption="@item.Title">
+                            <img src="/@item.Image" alt="@item.Title">
+                            <div class="gallery-overlay">
+                                <p>@item.Title</p>
+                                <i class="fas fa-search-plus"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                delay += delayIncrement;
+            }
+
+            <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="@delay">
+                <a class="btn btn-primary-custom" href="/Galary/Index">
+                    Tüm Galeriyi Görüntüle
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

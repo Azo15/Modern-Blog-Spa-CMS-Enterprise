@@ -1,0 +1,40 @@
+﻿@model List<Galary>
+@{
+    ViewData["Title"] = "Galeri";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Yüklenen Resimler</h2>
+    <a asp-action="Create" asp-controller="AdminGalary" class="btn btn-outline-primary">Galeriye Ekle</a>
+</div>
+
+<p>@ViewBag.galaryCount adet resim yüklendi.</p>
+
+<form asp-action="Delete" method="post">
+
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+            <div class="col-md-2 mb-4">
+                <div class="card h-100 position-relative">
+                    <img src="~/@item.Image" class="card-img-top aspect-ratioImg" alt="Resim">
+                    <div class="card-body pt-2 px-2 pb-0 text-center">
+                        <p>@item.Title</p>
+                        <div class="form-check d-inline-block">
+                            <input class="form-check-input" type="checkbox" name="ids" value="@item.Id" id="checkbox-@item.Id">
+                            <label class="form-check-label small" for="checkbox-@item.Id">Seç</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-end mt-3">
+        <button type="submit" class="btn btn-danger">Seçilenleri Sil</button>
+    </div>
+</form>

@@ -1,0 +1,39 @@
+﻿<meta charset="utf-8" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+<title>@ViewData["Title"] | XSpa</title>
+
+<script>
+    // Sayfa yüklenmeden önce temayı uygula
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+</script>
+
+<meta name="description" content="" />
+
+<link rel="icon" type="image/x-icon" href="~/admin/favicon.ico" />
+
+<link rel="stylesheet" href="~/admin/vendor/google-font/google-font.css"/>
+
+<!-- İcon CSS (EKLENMELİ) -->
+<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+
+<!-- Thema CSS (EKLENMELİ) -->
+<link rel="stylesheet" href="~/admin/vendor/css/core.css" /> <!-- Tema core CSS -->
+<link rel="stylesheet" href="~/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+<link rel="stylesheet" href="~/admin/vendor/libs/apex-charts/apex-charts.css" />
+
+<!-- Taos CSS (EKLENMELİ) -->
+<link href="~/css/taos/toastr.min.css" rel="stylesheet" />
+
+<!-- Dropzone CSS -->
+<link href="~/admin/css/dropzone.min.css" rel="stylesheet" />
+
+<!-- jQuery UI CSS (EKLENMELİ) -->
+<link rel="stylesheet" href="~/admin/vendor/jquery/jquery-ui.min.css" />
+
+<link rel="stylesheet" href="~/admin/css/demo.css" /> <!-- Genel sonradan eklenenler-->
+
+<script src="~/admin/vendor/js/helpers.js"></script>
+<script src="~/admin/js/config.js"></script>

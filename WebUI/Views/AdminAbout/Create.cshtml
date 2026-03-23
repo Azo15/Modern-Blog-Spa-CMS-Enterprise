@@ -1,0 +1,88 @@
+﻿@model About
+
+@{
+    ViewData["Title"] = "Hakkımızda Oluşturma";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Hakkımızda Ekleme Formu</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" asp-action="Create">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="CardTitle1" class="form-label"></label>
+                        <input asp-for="CardTitle1" class="form-control" />
+                        <span asp-validation-for="CardTitle1" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="CardTitle2" class="form-label"></label>
+                        <input asp-for="CardTitle2" class="form-control" />
+                        <span asp-validation-for="CardTitle2" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="CardContent1" class="form-label"></label>
+                        <textarea asp-for="CardContent1" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="CardContent1" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="CardContent2" class="form-label"></label>
+                        <textarea asp-for="CardContent2" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="CardContent2" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Görsel -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">Görsel</label>
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
+                        <div class="mt-2">
+                            <img id="imagePreview" src="@Url.Content("~/img/default-image.jpg")" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="Title" class="form-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label asp-for="Content" class="form-label"></label>
+                        <textarea asp-for="Content" class="form-control" id="tinymce"></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+﻿@model Service
+@{
+    ViewData["Title"] = "DestinationDetails";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<div class="row w-100 d-flex justify-content-center mb-3">
+    <div class="col-sm-5 mt-3">
+        <div class="card">
+            <div class="card-body">
+                <img class="w-100" sty=ServicDetailsImage src="~/uploads/@Model.Image" />
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-5 mt-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center">@Model.Title</h5>
+                <p class="card-text">@Html.Raw(Model.Content)</p>
+            </div>
+        </div>
+    </div>
+</div>
+@await Component.InvokeAsync("_RezervasyonButton")

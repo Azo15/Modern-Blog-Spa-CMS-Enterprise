@@ -1,17 +1,31 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class AppUser: IdentityUser<int>
+    public class AppUser : IdentityUser<int>
     {
-        public string name { get; set; }
-        public string surname { get; set; }
+        [Display(Name = "Ad")]
+        public string? FirstName { get; set; }
 
-        public ICollection<Blog> Blogs { get; set; }
+        [Display(Name = "Soyad")]
+        public string? LastName { get; set; }
+
+        [Display(Name = "Ad Soyad")]
+        public string? FullName => $"{FirstName} {LastName}";
+
+        [Display(Name = "Profil Fotoğrafı")]
+        public string? Image { get; set; }
+
+        [Display(Name = "Aktiflik Durumu")]
+        public bool IsActive { get; set; } = true;
+
+        public int FailedLoginCount { get; set; }
+
+        public DateTime? LastFailedLogin { get; set; }
+
+        // Navigation property
+        [Display(Name = "Bloglar")]
+        public ICollection<Blog>? Blogs { get; set; }
     }
 }

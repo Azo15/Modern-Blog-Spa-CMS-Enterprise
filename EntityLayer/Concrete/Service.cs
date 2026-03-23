@@ -1,23 +1,22 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
-    public class Service
+    public class Service : BaseEntity
     {
-        [Key]
-        public int ServiceID { get; set; }
-        public string ServiceName { get; set; }
-        public string ServiceDescription { get; set; }
-        public string ServiceDetails { get; set; }
-        public string ImgUrl { get; set; }
-        public DateTime ServiceDate { get; set; }
+        [Display(Name = "Servis Adı")]
+        public string? Title { get; set; }
+
+        [Display(Name = "Servis Fiyatı")]
+        public string? Content { get; set; }
+
+        [Display(Name = "Servis Detayları")]
+        public string? Details { get; set; }
+
+        [Display(Name = "Servis Fotoğrafı")]
+        public string? Image { get; set; }
+
+        [Display(Name = "Öne Çıkma")]
+        public bool Prominence { get; set; }
     }
 }

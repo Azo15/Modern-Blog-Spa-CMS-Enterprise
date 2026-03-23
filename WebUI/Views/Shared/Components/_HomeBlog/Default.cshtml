@@ -1,0 +1,18 @@
+﻿@model List<Blog>
+
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="section-title font-playfair text-white" data-aos="fade-up">Son Blog Yazıları</h2>
+                <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
+                    Sağlık ve güzellik hakkında faydalı bilgiler
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            @await Html.PartialAsync("~/Views/Blog/_BlogPartial.cshtml", Model)
+        </div>
+    </div>
+</section>
