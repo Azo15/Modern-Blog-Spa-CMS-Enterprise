@@ -161,6 +161,30 @@ namespace DataAccesLayer.Repository
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<T> TLastOrDefaultAsync(
+            Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            bool tracking = true,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (!tracking)
+                query = query.AsNoTracking();
+
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            if (orderBy != null)
+                query = orderBy(query);
+
+            return await query.LastOrDefaultAsync();
+        }
+
         public async Task<bool> TAnyAsync(Expression<Func<T, bool>>? filter = null)
         {
             if (filter == null)

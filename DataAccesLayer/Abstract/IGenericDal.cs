@@ -18,6 +18,11 @@ public interface IGenericDal<T> where T : class
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
         bool tracking = true,
         params Expression<Func<T, object>>[] includes);
+    Task<T> TLastOrDefaultAsync(
+        Expression<Func<T, bool>>? predicate = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+        bool tracking = true,
+        params Expression<Func<T, object>>[] includes);
 
     Task<bool> TAnyAsync(Expression<Func<T, bool>>? filter = null);
 

@@ -1,4 +1,4 @@
-﻿using EntityLayer.Concrete;
+using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +81,59 @@ namespace DataAccesLayer.Concrete
                 .WithMany(c => c.Blogs)
                 .HasForeignKey(b => b.CatagoryId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // =============================
+            // 📌 GLOBAL QUERY FILTERS (SOFT DELETE)
+            // =============================
+            modelBuilder.Entity<About>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<AboutCard>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Slider>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Service>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Contact>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ContactForm>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Galary>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<SiteTable>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Blog>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Catagory>().HasQueryFilter(e => !e.IsDeleted);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            ApplyAuditInformation();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override int SaveChanges()
+        {
+            ApplyAuditInformation();
+            return base.SaveChanges();
+        }
+
+        private void ApplyAuditInformation()
+        {
+            var entries = ChangeTracker.Entries<BaseEntity>();
+
+            foreach (var entry in entries)
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedDate = DateTime.Now;
+                        entry.Entity.IsDeleted = false;
+                        break;
+
+                    case EntityState.Modified:
+                        entry.Entity.UpdatedDate = DateTime.Now;
+                        break;
+
+                    case EntityState.Deleted:
+                        // Soft Delete dönüşümü
+                        entry.State = EntityState.Modified;
+                        entry.Entity.IsDeleted = true;
+                        entry.Entity.DeletedDate = DateTime.Now;
+                        break;
+                }
+            }
         }
     }
 }
