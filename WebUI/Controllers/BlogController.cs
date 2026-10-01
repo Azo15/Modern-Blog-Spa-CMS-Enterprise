@@ -1,7 +1,9 @@
 
 using BusinessLayer.Abstract;
+using BusinessLayer.CQRS.Queries;
 using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,31 +18,29 @@ namespace WebUI.Controllers
     [Route("yapilan-isler")]
     public class BlogController : Controller
     {
-
-        private readonly AppDbContext _context;
         private readonly IBlogService _blogService;
+        private readonly IMediator _mediator;
 
-        public BlogController(AppDbContext context, IBlogService blogService)
+        public BlogController(IBlogService blogService, IMediator mediator)
         {
-            _context = context;
             _blogService = blogService;
+            _mediator = mediator;
         }
 
         [HttpGet("")]
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 20;
-            var query = _blogService.GetQueryable();
+            
+            // 📌 CQRS MediatR Query Kullanımı
+            var allBlogs = await _mediator.Send(new GetAllBlogsQuery());
 
-            int totalItems = await query.CountAsync();
+            int totalItems = allBlogs.Count;
 
-            var data = await query
-                .Include(x => x.AppUser)
-                .Include(x => x.Catagory)
-                .OrderByDescending(b => b.CreatedDate)
+            var data = allBlogs
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
 
             ViewBag.TotalBlogs = totalItems;
 
@@ -75,12 +75,12 @@ namespace WebUI.Controllers
                 return NotFound();
             }
 
-            var relatedBlogs = await _blogService.GetListAsync(
-                filter: x => x.CatagoryId == blog.CatagoryId && x.Id != blog.Id && x.IsPublish == true,
-                orderBy: q => q.OrderByDescending(b => b.CreatedDate),
-                take: 4,
-                includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
-            );
+            // 📌 CQRS MediatR Query Kullanımı (Kategoriye Göre İlgili Bloglar)
+            var categoryBlogs = await _mediator.Send(new GetAllBlogsQuery(blog.CatagoryId));
+            var relatedBlogs = categoryBlogs
+                .Where(x => x.Id != blog.Id)
+                .Take(4)
+                .ToList();
 
             ViewBag.RelatedBlogs = relatedBlogs;
 
