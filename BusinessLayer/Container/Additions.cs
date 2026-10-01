@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using DataAccesLayer.Abstract;
 using DataAccesLayer.EntityFramework;
@@ -44,6 +44,12 @@ namespace BusinessLayer.Container
 
             services.AddScoped<IServiceDal, EFServiceDal>();
             services.AddScoped<IServiceService, ServiceManager>();
+
+            // 📌 Distributed Cache Servisi
+            services.AddScoped<ICacheService, CacheManager>();
+
+            // 📌 MediatR CQRS Entegrasyonu
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Additions).Assembly));
         }
     }
 }
