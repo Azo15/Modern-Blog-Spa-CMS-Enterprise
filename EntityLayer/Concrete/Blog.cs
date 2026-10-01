@@ -13,9 +13,9 @@ namespace EntityLayer.Concrete
 
         [Display(Name = "İçerik")]
         public string? Content { get; set; }
-        
-        //[Display(Name = "Slug")]
-        //public string? Slug { get; set; }
+
+        [Display(Name = "Slug")]
+        public string? Slug { get; set; }
 
         [Display(Name = "Fotoğraf")]
         public string? Image { get; set; }
