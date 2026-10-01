@@ -1,0 +1,62 @@
+@model List<WebUI.Models.UserRoleAssignViewModel>
+
+@{
+    ViewData["Title"] = "Rol Atama";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-user-gear me-2"></i>Kullanıcı Rol Yönetimi: <span class="text-primary">@ViewBag.UserName</span>
+                </h5>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Listeye Dön
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Kullanıcıya atanmasını istediğiniz rollerin kutularını işaretleyin ve değişiklikleri kaydedin.</p>
+                <form asp-action="AssignRole" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" value="@ViewBag.UserId" />
+
+                    <div class="list-group mb-4">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            string roleBadge = Model[i].RoleName switch
+                            {
+                                "System Admin" => "bg-danger",
+                                "Content Manager" => "bg-primary",
+                                "Author" => "bg-info",
+                                "Moderator" => "bg-warning text-dark",
+                                "Registered User" => "bg-success",
+                                _ => "bg-secondary"
+                            };
+
+                            <label class="list-group-item d-flex justify-content-between align-items-center cursor-pointer">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input me-2" type="checkbox" asp-for="@Model[i].RoleExist" id="role_@i" />
+                                    <input type="hidden" asp-for="@Model[i].RoleId" />
+                                    <input type="hidden" asp-for="@Model[i].RoleName" />
+                                    <strong class="form-check-label" for="role_@i">
+                                        @Model[i].RoleName
+                                    </strong>
+                                </div>
+                                <span class="badge @roleBadge">@Model[i].RoleName</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk me-1"></i>Rolleri Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
