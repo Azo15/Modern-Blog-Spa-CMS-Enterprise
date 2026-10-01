@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: modern_blog_webui
+    ports:
+      - "5157:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=xspa_db;User Id=sa;Password=Your_password123!;TrustServerCertificate=True;
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - sqlserver
+      - redis
+    restart: always
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: modern_blog_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Your_password123!
+    ports:
+      - "1433:1433"
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: modern_blog_redis
+    ports:
+      - "6379:6379"
+    restart: always
