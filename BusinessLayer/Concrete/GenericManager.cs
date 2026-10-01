@@ -71,6 +71,15 @@ namespace BusinessLayer.Concrete
             return await _genericDal.TFirstOrDefaultAsync(predicate, orderBy, tracking, includes);
         }
 
+        public async Task<T> LastOrDefaultAsync(
+           Expression<Func<T, bool>>? predicate = null,
+           Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+           bool tracking = true,
+           params Expression<Func<T, object>>[] includes)
+        {
+            return await _genericDal.TLastOrDefaultAsync(predicate, orderBy, tracking, includes);
+        }
+
         public IQueryable<T> GetQueryable()
         {
             return _genericDal.TGetQueryable();

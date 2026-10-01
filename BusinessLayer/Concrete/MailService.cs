@@ -36,7 +36,7 @@ namespace BusinessLayer.Concrete
             var emailMessage = new MimeMessage();
 
             // Gönderen
-            emailMessage.From.Add(new MailboxAddress("Askar Profile İletişim", smtpInfo.Mail));
+            emailMessage.From.Add(new MailboxAddress("XSpa İletişim", smtpInfo.Mail));
 
             // Alıcı
             emailMessage.To.Add(MailboxAddress.Parse(smtpInfo.Mail));
@@ -129,7 +129,7 @@ namespace BusinessLayer.Concrete
                 <body>
                     <div class=""email-wrapper"">
                         <div class=""email-header"">
-                            <img src=""https://askarprofilo.netlify.app/img/logo.png"" alt=""Logo"">
+                            <img src=""https://drive.google.com/drive/u/0/home/logo.png"" alt=""Logo"">
                         </div>
                         <div class=""email-body"">
                             <h2>Rezervasyon Mesajı</h2>

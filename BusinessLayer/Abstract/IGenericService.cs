@@ -30,5 +30,11 @@ namespace BusinessLayer.Abstract
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             bool tracking = true,
             params Expression<Func<T, object>>[] includes);
+
+        Task<T> LastOrDefaultAsync(
+           Expression<Func<T, bool>>? predicate = null,
+           Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+           bool tracking = true,
+           params Expression<Func<T, object>>[] includes);
     }
 }
