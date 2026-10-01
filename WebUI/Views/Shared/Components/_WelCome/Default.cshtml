@@ -17,8 +17,8 @@
                                         <h1 class="hero-title font-playfair">@item.Title</h1>
                                         <p class="hero-subtitle">@Html.Raw(item.Content)</p>
                                         <div class="mt-4">
-                                            <a class="btn btn-primary-custom me-3" href="/Service/Index">Hizmetlerimizi Keşfedin</a>
-                                            <a class="btn btn-outline-custom" href="tel:+@ViewBag.Phone">Randevu Alın</a>
+                                            <a class="btn btn-primary-custom me-3" asp-controller="Service" asp-action="Index">Hizmetlerimizi Keşfedin</a>
+                                            <a class="btn btn-outline-custom" asp-controller="Contact" asp-action="Index">Bize Ulaş</a>
                                         </div>
                                     </div>
                                 </div>

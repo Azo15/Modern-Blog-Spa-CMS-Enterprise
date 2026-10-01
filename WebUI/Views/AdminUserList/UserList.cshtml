@@ -7,51 +7,58 @@
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Admin Listesi</h5>
-        <a asp-controller="dashboard" asp-action="signUp" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Admin Ekle</a>
-    </div>
+        <h5 class="card-header">@ViewData["Title"]</h5>
+        <a asp-controller="dashboard" asp-action="signUp" class="btn btn-outline-primary"><i
+            class="fa-solid fa-plus me-md-2"></i>Admin Ekle</a>
+        </div>
 
-    <div class="table-responsive text-nowrap">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.FullName)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Image)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Email)
-                    </th>
-                    <th>Eylemler</th>
-                </tr>
-            </thead>
-
-            <tbody class="table-border-bottom-0">
-                @foreach (var item in Model)
-                {
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover">
+                <thead>
                     <tr>
-                        <td>@sayac</td>
-                        <td>@item.FullName</td>
-                        <td>
-                            <img src="~/img/admin/@item.Id" class="img-fluid profilImage" alt="profil fotoğrafı" />
-                        </td>
-                        <td>@item.Email</td>
-                        <td>
-                            <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
-                                <i class="fa-solid fa-trash me-1"></i> Sil
-                            </a>
-                        </td>
+                        <th>#</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.FullName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Image)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Email)
+                        </th>
+                        <th>Eylemler</th>
                     </tr>
-                    sayac++;
-                }
-            </tbody>
-        </table>
-        <hr class="mt-0" />
-        <div class="px-5">
-            <p><small>Tabloda</small><span class="mx-2">@ViewBag.Count</span><small>adet admin var</small></p>
+                </thead>
+
+                <tbody class="table-border-bottom-0">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@sayac</td>
+                            <td>@item.FullName</td>
+                            <td>
+                                <img src="~/img/admin/@item.Id" class="img-fluid profilImage" alt="profil fotoğrafı" />
+                            </td>
+                            <td>@item.Email</td>
+                            <td>
+                                <form asp-controller="AdminUserList" asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                      onsubmit="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa-solid fa-trash me-1"></i> Sil
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        sayac++;
+                    }
+                </tbody>
+            </table>
+            <hr class="mt-0" />
+            <div class="px-5">
+                <p><small>Tabloda</small><span class="mx-2">@ViewBag.Count</span><small>adet admin var</small></p>
+            </div>
         </div>
     </div>
-</div>

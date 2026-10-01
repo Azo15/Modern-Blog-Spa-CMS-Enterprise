@@ -2,8 +2,10 @@
 
 <html lang="tr">
 
-@await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
+<head>
+    @await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
     @await RenderSectionAsync("Styles", required: false)
+</head>
 
 <body>
 

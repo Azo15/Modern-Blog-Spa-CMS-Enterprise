@@ -5,11 +5,15 @@ using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
+using WebUI.Helpers;
+using WebUI.Models;
 
 namespace WebUI.Controllers
 {
     [AllowAnonymous]
+    [Route("yapilan-isler")]
     public class BlogController : Controller
     {
 
@@ -22,6 +26,7 @@ namespace WebUI.Controllers
             _blogService = blogService;
         }
 
+        [HttpGet("")]
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 20;
@@ -38,28 +43,29 @@ namespace WebUI.Controllers
                 .ToListAsync();
 
             ViewBag.TotalBlogs = totalItems;
-            
-            ViewBag.PaginationInfo = new WebUI.Models.PaginationInfo
+
+            ViewBag.PaginationInfo = new PaginationInfo
             {
                 CurrentPage = page,
                 ItemsPerPage = pageSize,
                 TotalItems = totalItems,
-                UrlFormat = "/Blog?page={0}"
+                Controller = "Blog",
+                Action = "Index"
             };
 
             return View(data);
-
         }
 
-        public async Task<IActionResult> Post(int? id)
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> Post(string slug)
         {
-            if (id == null || id <= 0)
+            if (slug.IsNullOrEmpty())
             {
                 return NotFound();
             }
 
             var blog = await _blogService.FirstOrDefaultAsync(
-                predicate: b => b.Id == id,
+                predicate: b => b.Slug == slug,
                 orderBy: null,
                 includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
             );
@@ -75,7 +81,7 @@ namespace WebUI.Controllers
                 take: 4,
                 includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
             );
-            
+
             ViewBag.RelatedBlogs = relatedBlogs;
 
             ViewBag.ReadingTime = BlogUtils.CalculateReadingTime(blog.Content);
@@ -83,7 +89,7 @@ namespace WebUI.Controllers
             return View(blog);
         }
 
-        
+
         // YArdımcı metotlar okunma süresi hesalama
 
         public static class BlogUtils
@@ -102,6 +108,5 @@ namespace WebUI.Controllers
                 return (int)Math.Ceiling((double)wordCount / wordsPerMinute);
             }
         }
-
     }
 }

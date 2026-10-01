@@ -6,6 +6,7 @@ namespace WebUI.Controllers
 {
 
     [AllowAnonymous]
+    [Route("gorsel-galerisi")]
     public class GalaryController : Controller
     {
         private readonly IGalaryService _galaryService;

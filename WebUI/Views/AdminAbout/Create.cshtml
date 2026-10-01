@@ -1,13 +1,13 @@
 ﻿@model About
 
 @{
-    ViewData["Title"] = "Hakkımızda Oluşturma";
+    ViewData["Title"] = "Hakkımızda Bilgisi Oluşturma";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="card">
     <div class="card-header">
-        <h5>Hakkımızda Ekleme Formu</h5>
+        <h5>@ViewData["Title"]</h5>
     </div>
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" asp-action="Create">
@@ -55,7 +55,7 @@
                         <label class="form-label">Görsel</label>
                         <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
                         <div class="mt-2">
-                            <img id="imagePreview" src="@Url.Content("~/img/default-image.jpg")" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            <img id="imagePreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
                         </div>
                     </div>
                 </div>

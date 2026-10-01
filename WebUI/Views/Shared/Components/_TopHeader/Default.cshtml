@@ -50,7 +50,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item" asp-controller="SiteInfo" asp-action="Index">
+                            <a class="dropdown-item" asp-controller="AdminSiteInfo" asp-action="Index">
                                 <i class="fa-solid fa-gear icon-md me-3"></i><span>Ayarlar</span>
                             </a>
                         </li>
@@ -60,7 +60,7 @@
                         <li>
                             <form method="post" asp-controller="dashboard" asp-action="logout">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="dropdown-item">
+                                <button type="submit" class="dropdown-item exit-button">
                                     <i class="fa-solid fa-right-from-bracket icon-md me-3"></i><span>Çıkış Yap</span>
                                 </button>
                             </form>

@@ -474,3 +474,13 @@ table .sortable-placeholder td {
 .dz-preview {
     background: var(--bs-menu-active-bg) !important;
 }
+
+.exit-button {
+    width: 94%;
+    margin: auto;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+.exit-button:hover {
+    background-color: #ff0000a9;
+}

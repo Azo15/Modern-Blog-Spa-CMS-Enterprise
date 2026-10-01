@@ -60,8 +60,8 @@
             <div class="container">
                 <h2 class="section-title font-playfair" data-aos="fade-up">İlgili Yazılar (@relatedBlogs.First().Catagory?.Title)</h2>
                 
-                <div class="row">
-                    @await Html.PartialAsync("_BlogPartial", relatedBlogs)
+                <div class="row g-3">
+                    @await Html.PartialAsync("_BlogCardPartial", relatedBlogs)
                 </div>
                 
             </div>

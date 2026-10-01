@@ -1,0 +1,21 @@
+﻿@model List<Galary>
+@{
+    int delay = 200;
+    int delayIncrement = 200;
+}
+
+<div class="row g-3">
+    @foreach (var item in Model)
+    {
+        <div class="col-6 col-lg-4 col-xl-3 mb-3" data-aos="fade-up" data-aos-delay="@delay">
+            <a href="/@item.Image" class="gallery-item" data-fancybox="gallery" data-caption="@item.Title">
+                <img src="/@item.Image" alt="Spa Görseli">
+                <div class="gallery-overlay">
+                    <p class="d-block">@item.Title</p>
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </a>
+        </div>
+        delay += delayIncrement;
+    }
+</div>

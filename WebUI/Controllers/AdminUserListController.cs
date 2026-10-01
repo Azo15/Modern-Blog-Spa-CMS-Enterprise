@@ -32,7 +32,6 @@ namespace WebUI.Controllers
             }
 
             var users = await _userManager.Users
-                .Where(u => u.Id != currentUser.Id) // Giriş yapan hariç
                 .Select(u => new UserListViewModel
                 {
                     Id = u.Id.ToString(),
@@ -49,7 +48,7 @@ namespace WebUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -59,13 +58,13 @@ namespace WebUI.Controllers
                 return RedirectToAction("Index", "Dashboard");
             }
 
-            if (id == currentUser.Id.ToString())
+            if (id == currentUser.Id)
             {
-                SetToastMessage("Kendi hesabınızı silemezsiniz.", "error");
+                SetToastMessage("Güvenlik nedeniyle kendi hesabınızı silemezsiniz.", "warning");
                 return RedirectToAction(nameof(UserList));
             }
 
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
                 SetToastMessage("Kullanıcı bulunamadı", "error");

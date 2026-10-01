@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<Contact>
 
 @{
-    ViewData["Title"] = "İletişim Bilgileri";
+    ViewData["Title"] = "İletişim Bilgisi Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">İletişim Bilgileri</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
         @if (Model.Count() < 1)
         {
             <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Bilgi Ekle</a>

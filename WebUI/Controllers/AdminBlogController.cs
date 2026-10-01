@@ -1,3 +1,4 @@
+using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.Dtos;
 using EntityLayer.Concrete;
@@ -6,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using AutoMapper;
 using WebUI.Models;
+using static WebUI.Helpers.GlobalHelper;
 
 namespace WebUI.Controllers
 {
@@ -64,7 +65,9 @@ namespace WebUI.Controllers
                 return View(model);
             }
 
+            model.Slug = ToSlug(model.Title);
             var blog = _mapper.Map<Blog>(model);
+
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             blog.AppUserId = userId;
 
@@ -109,6 +112,7 @@ namespace WebUI.Controllers
                 var existingBlog = await _blogService.GetByIDAsync(id);
                 if (existingBlog == null) return NotFound();
 
+                model.Slug = ToSlug(model.Title);
                 _mapper.Map(model, existingBlog);
 
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));

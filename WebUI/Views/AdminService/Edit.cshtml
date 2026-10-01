@@ -1,14 +1,14 @@
 ﻿@model Service
 
 @{
-    ViewData["Title"] = "Hizmet Güncelle";
+    ViewData["Title"] = "Hizmet Güncelleme";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="card">
     <form method="post" enctype="multipart/form-data" asp-action="Edit">
         <div class="card-header d-flex justify-content-between">
-            <h5>Hakkımızda Ekleme Formu</h5>
+            <h5>@ViewData["Title"]</h5>
 
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" asp-for="Prominence">

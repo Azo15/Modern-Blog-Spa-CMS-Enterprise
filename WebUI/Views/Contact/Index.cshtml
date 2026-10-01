@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_UILayout.cshtml";
 }
 
-<div id="contact" >
+<div id="contact">
     <section class="section">
         <div class="container">
             <div class="row">
@@ -14,6 +14,42 @@
                     <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
                         Bizimle iletişime geçin ve randevunuzu alın
                     </p>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <a href="https://maps.google.com/?q=@Model?.Contact?.Adres" target="_blank" class="text-decoration-none">
+                        <div class="contact-info-card glass p-4 text-center text-white">
+                            <div class="service-icon mb-3">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h4>Adres</h4>
+                            <p>@Model?.Contact?.Adres</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <a href="tel:@Model?.Contact?.Phone" class="text-decoration-none">
+                        <div class="contact-info-card glass p-4 text-center text-white">
+                            <div class="service-icon mb-3">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <h4>Telefon</h4>
+                            <p>@Model?.Contact?.Phone</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                    <a href="mailto:@Model?.Contact?.Mail" class="text-decoration-none">
+                        <div class="contact-info-card glass p-4 text-center text-white">
+                            <div class="service-icon mb-3">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <h4>E-Posta Bilgisi</h4>
+                            <p>@Model?.Contact?.Mail</p>
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -74,37 +110,6 @@
                 </div>
             </div>
 
-            <div class="row mt-5">
-                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="glass p-4 text-center text-white">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h4>Adres</h4>
-                        <p>Atatürk Caddesi No:123<br>Beşiktaş, İstanbul</p>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="glass p-4 text-center text-white">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <h4>Telefon</h4>
-                        <p>+90 212 555 0123<br>+90 532 555 0123</p>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
-                    <div class="glass p-4 text-center text-white">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h4>Çalışma Saatleri</h4>
-                        <p>Pazartesi - Cumartesi<br>09:00 - 21:00</p>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 </div>

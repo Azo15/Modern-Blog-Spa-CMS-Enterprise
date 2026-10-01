@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebUI.Controllers
 {
     [AllowAnonymous]
+    [Route("hakkimizda")]
     public class AboutController : Controller
     {
         private readonly IAboutService _aboutService;

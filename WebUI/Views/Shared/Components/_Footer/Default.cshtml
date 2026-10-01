@@ -24,11 +24,11 @@
 
             <div class="col-lg-2 col-md-6 mb-4">
                 <h4 class="footer-title">Hızlı Linkler</h4>
-                <a href="/Default" class="footer-link">Ana Sayfa</a>
-                <a href="/About" class="footer-link">Hakkımızda</a>
-                <a href="/Service" class="footer-link">Hizmetlerimiz</a>
-                <a href="/Blog" class="footer-link">Blog</a>
-                <a href="/Contact" class="footer-link">İletişim</a>
+                <a asp-controller="Default" class="footer-link">Ana Sayfa</a>
+                <a asp-controller="About" class="footer-link">Hakkımızda</a>
+                <a asp-controller="Service" class="footer-link">Hizmetlerimiz</a>
+                <a asp-controller="Blog" class="footer-link">Blog</a>
+                <a asp-controller="Contact" class="footer-link">İletişim</a>
             </div>
 
             <div class="col-lg-3 col-md-6 mb-4">
@@ -37,7 +37,7 @@
                 {
                     @foreach (var item in Model.Services)
                     {
-                        <a href="/Service/serviceDetails/@item.Id" class="footer-link">@item.Title</a>
+                        <span class="footer-link">@item.Title</span>
                     }
                 }
             </div>

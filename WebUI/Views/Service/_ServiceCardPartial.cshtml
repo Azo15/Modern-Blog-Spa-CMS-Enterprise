@@ -1,0 +1,28 @@
+@model IEnumerable<Service>
+@{
+    int index = 0;
+}
+@foreach (var item in Model)
+{
+    int delay = 200 + ((index % 4) * 200);
+    var details = item.Details?.Length > 120 ? item.Details.Substring(0, 120) + "..." : item.Details;
+
+    <div class="col-6 col-lg-4 col-xl-3 mb-4" data-aos="fade-up" data-aos-delay="@delay">
+        <div class="service-card">
+            <div class="service-card-header">
+                <img src="~/@item.Image" class="service-card-img" alt="@item.Title" />
+            </div>
+            <div class="service-card-body">
+                <h3 class="service-title">@item.Title</h3>
+                <p class="service-description">@Html.Raw(details)</p>
+                <div class="service-footer">
+                    <span class="service-price">@item.Content</span>
+                    @* <a asp-controller="Service" asp-action="Detail" asp-route-id="@item.Id" class="service-link">
+                        İncele <i class="fas fa-arrow-right"></i>
+                    </a> *@
+                </div>
+            </div>
+        </div>
+    </div>
+    index++;
+}

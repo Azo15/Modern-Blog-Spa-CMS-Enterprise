@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ContactForm>
 
 @{
-    ViewData["Title"] = "Rezervasyon Listesi";
+    ViewData["Title"] = "Gelen Mesaj Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -12,7 +12,7 @@
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Rezervasyonlar</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
     </div>
 
     <div class="table-responsive text-nowrap">
@@ -30,7 +30,7 @@
                         @Html.DisplayNameFor(model => model.Subject)
                     </th>
                     <th>
-                        Bekleme Süresi
+                        Gönderilme Tarihi
                     </th>
                     <th>Eylemler</th>
                 </tr>
@@ -43,13 +43,7 @@
                         <td>@item.FullName</td>
                         <td>@item.Email</td>
                         <td>@item.Subject</td>
-                        <td data-created-date="@item.CreatedDate.ToString("o")">
-                            @* ISO 8601 formatında tarih *@
-                            <div class="reservation-timer-container">
-                                <div class="reservation-timer-progress" style="width: 0%; background-position: 0%;"></div>
-                                <span class="reservation-timer-text">Yükleniyor...</span>
-                            </div>
-                        </td>
+                        <td>@item.CreatedDate.ToString("dd MMMM yyyy HH:mm")</td>
                         <td>
                             <div class="dropdown">
                                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">

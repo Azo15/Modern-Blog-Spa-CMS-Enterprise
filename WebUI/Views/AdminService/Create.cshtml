@@ -1,7 +1,7 @@
 ﻿@model Service
 
 @{
-    ViewData["Title"] = "Hizmet Ekleme";
+    ViewData["Title"] = "Hizmet Oluşturma";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -9,7 +9,7 @@
     <form method="post" enctype="multipart/form-data" asp-action="Create">
 
         <div class="card-header d-flex justify-content-between">
-            <h5>Hakkımızda Ekleme Formu</h5>
+            <h5>@ViewData["Title"]</h5>
 
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" asp-for="Prominence">
@@ -56,7 +56,7 @@
                         <label class="form-label">Görsel</label>
                         <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
                         <div class="mt-2">
-                            <img id="imagePreview" src="@Url.Content("~/img/default-image.jpg")" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            <img id="imagePreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
                         </div>
                     </div>
                 </div>

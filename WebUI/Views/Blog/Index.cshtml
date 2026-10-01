@@ -18,8 +18,8 @@
                 </div>
             </div>
 
-            <div class="row">
-                @await Html.PartialAsync("_BlogPartial", Model)
+            <div class="row g-3">
+                @await Html.PartialAsync("_BlogCardPartial", Model)
             </div>
             
             @if (ViewBag.PaginationInfo != null)

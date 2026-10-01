@@ -9,6 +9,7 @@ namespace WebUI.Controllers
 {
 
     [AllowAnonymous]
+    [Route("hizmetler")]
     public class ServiceController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,6 +21,7 @@ namespace WebUI.Controllers
             _serviceService = serviceService;
         }
 
+        [HttpGet("")]
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 20;
@@ -34,32 +36,33 @@ namespace WebUI.Controllers
                 .ToListAsync();
 
             ViewBag.TotalBlogs = totalItems;
-            
+
             ViewBag.PaginationInfo = new WebUI.Models.PaginationInfo
             {
                 CurrentPage = page,
                 ItemsPerPage = pageSize,
                 TotalItems = totalItems,
-                UrlFormat = "/Service?page={0}"
+                Controller = "Service",
+                Action = "Index"
             };
             return View(data);
         }
 
-        [HttpGet]
-        public IActionResult ServiceDetails(int? id)
-        {
-            if(id == null || id <= 0)
-            {
-                return NotFound();
-            }
+        //[HttpGet("hizmet-detayı")]
+        //public IActionResult ServiceDetails(int? id)
+        //{
+        //    if(id == null || id <= 0)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var values = _serviceService.GetByIDAsync(id.Value);
+        //    var values = _serviceService.GetByIDAsync(id.Value);
 
-            if (values == null)
-            {
-                return NotFound();
-            }
-            return View(values);
-        }
+        //    if (values == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(values);
+        //}
     }
 }

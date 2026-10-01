@@ -1,10 +1,10 @@
 ﻿@model List<Galary>
 @{
-    ViewData["Title"] = "Galeri";
+    ViewData["Title"] = "Galeriye Yüklenen Resimler";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Yüklenen Resimler</h2>
+    <h5 class="mb-0">@ViewData["Title"]</h5>
     <a asp-action="Create" asp-controller="AdminGalary" class="btn btn-outline-primary">Galeriye Ekle</a>
 </div>
 

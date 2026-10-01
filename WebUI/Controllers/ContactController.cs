@@ -8,17 +8,20 @@ using WebUI.Models;
 namespace WebUI.Controllers
 {
     [AllowAnonymous]
+    [Route("iletisim")]
     public class ContactController : BaseController
     {
         private readonly IContactFormService _contactFormService;
+        private readonly IContactService _contactService;
         private readonly IMailService _mailService;
         private readonly ILogger<ContactController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _cache;
 
-        public ContactController(IContactFormService contactFormService, IMailService mailService, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache)
+        public ContactController(IContactFormService contactFormService, IContactService contactService, IMailService mailService, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache)
         {
             _contactFormService = contactFormService;
+            _contactService = contactService;
             _mailService = mailService;
             _logger = logger;
             _configuration = configuration;
@@ -26,11 +29,9 @@ namespace WebUI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var siteKey = _configuration["GoogleReCaptcha:SiteKey"];
-            ViewData["SiteKey"] = siteKey;
-            return View();
+            return View(await BuildViewModel());
         }
 
         [HttpPost]
@@ -39,58 +40,65 @@ namespace WebUI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("Index", model);
+                SetSweetAlertMessage("Hata", "Lütfen tüm alanları doldurun.", "error");
+                var vm = await BuildViewModel();
+                vm.ContactForm = model.ContactForm;
+                return View("Index", vm);
             }
 
             var ip = GetClientIp();
 
-            // 🛑 IP engelli mi?
             if (IsIpOnCooldown(ip))
             {
                 _logger.LogWarning("Spam engellendi - IP: {IP}", ip);
                 SetSweetAlertMessage("Uyarı", "Çok sık mesaj gönderiyorsunuz. Lütfen birkaç dakika sonra tekrar deneyin.", "warning");
-                return View("Index", model);
+                var vm = await BuildViewModel();
+                vm.ContactForm = model.ContactForm;
+                return View("Index", vm);
             }
 
-            // ✅ reCAPTCHA kontrolü
             var recaptchaToken = Request.Form["g-recaptcha-response"];
             if (!await IsReCaptchaValid(recaptchaToken))
             {
                 SetSweetAlertMessage("Bilgi", "Lütfen robot olmadığınızı doğrulayın.", "info");
-                return View("Index", model);
+                var vm = await BuildViewModel();
+                vm.ContactForm = model.ContactForm;
+                return View("Index", vm);
             }
 
             try
             {
                 await _mailService.SendContactMailAsync(model.ContactForm);
+                await _contactFormService.AddAsync(model.ContactForm);
 
-                var contactFormEntity = new ContactForm
-                {
-                    FullName = model.ContactForm.FullName,
-                    Email = model.ContactForm.Email,
-                    Phone = model.ContactForm.Phone,
-                    Subject = model.ContactForm.Subject,
-                    Message = model.ContactForm.Message,
-                    CreatedDate = DateTime.Now,
-                };
-                await _contactFormService.AddAsync(contactFormEntity);
-
-                // ⏳ IP'yi 60 saniye engelle
                 SetIpCooldown(ip, TimeSpan.FromSeconds(60));
-
                 _logger.LogInformation("Mesaj başarıyla gönderildi: {Email}", model.ContactForm.Email);
                 SetSweetAlertMessage("Başarılı!", "Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.", "success");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Mail gönderme sırasında hata oluştu.");
-                SetSweetAlertMessage("Hata", $"{ex} Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "error");
+                SetSweetAlertMessage("Hata", "Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "error");
             }
 
             return RedirectToAction("Index");
         }
 
-        // Yardımcı metodlar
+        // ViewModel'i her seferinde hazırla
+        private async Task<ContactPageViewModel> BuildViewModel()
+        {
+            ViewData["SiteKey"] = _configuration["GoogleReCaptcha:SiteKey"];
+
+            return new ContactPageViewModel
+            {
+                Contact = await _contactService.LastOrDefaultAsync(
+                    predicate: x => x.IsPublish == true,
+                    orderBy: q => q.OrderBy(x => x.Id)
+                ),
+                ContactForm = new ContactForm()
+            };
+        }
+
         private string GetClientIp()
         {
             return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -115,9 +123,10 @@ namespace WebUI.Controllers
             var response = await client.PostAsync(
                 $"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={token}",
                 null);
-            var result = await response.Content.ReadAsStringAsync();
 
-            return result.Contains("\"success\": true");
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            return doc.RootElement.GetProperty("success").GetBoolean();
         }
     }
 }

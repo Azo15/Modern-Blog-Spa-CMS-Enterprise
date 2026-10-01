@@ -9,6 +9,8 @@ namespace WebUI.Controllers
 {
 
     [AllowAnonymous]
+    [Route("")]
+    [Route("ana-sayfa")]
     public class DefaultController : Controller
     {
         public IActionResult Index()
