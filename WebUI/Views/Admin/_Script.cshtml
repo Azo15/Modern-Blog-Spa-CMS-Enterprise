@@ -1,4 +1,4 @@
-﻿<script src="~/admin/vendor/libs/jquery/jquery.js"></script>
+<script src="~/admin/vendor/libs/jquery/jquery.js"></script>
 <script src="~/admin/vendor/libs/popper/popper.js"></script>
 <script src="~/admin/vendor/js/bootstrap.js"></script>
 <script src="~/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
@@ -18,3 +18,37 @@
 <script src="~/js/taos/toastr.min.js"></script>
 
 <script src="~/admin/js/site-sortable.js" asp-append-version="true"></script>
+
+<!-- 📌 SignalR Real-Time Notification Client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveNotification", function (title, message, type) {
+            if (typeof toastr !== "undefined") {
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "timeOut": "8000"
+                };
+                if (type === "success") toastr.success(message, title);
+                else if (type === "error") toastr.error(message, title);
+                else if (type === "warning") toastr.warning(message, title);
+                else toastr.info(message, title);
+            } else {
+                alert(title + ": " + message);
+            }
+        });
+
+        connection.start().then(function () {
+            console.log("🟢 SignalR Canlı Bildirim Bağlantısı Başarılı!");
+        }).catch(function (err) {
+            console.error("🔴 SignalR Bağlantı Hatası:", err.toString());
+        });
+    });
+</script>

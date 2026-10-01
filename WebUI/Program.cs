@@ -8,10 +8,17 @@ using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
 using WebUI.Data;
 using WebUI.Middleware;
+using WebUI.Hubs;
 using Serilog;
 using static WebUI.Helpers.GlobalHelper;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 📌 SignalR Canlı Bildirim Servisi
+builder.Services.AddSignalR();
+
+// 📌 Distributed Cache (Redis / In-Memory Fallback)
+builder.Services.AddDistributedMemoryCache();
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
 Log.Logger = new LoggerConfiguration()
@@ -132,6 +139,9 @@ app.MapControllerRoute(
     name: "404-CatchAll",
     pattern: "{*url}",
     defaults: new { controller = "Error", action = "PageNotFound" });
+
+// 📌 SignalR Hub Endpoint
+app.MapHub<NotificationHub>("/notificationHub");
 
 // 13. Uygulamayı çalıştır
 app.Run();
