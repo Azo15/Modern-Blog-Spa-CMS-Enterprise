@@ -11,6 +11,17 @@ namespace WebUI.Data
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+            // ──────────────────── ROLLER ────────────────────
+            string[] roles = new[] { "System Admin", "Content Manager", "Author", "Moderator", "Registered User", "Visitor" };
+            foreach (var roleName in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
+                }
+            }
 
             // ──────────────────── KULLANICI ────────────────────
             AppUser? seederUser = await userManager.FindByEmailAsync("admin@spa.com");
@@ -25,6 +36,11 @@ namespace WebUI.Data
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(seederUser, "Admin123!");
+            }
+
+            if (!await userManager.IsInRoleAsync(seederUser, "System Admin"))
+            {
+                await userManager.AddToRoleAsync(seederUser, "System Admin");
             }
 
             // ──────────────────── KATEGORİLER ────────────────────

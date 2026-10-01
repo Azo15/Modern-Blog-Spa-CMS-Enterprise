@@ -7,9 +7,20 @@ using BusinessLayer.Container;
 using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
 using WebUI.Data;
+using WebUI.Middleware;
+using Serilog;
 using static WebUI.Helpers.GlobalHelper;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // 1. Uygulama ayarlarını al
 var configuration = builder.Configuration;
@@ -17,7 +28,7 @@ var configuration = builder.Configuration;
 // 2. Katman bağımlılıklarını çöz
 builder.Services.ContainerDependencies();
 
-// 3. DbContext'i DI sistemine ekle ve MySQL Server bağlantısını ayarla
+// 3. DbContext'i DI sistemine ekle ve SQL Server bağlantısını ayarla
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -67,10 +78,23 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Error/AccessDenied"; // Yetki yoksa buraya gider
     options.SlidingExpiration = true;
     options.Cookie.Name = ".SpaMerkezi.Auth";
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS zorunlu
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
 });
 
 var app = builder.Build();
+
+// 📌 Global Exception Middleware (Merkezi Hata Yakalama)
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// Yerel geliştirmede örnek verilerden önce veritabanını hazırla.
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+}
 
 // 8. Örnek verileri yükle (tablolar boşsa)
 await DataSeeder.SeedAsync(app.Services);
@@ -87,7 +111,10 @@ else
 }
 
 // 10. HTTP ve statik dosya ayarları
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 
 // 11. Routing ve kimlik doğrulama
