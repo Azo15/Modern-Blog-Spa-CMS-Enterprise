@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Slider>
+@model IEnumerable<Slider>
 
 @{
     ViewData["Title"] = "Slider Listesi";
@@ -54,7 +54,7 @@
                         </td>
 
                         <td>
-                            @item.UpdatedDate.ToString("dd MMMM yyyy")
+                            @(item.UpdatedDate?.ToString("dd MMMM yyyy") ?? "-")
                         </td>
 
                         <td>

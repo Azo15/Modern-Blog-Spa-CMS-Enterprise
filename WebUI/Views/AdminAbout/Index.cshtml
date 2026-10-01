@@ -1,14 +1,14 @@
-﻿@model IEnumerable<About>
+@model IEnumerable<About>
 
 @{
-    ViewData["Title"] = "Hakkımızda Listesi";
+    ViewData["Title"] = "Hakkımızda Bilgisi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Hakkımızda Bilgileri</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
         @if (Model.Count() < 1)
         {
             <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Yeni Bilgi Ekle</a>
@@ -59,7 +59,7 @@
                     </td>
 
                     <td>
-                        @item.UpdatedDate.ToString("dd MMMM yyyy")
+                        @(item.UpdatedDate?.ToString("dd MMMM yyyy") ?? "-")
                     </td>
 
                     <td>

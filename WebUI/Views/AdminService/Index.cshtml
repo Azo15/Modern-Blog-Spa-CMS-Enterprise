@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Service>
+@model IEnumerable<Service>
 
 @{
     ViewData["Title"] = "Hizmet Listesi";
@@ -8,7 +8,7 @@
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Hizmet Listesi</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
         <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Hizmet Ekle</a>
     </div>
 
@@ -74,7 +74,7 @@
                             }
                         </td>
                         <td>
-                            @item.UpdatedDate.ToString("dd MMMM yyyy")
+                            @(item.UpdatedDate?.ToString("dd MMMM yyyy") ?? "-")
                         </td>
 
                         <td>

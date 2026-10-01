@@ -1,13 +1,13 @@
-﻿@model IEnumerable<Catagory>
+@model IEnumerable<Catagory>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Blog Kategori Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Blog Kategorileri</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
         <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Yeni Kategori Ekle</a>
     </div>
 
@@ -31,7 +31,7 @@
                     <tr>
                         <td>@sayac</td>
                         <td>@item.Title</td>
-                        <td>@item.UpdatedDate.ToString("dd-MM-yyyy")</td>
+                        <td>@(item.UpdatedDate?.ToString("dd-MM-yyyy") ?? "-")</td>
                         <td>
                             <div class="dropdown">
                                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
