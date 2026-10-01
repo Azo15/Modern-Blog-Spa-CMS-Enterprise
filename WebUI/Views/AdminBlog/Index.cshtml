@@ -8,7 +8,7 @@
 
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
-        <h5 class="card-header">Hakkımızda Bilgileri</h5>
+        <h5 class="card-header">@ViewData["Title"]</h5>
 
         <form asp-action="Index" method="get" class="p-4">
 
@@ -84,13 +84,13 @@
                             @{
                                 var imgPath = string.IsNullOrEmpty(item.Image) ? "img/default-image.jpg" : item.Image;
                             }
-                            <img src="@Url.Content("~/" + imgPath)"
+                            <img src="~/@imgPath"
                                  alt="blog görseli"
                                  class="table-image" />
                         </td>
 
                         <td>
-                            @item.UpdatedDate.ToString("dd MMMM yyyy")
+                            @(item.UpdatedDate?.ToString("dd MMMM yyyy") ?? "-")
                         </td>
 
                         <td>
@@ -102,8 +102,8 @@
                                     <a class="dropdown-item text-warning" asp-action="Edit" asp-route-id="@item.Id">
                                         <i class="fa-solid fa-pen-to-square me-1"></i>Düzenle
                                     </a>
-                                    <a class="dropdown-item text-danger" 
-                                       asp-action="Delete" 
+                                    <a class="dropdown-item text-danger"
+                                       asp-action="Delete"
                                        asp-route-id="@item.Id">
                                         <i class="fa-solid fa-trash me-1"></i>Sil
                                     </a>

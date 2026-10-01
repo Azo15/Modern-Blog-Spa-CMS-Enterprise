@@ -24,8 +24,15 @@
 
         <li class="menu-item @(Html.IsActive("AdminUserList"))">
             <a asp-controller="AdminUserList" asp-action="UserList" class="menu-link">
-                <i class="menu-icon fa-solid fa-users-gear"></i>
+                <i class="menu-icon fa-solid fa-users"></i>
                 <div class="text-truncate">Admin Listesi</div>
+            </a>
+        </li>
+
+        <li class="menu-item @(Html.IsActive("AdminUserRole"))">
+            <a asp-controller="AdminUserRole" asp-action="Index" class="menu-link">
+                <i class="menu-icon fa-solid fa-user-shield"></i>
+                <div class="text-truncate">Rol & Kullanıcı Yönetimi</div>
             </a>
         </li>
 

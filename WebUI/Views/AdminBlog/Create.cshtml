@@ -8,7 +8,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h5>Blog Ekleme Formu</h5>
+        <h5>@ViewData["Title"]</h5>
     </div>
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" asp-action="Create">
@@ -21,9 +21,17 @@
 
                 <div class="mb-3 col-lg-6">
                     <div class="form-group">
-                        <label asp-for="Title" class="form-label"></label>
+                        <label asp-for="Title" class="form-label" data-slug-source="slugPreview"></label>
                         <input asp-for="Title" class="form-control" />
                         <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="Slug" class="form-label"></label>
+                        <input asp-for="Slug" class="form-control" readonly placeholder="Başlık girilince otomatik oluşur" />
+                        <span asp-validation-for="Slug" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -51,7 +59,7 @@
                         <label class="form-label">Görsel</label>
                         <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
                         <div class="mt-2">
-                            <img id="imagePreview" src="@Url.Content("~/img/default-image.jpg")" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
+                            <img id="imagePreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
                         </div>
                     </div>
                 </div>
@@ -74,3 +82,26 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '#tinymce',
+            height: 400,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+            toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
