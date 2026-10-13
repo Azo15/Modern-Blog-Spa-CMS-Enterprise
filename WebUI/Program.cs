@@ -107,8 +107,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options => options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)))
-    .AddRazorRuntimeCompilation()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.Load("BusinessLayer")));
+    .AddRazorRuntimeCompilation();
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

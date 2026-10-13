@@ -1,4 +1,6 @@
 @model SiteTable
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService NavigationAuthorization
 <nav class="navbar navbar-expand-xl sticky-top">
     <div class="container">
         <!-- Logo -->
@@ -52,6 +54,14 @@
                        asp-controller="Profile" asp-action="Index" title="@L["Profile"]">
                         <i class="fa fa-user-circle" aria-hidden="true"></i>
                     </a>
+                    @if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded)
+                    {
+                        <a asp-controller="AdminBlog" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2">@L["AdminPanel"]</a>
+                    }
+                    else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
+                    {
+                        <a asp-controller="AdminMessage" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2">@L["AdminPanel"]</a>
+                    }
                 }
             </div>
         </div>

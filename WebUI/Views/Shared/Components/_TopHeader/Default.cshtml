@@ -1,5 +1,7 @@
 ﻿@model TopHeaderViewModel
 
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService HeaderAuthorization
 <div class="px-xxl-5">
     <nav class="layout-navbar container-fluid navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
         <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
@@ -49,11 +51,14 @@
                             </a>
                         </li>
 
+                        @if ((await HeaderAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Admin)).Succeeded)
+                        {
                         <li>
                             <a class="dropdown-item" asp-controller="AdminSiteInfo" asp-action="Index">
-                                <i class="fa-solid fa-gear icon-md me-3"></i><span>Ayarlar</span>
+                                <i class="fa-solid fa-gear icon-md me-3"></i><span>@L["Settings"]</span>
                             </a>
                         </li>
+                        }
 
                         <li><div class="dropdown-divider my-1"></div></li>
 
