@@ -43,3 +43,11 @@ dotnet build WebUI.sln
 Derleme başarılıdır; mevcut kodda nullable ve paket güvenlik uyarıları bulunur. Örnek verilerde belirtilen bazı görseller depoda bulunmayabilir. E-posta ve reCAPTCHA gibi dış servisler kendi geçerli ayarlarına ihtiyaç duyar; yerel başlatma bunları yapılandırmaz.
 
 Yetkilendirme, migration ve test ayrıntıları: [uygulama raporu](docs/YETKILENDIRME_VE_WORKFLOW.md).
+
+## Aşama 2
+
+Blog işlemleri MediatR ve FluentValidation pipeline üzerinden yürür. Halka açık bloglar salt-okunur DTO ve veritabanı sayfalaması kullanır. `ConnectionStrings:Redis` tanımlıysa Redis, yoksa bellek cache kullanılır; bağlantı kesintisinde bellek fallback devreye girer.
+
+Yorumlar üyeler tarafından oluşturulur, System Admin/Moderator onayıyla görünür. Ana yorum ve yanıt olmak üzere iki seviye desteklenir. Moderasyon paneli: `/AdminComment/Index`.
+
+Dosyalar, migration ve testler: [Aşama 2 uygulama raporu](docs/ASAMA_2_UYGULAMA_RAPORU.md).
