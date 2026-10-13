@@ -26,13 +26,24 @@ public sealed class BlogWorkflowService(AppDbContext db, ICurrentUserService cur
         if (oldCategory != blog.CatagoryId) await cache.RemoveAsync($"blogs_category_{oldCategory}");
     }
 
+    private static string CreateSlug(string? title)
+    {
+        var text = (title ?? string.Empty).ToLower(new System.Globalization.CultureInfo("tr-TR"))
+            .Replace("ş", "s").Replace("ğ", "g").Replace("ü", "u")
+            .Replace("ö", "o").Replace("ı", "i").Replace("ç", "c");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"[^a-z0-9\s-]", "");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", "-");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"-+", "-").Trim('-');
+        return string.IsNullOrEmpty(text) ? Guid.NewGuid().ToString("N") : text;
+    }
+
     public async Task<int> CreateAsync(Blog blog, CancellationToken cancellationToken = default)
     {
         await RequireAsync(AccessPolicies.BlogAuthor);
         if (!int.TryParse(currentUser.UserId, out var userId)) throw new UnauthorizedAccessException();
         // Never accept author/publish/delete/audit fields supplied by a client.
         var entity = new Blog { Title = blog.Title, SubTitle = blog.SubTitle,
-            Content = sanitizer.Sanitize(blog.Content), Slug = blog.Slug, Image = blog.Image,
+            Content = sanitizer.Sanitize(blog.Content), Slug = CreateSlug(blog.Title), Image = blog.Image,
             CatagoryId = blog.CatagoryId, AppUserId = userId, PublishStatus = PublishStatus.Draft, IsPublish = false };
         db.Blogs.Add(entity);
         await db.SaveChangesAsync(cancellationToken);

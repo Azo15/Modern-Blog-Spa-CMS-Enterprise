@@ -45,7 +45,7 @@ namespace BusinessLayer.Dtos
         public string Title { get; set; }
 
         [Display(Name = "Slug")]
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         [Display(Name = "Alt Başlık")]
         public string SubTitle { get; set; }
@@ -69,7 +69,7 @@ namespace BusinessLayer.Dtos
         public string Title { get; set; }
 
         [Display(Name = "Slug")]
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         [Display(Name = "Alt Başlık")]
         public string SubTitle { get; set; }
