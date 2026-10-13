@@ -1,3 +1,5 @@
+using FluentValidation;
+using BusinessLayer.CQRS.Behaviors;
 using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using DataAccesLayer.Abstract;
@@ -48,10 +50,13 @@ namespace BusinessLayer.Container
             services.AddScoped<IServiceService, ServiceManager>();
 
             // 📌 Distributed Cache Servisi
-            services.AddScoped<ICacheService, CacheManager>();
+            services.AddSingleton<CacheFallbackStore>();
+            services.AddSingleton<ICacheService, CacheManager>();
+            services.AddScoped<IProfanityFilterService, ProfanityFilterService>();
+            services.AddValidatorsFromAssembly(typeof(Additions).Assembly);
 
             // 📌 MediatR CQRS Entegrasyonu
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Additions).Assembly));
+            services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(Additions).Assembly); cfg.AddOpenBehavior(typeof(ValidationBehavior<,>)); });
         }
     }
 }

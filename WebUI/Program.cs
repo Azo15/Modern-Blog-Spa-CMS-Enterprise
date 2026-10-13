@@ -22,7 +22,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 
 // 📌 Distributed Cache (Redis / In-Memory Fallback)
-builder.Services.AddDistributedMemoryCache();
+var redis = builder.Configuration.GetConnectionString("Redis");
+if (string.IsNullOrWhiteSpace(redis)) builder.Services.AddDistributedMemoryCache();
+else builder.Services.AddStackExchangeRedisCache(options =>
+{
+    var configuration = StackExchange.Redis.ConfigurationOptions.Parse(redis);
+    configuration.AbortOnConnectFail = false;
+    configuration.ConnectTimeout = 1000;
+    configuration.AsyncTimeout = 1000;
+    configuration.SyncTimeout = 1000;
+    options.ConfigurationOptions = configuration;
+    options.InstanceName = "spa:";
+});
+builder.Services.AddScoped<IBlogImageStorage, BlogImageStorage>();
+builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
 Log.Logger = new LoggerConfiguration()
