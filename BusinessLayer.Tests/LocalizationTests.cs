@@ -14,6 +14,23 @@ namespace BusinessLayer.Tests;
 public sealed class LocalizationTests
 {
     [Theory]
+    [InlineData("tr-TR", "Mevcut şifre hatalı.", "Şifre en az 8 karakter olmalıdır.")]
+    [InlineData("en-US", "The current password is incorrect.", "The password must contain at least 8 characters.")]
+    public void IdentityProfileErrorsUseSelectedLanguage(string culture, string mismatch, string length)
+    {
+        var original = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
+            using var provider = new ServiceCollection().AddLogging().AddLocalization(o => o.ResourcesPath = "Resources").BuildServiceProvider();
+            var describer = new WebUI.Services.LocalizedIdentityErrorDescriber(provider.GetRequiredService<IStringLocalizer<SharedResource>>());
+            Assert.Equal(mismatch, describer.PasswordMismatch().Description);
+            Assert.Equal(length, describer.PasswordTooShort(8).Description);
+            Assert.Equal("PasswordMismatch", describer.PasswordMismatch().Code);
+        }
+        finally { CultureInfo.CurrentUICulture = original; }
+    }
+    [Theory]
     [InlineData("tr-TR", "Ana Sayfa", "Geri yükle")]
     [InlineData("en-US", "Home", "Restore")]
     public void SharedResourcesResolveMenuAndActionsInSelectedCulture(string culture, string home, string restore)

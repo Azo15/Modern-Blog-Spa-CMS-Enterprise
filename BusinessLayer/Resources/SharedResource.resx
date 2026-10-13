@@ -615,4 +615,46 @@
   <data name="InteractionConflict" xml:space="preserve">
     <value>İşlem başka bir istekle çakıştı. Lütfen yeniden deneyin.</value>
   </data>
+  <data name="Identity.DefaultError" xml:space="preserve">
+    <value>İşlem tamamlanamadı. Lütfen yeniden deneyin.</value>
+  </data>
+  <data name="Identity.ConcurrencyFailure" xml:space="preserve">
+    <value>Hesap başka bir işlemde değişti. Lütfen sayfayı yenileyin.</value>
+  </data>
+  <data name="Identity.PasswordMismatch" xml:space="preserve">
+    <value>Mevcut şifre hatalı.</value>
+  </data>
+  <data name="Identity.PasswordTooShort" xml:space="preserve">
+    <value>Şifre en az {0} karakter olmalıdır.</value>
+  </data>
+  <data name="Identity.PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Şifre en az {0} farklı karakter içermelidir.</value>
+  </data>
+  <data name="Identity.PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Şifre en az bir özel karakter içermelidir.</value>
+  </data>
+  <data name="Identity.PasswordRequiresDigit" xml:space="preserve">
+    <value>Şifre en az bir rakam içermelidir.</value>
+  </data>
+  <data name="Identity.PasswordRequiresLower" xml:space="preserve">
+    <value>Şifre en az bir küçük harf içermelidir.</value>
+  </data>
+  <data name="Identity.PasswordRequiresUpper" xml:space="preserve">
+    <value>Şifre en az bir büyük harf içermelidir.</value>
+  </data>
+  <data name="Identity.DuplicateEmail" xml:space="preserve">
+    <value>{0} e-posta adresi zaten kayıtlı.</value>
+  </data>
+  <data name="Identity.DuplicateUserName" xml:space="preserve">
+    <value>{0} kullanıcı adı zaten kayıtlı.</value>
+  </data>
+  <data name="Identity.InvalidEmail" xml:space="preserve">
+    <value>{0} geçerli bir e-posta adresi değil.</value>
+  </data>
+  <data name="Identity.InvalidUserName" xml:space="preserve">
+    <value>{0} geçerli bir kullanıcı adı değil.</value>
+  </data>
+  <data name="Identity.UserAlreadyHasPassword" xml:space="preserve">
+    <value>Bu hesap için zaten bir şifre tanımlı.</value>
+  </data>
 </root>

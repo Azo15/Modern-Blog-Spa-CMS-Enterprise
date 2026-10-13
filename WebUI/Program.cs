@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
-using System.Reflection;
-using BusinessLayer.Mapping;
 using BusinessLayer.Container;
 using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
@@ -101,6 +99,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
     options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<AppDbContext>() // EF Core kullanımı
+.AddErrorDescriber<LocalizedIdentityErrorDescriber>()
 .AddDefaultTokenProviders(); // Şifre yenileme vb. için gerekli token sağlayıcılar
 
 // 5. Razor runtime compilation ve FluentValidation
@@ -109,9 +108,6 @@ builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization(options => options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)))
     .AddRazorRuntimeCompilation();
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
-
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
