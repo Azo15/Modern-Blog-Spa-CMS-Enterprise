@@ -1,29 +1,8 @@
-using BusinessLayer.Abstract;
-using EntityLayer.Concrete;
+using BusinessLayer.CQRS.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-
-namespace WebUI.ViewComponents.Default
+namespace WebUI.ViewComponents.Default;
+public sealed class _HomeBlog(ISender sender) : ViewComponent
 {
-    public class _HomeBlog : ViewComponent
-    {
-        private readonly IBlogService _blogService;
-
-        public _HomeBlog(IBlogService blogService)
-        {
-            _blogService = blogService;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var data = await _blogService.GetListAsync(
-                filter: x => !x.IsDeleted && x.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
-                orderBy: q => q.OrderByDescending(x => x.CreatedDate),
-                take: 8,
-                includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
-            );
-
-            return View(data);
-        }
-    }
+    public async Task<IViewComponentResult> InvokeAsync()=>View((await sender.Send(new GetPublicBlogsQuery(1,8),HttpContext.RequestAborted)).Items);
 }

@@ -1,4 +1,4 @@
-@model IEnumerable<Blog>
+@model IEnumerable<BusinessLayer.Dtos.BlogListDto>
 @{
     int index = 0;
 }
@@ -14,7 +14,7 @@
                 <div class="blog-card h-100">
                     <div class="blog-image">
                         <img src="~/@imgPath" alt="@item.Title" />
-                        <div class="blog-date">@item?.Catagory?.Title</div>
+                        <div class="blog-date">@item.CategoryTitle</div>
                     </div>
                     <div class="blog-content">
                         <h3 class="blog-title">@item.Title</h3>
@@ -22,7 +22,7 @@
                         <div class="blog-meta">
                             <div class="blog-author">
                                 <i class="fas fa-user-circle"></i>
-                                @item?.AppUser?.FullName
+                                @item.AuthorName
                             </div>
                             <span>@item.CreatedDate.ToString("dd MMM yyyy")</span>
                         </div>

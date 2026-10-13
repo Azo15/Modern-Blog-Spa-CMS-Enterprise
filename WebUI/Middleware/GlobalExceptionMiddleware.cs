@@ -20,6 +20,11 @@ namespace WebUI.Middleware
             {
                 await _next(context);
             }
+            catch (FluentValidation.ValidationException exception)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { message = "Doğrulama başarısız.", errors = exception.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }) });
+            }
             catch (UnauthorizedAccessException)
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;

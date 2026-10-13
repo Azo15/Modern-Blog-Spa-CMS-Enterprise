@@ -1,0 +1,19 @@
+@model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.PendingCommentDto>
+@{ ViewData["Title"]="Bekleyen Yorumlar";Layout="~/Views/Shared/_AdminLayout.cshtml"; }
+<div class="card p-4">
+<h5>Bekleyen Yorumlar (@Model.TotalCount)</h5>
+@if(TempData["CommentError"] is string error){<p class="text-danger">@error</p>}
+<table class="table"><thead><tr><th>Blog ID</th><th>Yazar</th><th>Yorum</th><th>Tarih (UTC)</th><th>İşlem</th></tr></thead><tbody>
+@foreach(var comment in Model.Items)
+{
+<tr><td>@comment.BlogId</td><td>@comment.AuthorName</td><td style="white-space:pre-wrap">@comment.Content</td><td>@comment.CreatedDate</td><td>
+<form asp-action="Approve" method="post"><input type="hidden" name="id" value="@comment.Id"/><button class="btn btn-success">Onayla</button></form>
+<form asp-action="Delete" method="post"><input type="hidden" name="id" value="@comment.Id"/><button class="btn btn-danger">Reddet / Sil</button></form>
+</td></tr>
+}
+</tbody></table>
+<nav>
+@if(Model.HasPreviousPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex-1)">Önceki</a>}
+<span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+@if(Model.HasNextPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex+1)">Sonraki</a>}
+</nav></div>

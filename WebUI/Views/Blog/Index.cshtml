@@ -1,4 +1,4 @@
-@model IEnumerable<Blog>
+@model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.BlogListDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,17 +19,14 @@
             </div>
 
             <div class="row g-3">
-                @await Html.PartialAsync("_BlogCardPartial", Model)
+                @await Html.PartialAsync("_BlogCardPartial", Model.Items)
             </div>
             
-            @if (ViewBag.PaginationInfo != null)
-            {
-                <div class="row mt-4">
-                    <div class="col-12">
-                        @await Component.InvokeAsync("Pagination", new { paginationInfo = ViewBag.PaginationInfo })
-                    </div>
-                </div>
-            }
+            <nav class="mt-4" aria-label="Blog sayfaları">
+                @if(Model.HasPreviousPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.CategoryId">Önceki</a>}
+                <span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+                @if(Model.HasNextPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.CategoryId">Sonraki</a>}
+            </nav>
         </div>
     </section>
 </div>

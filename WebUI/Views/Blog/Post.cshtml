@@ -1,26 +1,26 @@
 @inject BusinessLayer.Abstract.IHtmlContentSanitizer HtmlSanitizer
-@model Blog
+@model WebUI.Models.BlogPostViewModel
 
 @{
     ViewData["Title"] = "Post";
     Layout = "~/Views/Shared/_UILayout.cshtml";
 }
-<section class="blog-detail-header" style="background-image: url('~/blogImage/@Model.Image')">
+<section class="blog-detail-header" style="background-image: url('~/blogImage/@Model.Blog.Image')">
     <div class="container">
         <div class="blog-detail-category" data-aos="fade-up">
             Spa & Wellness
         </div>
         <h1 class="blog-detail-title font-playfair" data-aos="fade-up" data-aos-delay="100">
-            @Model.Title
+            @Model.Blog.Title
         </h1>
         <div class="blog-detail-meta" data-aos="fade-up" data-aos-delay="200">
             <span>
                 <i class="fas fa-calendar-alt"></i>
-                @Model.CreatedDate.ToString("dd MMMM yyyy")
+                @Model.Blog.CreatedDate.ToString("dd MMMM yyyy")
             </span>
             <span>
                 <i class="fas fa-user"></i>
-                @Model?.AppUser?.FirstName @Model?.AppUser?.LastName
+                @Model.Blog.AuthorName
             </span>
             <span>
                 <i class="fas fa-clock"></i>
@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="blog-content-wrapper" data-aos="fade-up" data-aos-delay="100">
-                    @Html.Raw(HtmlSanitizer.Sanitize(Model.Content))
+                    @Html.Raw(HtmlSanitizer.Sanitize(Model.Blog.Content))
                 </div>
             </div>
         </div>
@@ -54,12 +54,12 @@
 <!-- Related Posts -->
 @if (ViewBag.RelatedBlogs != null)
 {
-    var relatedBlogs = (IEnumerable<Blog>)ViewBag.RelatedBlogs;
+    var relatedBlogs = (IEnumerable<BusinessLayer.Dtos.BlogListDto>)ViewBag.RelatedBlogs;
     if (relatedBlogs.Any())
     {
         <section class="related-posts">
             <div class="container">
-                <h2 class="section-title font-playfair" data-aos="fade-up">İlgili Yazılar (@relatedBlogs.First().Catagory?.Title)</h2>
+                <h2 class="section-title font-playfair" data-aos="fade-up">İlgili Yazılar (@relatedBlogs.First().CategoryTitle)</h2>
                 
                 <div class="row g-3">
                     @await Html.PartialAsync("_BlogCardPartial", relatedBlogs)
@@ -69,3 +69,4 @@
         </section>
     }
 }
+@await Html.PartialAsync("_Comments", Model)

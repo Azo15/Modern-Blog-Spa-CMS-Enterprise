@@ -5,6 +5,7 @@
     var admin = (await Authorization.AuthorizeAsync(User, AccessPolicies.Admin)).Succeeded;
     var content = (await Authorization.AuthorizeAsync(User, AccessPolicies.ContentManager)).Succeeded;
     var blog = (await Authorization.AuthorizeAsync(User, AccessPolicies.BlogAuthor)).Succeeded;
+    var comments = (await Authorization.AuthorizeAsync(User, AccessPolicies.CommentModerator)).Succeeded;
     var moderation = (await Authorization.AuthorizeAsync(User, AccessPolicies.Moderator)).Succeeded;
 }
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -32,6 +33,10 @@
         <li class="menu-item"><a asp-controller="AdminSlider" asp-action="Index" class="menu-link">Slider</a></li>
         <li class="menu-item"><a asp-controller="AdminGalary" asp-action="Index" class="menu-link">Galeri</a></li>
         <li class="menu-item"><a asp-controller="AdminService" asp-action="Index" class="menu-link">Hizmetler</a></li>
+    }
+    @if (comments)
+    {
+        <li class="menu-item"><a asp-controller="AdminComment" asp-action="Index" class="menu-link">Bekleyen Yorumlar</a></li>
     }
     @if (moderation)
     {

@@ -2,7 +2,7 @@
 @using EntityLayer.Enum
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService Authorization
-@model IEnumerable<Blog>
+@model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.BlogAdminDto>
 
 @{
     ViewData["Title"] = "Blog Listesi";
@@ -50,22 +50,22 @@
                 <tr>
                     <th>#</th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Title)
+                        Başlık
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Content)
+                        İçerik
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Image)
+                        Görsel
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.UpdatedDate)
+                        Güncelleme
                     </th>
                     <th>Eylemler</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
-                @foreach (var item in Model)
+                @foreach (var item in Model.Items)
                 {
 
                     <tr>
@@ -141,3 +141,8 @@
         </div>
     </div>
 </div>
+<nav class="p-3" aria-label="Blog sayfaları">
+@if (Model.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.SelectedCategory">Önceki</a> }
+<span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+@if (Model.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.SelectedCategory">Sonraki</a> }
+</nav>

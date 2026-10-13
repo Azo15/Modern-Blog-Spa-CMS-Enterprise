@@ -39,6 +39,7 @@ public sealed class BlogWorkflowTests : IDisposable
         db.Catagories.AddRange(new Catagory { Id = 1, Title = "A" }, new Catagory { Id = 2, Title = "B" });
         db.SaveChanges();
         cache.Setup(c => c.RemoveAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+        cache.Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
         workflow = new BlogWorkflowService(db, user, provider.GetRequiredService<IAuthorizationService>(), new HtmlContentSanitizer(), cache.Object);
     }
 
@@ -103,8 +104,8 @@ public sealed class BlogWorkflowTests : IDisposable
         Assert.Equal("1", blog.CreatedBy);
         Assert.Equal("2", blog.UpdatedBy);
         Assert.DoesNotContain("<script", blog.Content);
-        cache.Verify(c => c.RemoveAsync("blogs_category_1"), Times.AtLeastOnce);
-        cache.Verify(c => c.RemoveAsync("blogs_category_2"), Times.AtLeastOnce);
+        cache.Verify(c => c.RemoveByPrefixAsync("blogs_cat_1"), Times.AtLeastOnce);
+        cache.Verify(c => c.RemoveByPrefixAsync("blogs_cat_2"), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -188,14 +189,15 @@ public sealed class BlogWorkflowTests : IDisposable
         await workflow.ChangeStatusAsync(rejected, PublishStatus.Rejected);
         await workflow.ChangeStatusAsync(deleted, PublishStatus.Published);
         await workflow.DeleteAsync(deleted);
-        var blogs = new BlogManager(new DataAccesLayer.EntityFramework.EFBlogDal(db));
-        var list = new BusinessLayer.CQRS.Handlers.GetAllBlogsQueryHandler(blogs, cache.Object);
-        var detail = new BusinessLayer.CQRS.Handlers.GetBlogByIdQueryHandler(blogs, cache.Object);
-        var publicPosts = await list.Handle(new BusinessLayer.CQRS.Queries.GetAllBlogsQuery(), default);
-        Assert.Equal(published, Assert.Single(publicPosts).Id);
+        foreach (var blog in await db.Blogs.IgnoreQueryFilters().ToListAsync()) blog.Slug = "post-" + blog.Id;
+        await db.SaveChangesAsync();
+        var list = new BusinessLayer.CQRS.Handlers.GetPublicBlogsQueryHandler(db, cache.Object);
+        var detail = new BusinessLayer.CQRS.Handlers.GetPublicBlogBySlugQueryHandler(db, new HtmlContentSanitizer());
+        var publicPosts = await list.Handle(new BusinessLayer.CQRS.Queries.GetPublicBlogsQuery(), default);
+        Assert.Equal(published, Assert.Single(publicPosts.Items).Id);
         foreach (var id in new[] { draft, pending, rejected, deleted })
-            Assert.Null(await detail.Handle(new BusinessLayer.CQRS.Queries.GetBlogByIdQuery(id), default));
-        Assert.NotNull(await detail.Handle(new BusinessLayer.CQRS.Queries.GetBlogByIdQuery(published), default));
+            Assert.Null(await detail.Handle(new BusinessLayer.CQRS.Queries.GetPublicBlogBySlugQuery("post-" + id), default));
+        Assert.NotNull(await detail.Handle(new BusinessLayer.CQRS.Queries.GetPublicBlogBySlugQuery("post-" + published), default));
     }
 
     public void Dispose() { db.Dispose(); connection.Dispose(); provider.Dispose(); }

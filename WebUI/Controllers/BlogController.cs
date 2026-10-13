@@ -1,112 +1,37 @@
-
-using BusinessLayer.Abstract;
 using BusinessLayer.CQRS.Queries;
-using DataAccesLayer.Concrete;
-using EntityLayer.Concrete;
+using BusinessLayer.Dtos;
+using BusinessLayer.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq.Expressions;
-using WebUI.Helpers;
 using WebUI.Models;
+namespace WebUI.Controllers;
 
-namespace WebUI.Controllers
+[Authorize(Policy=AccessPolicies.Visitor)]
+[Route("yapilan-isler")]
+public sealed class BlogController(ISender sender) : Controller
 {
-    [Authorize(Policy = BusinessLayer.Security.AccessPolicies.Visitor)]
-    [Route("yapilan-isler")]
-    public class BlogController : Controller
+    [HttpGet("")]
+    public async Task<IActionResult> Index(int page=1,int? categoryId=null,CancellationToken ct=default)
     {
-        private readonly IBlogService _blogService;
-        private readonly IMediator _mediator;
-
-        public BlogController(IBlogService blogService, IMediator mediator)
-        {
-            _blogService = blogService;
-            _mediator = mediator;
-        }
-
-        [HttpGet("")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            int pageSize = 20;
-            
-            // 📌 CQRS MediatR Query Kullanımı
-            var allBlogs = await _mediator.Send(new GetAllBlogsQuery());
-
-            int totalItems = allBlogs.Count;
-
-            var data = allBlogs
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            ViewBag.TotalBlogs = totalItems;
-
-            ViewBag.PaginationInfo = new PaginationInfo
-            {
-                CurrentPage = page,
-                ItemsPerPage = pageSize,
-                TotalItems = totalItems,
-                Controller = "Blog",
-                Action = "Index"
-            };
-
-            return View(data);
-        }
-
-        [HttpGet("{slug}")]
-        public async Task<IActionResult> Post(string slug)
-        {
-            if (slug.IsNullOrEmpty())
-            {
-                return NotFound();
-            }
-
-            var blog = await _blogService.FirstOrDefaultAsync(
-                predicate: b => b.Slug == slug && !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
-                orderBy: null,
-                includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
-            );
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            // 📌 CQRS MediatR Query Kullanımı (Kategoriye Göre İlgili Bloglar)
-            var categoryBlogs = await _mediator.Send(new GetAllBlogsQuery(blog.CatagoryId));
-            var relatedBlogs = categoryBlogs
-                .Where(x => x.Id != blog.Id)
-                .Take(4)
-                .ToList();
-
-            ViewBag.RelatedBlogs = relatedBlogs;
-
-            ViewBag.ReadingTime = BlogUtils.CalculateReadingTime(blog.Content);
-
-            return View(blog);
-        }
-
-
-        // YArdımcı metotlar okunma süresi hesalama
-
-        public static class BlogUtils
-        {
-            public static int CalculateReadingTime(string content)
-            {
-                if (string.IsNullOrWhiteSpace(content))
-                    return 0;
-
-                var wordCount = content.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
-
-                // Ortalama 200 kelime/dk
-                int wordsPerMinute = 200;
-
-                // Yuvarlayarak dakika cinsinden döndür
-                return (int)Math.Ceiling((double)wordCount / wordsPerMinute);
-            }
-        }
+        var result=await sender.Send(new GetPublicBlogsQuery(page,20,categoryId),ct);
+        ViewBag.TotalBlogs=result.TotalCount;
+        ViewBag.CategoryId=categoryId;
+        return View(result);
+    }
+    [HttpGet("{slug}")]
+    public async Task<IActionResult> Post(string slug,int commentPage=1,CancellationToken ct=default)
+    {
+        var blog=await sender.Send(new GetPublicBlogBySlugQuery(slug),ct);
+        if(blog is null)return NotFound();
+        var comments=await sender.Send(new GetPublicCommentsQuery(blog.Id,commentPage),ct);
+        var own=User.Identity?.IsAuthenticated==true ? await sender.Send(new GetMyCommentsQuery(blog.Id),ct) : new List<OwnCommentDto>();
+        ViewBag.RelatedBlogs=(await sender.Send(new GetPublicBlogsQuery(1,4,blog.CatagoryId,blog.Id),ct)).Items;
+        ViewBag.ReadingTime=BlogUtils.CalculateReadingTime(blog.Content);
+        return View(new BlogPostViewModel(blog,comments,own));
+    }
+    public static class BlogUtils
+    {
+        public static int CalculateReadingTime(string? content)=>string.IsNullOrWhiteSpace(content)?0:(int)Math.Ceiling(content.Split(new[]{' ','\r','\n'},StringSplitOptions.RemoveEmptyEntries).Length/200.0);
     }
 }
