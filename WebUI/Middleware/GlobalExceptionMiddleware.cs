@@ -20,6 +20,10 @@ namespace WebUI.Middleware
             {
                 await _next(context);
             }
+            catch (UnauthorizedAccessException)
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Beklenmeyen bir sunucu hatası meydana geldi! Path: {Path}, Method: {Method}",

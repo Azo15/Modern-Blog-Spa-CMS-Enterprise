@@ -247,6 +247,9 @@ namespace DataAccesLayer.Migrations
                     b.Property<bool>("IsPublish")
                         .HasColumnType("bit");
 
+                    b.Property<int>("PublishStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 

@@ -32,7 +32,10 @@ namespace BusinessLayer.Concrete
                 SlidingExpiration = TimeSpan.FromMinutes(10)
             };
 
-            var jsonData = JsonSerializer.Serialize(data);
+            var jsonData = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+            });
             await _distributedCache.SetStringAsync(key, jsonData, options);
         }
 

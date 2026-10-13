@@ -10,7 +10,7 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     public AppDbContext CreateDbContext(string[] args)
     {
         var configuration = new ConfigurationBuilder()
-            .AddUserSecrets("modern-blog-spa-local-development", optional: true)
+            .AddUserSecrets<AppDbContextFactory>(optional: true)
             .AddEnvironmentVariables().Build();
         var connection = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Set ConnectionStrings__DefaultConnection or the WebUI User Secret.");

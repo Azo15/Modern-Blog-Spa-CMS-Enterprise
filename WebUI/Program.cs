@@ -91,7 +91,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
     options.LoginPath = "/dashboard/giris"; // Giriş yapılmadıysa buraya gider
-    options.AccessDeniedPath = "/Error/AccessDenied"; // Yetki yoksa buraya gider
+    options.AccessDeniedPath = "/hata/403";
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
     options.SlidingExpiration = true;
     options.Cookie.Name = ".SpaMerkezi.Auth";
     options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
