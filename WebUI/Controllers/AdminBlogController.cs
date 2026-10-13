@@ -1,7 +1,9 @@
 using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.Dtos;
+using BusinessLayer.Security;
 using EntityLayer.Concrete;
+using EntityLayer.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,206 +12,128 @@ using System.Security.Claims;
 using WebUI.Models;
 using static WebUI.Helpers.GlobalHelper;
 
-namespace WebUI.Controllers
+namespace WebUI.Controllers;
+
+[Authorize(Policy = AccessPolicies.BlogAuthor)]
+public class AdminBlogController(IBlogService blogs, ICatagoryService categories, IFileHelper files,
+    IWebHostEnvironment environment, IMapper mapper, IAuthorizationService authorization,
+    IBlogWorkflowService workflow) : BaseController
 {
-    [Authorize]
-    public class AdminBlogController : BaseController
+    private string UploadPath => Path.Combine(environment.WebRootPath, "uploads", "blogs");
+    private async Task<bool> CanManage(Blog blog) =>
+        (await authorization.AuthorizeAsync(User, blog, AccessPolicies.BlogResource)).Succeeded;
+
+    public async Task<IActionResult> Index(int? categoryId)
     {
-        private readonly IMapper _mapper;
-        private readonly string _uploadPath;
-        private readonly IBlogService _blogService;
-        private readonly ICatagoryService _catagoryService;
-        private readonly IFileHelper _fileHelper;
-        private readonly IWebHostEnvironment _env;
-
-        public AdminBlogController(IBlogService blogService, ICatagoryService catagoryService, IFileHelper fileHelper, IWebHostEnvironment env, IMapper mapper)
+        var query = blogs.GetQueryable();
+        if (!(await authorization.AuthorizeAsync(User, AccessPolicies.ContentManager)).Succeeded)
         {
-            _blogService = blogService;
-            _catagoryService = catagoryService;
-            _fileHelper = fileHelper;
-            _env = env;
-            _mapper = mapper;
-            _uploadPath = Path.Combine(_env.WebRootPath, "uploads", "blogs");
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)) return Forbid();
+            query = query.Where(b => b.AppUserId == id);
         }
-
-        public async Task<IActionResult> Index(int? categoryId)
-        {
-            var data = await _blogService.GetQueryable()
-                .Where(b => !categoryId.HasValue || b.CatagoryId == categoryId.Value)
-                .OrderByDescending(b => b.CreatedDate)
-                .Include(b => b.AppUser)
-                .Include(b => b.Catagory)
-                .ToListAsync();
-
-            ViewBag.blogCount = data.Count;
-            ViewBag.SelectedCategory = categoryId;
-            ViewBag.Categories = await GetCategorySelectList();
-
-            return View(data);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.Categories = await GetCategorySelectList();
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BlogCreateDto model, IFormFile? ImageFile)
-        {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Categories = await GetCategorySelectList();
-                return View(model);
-            }
-
-            model.Slug = ToSlug(model.Title);
-            var blog = _mapper.Map<Blog>(model);
-
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            blog.AppUserId = userId;
-
-            if (ImageFile != null)
-                blog.Image = await _fileHelper.UploadAsync(ImageFile, _uploadPath);
-
-            await _blogService.AddAsync(blog);
-            SetToastMessage("Blog başarıyla oluşturuldu", "success");
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || id <= 0) return NotFound();
-
-            var data = await _blogService.GetByIDAsync(id.Value);
-
-            if (data == null) return NotFound();
-
-            var model = _mapper.Map<BlogUpdateDto>(data);
-
-            ViewBag.Categories = await GetCategorySelectList();
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BlogUpdateDto model, int id, IFormFile? NewImageFile)
-        {
-            if (id != model.Id) return NotFound();
-
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Categories = await GetCategorySelectList();
-                return View(model);
-            }
-
-            try
-            {
-                var existingBlog = await _blogService.GetByIDAsync(id);
-                if (existingBlog == null) return NotFound();
-
-                model.Slug = ToSlug(model.Title);
-                _mapper.Map(model, existingBlog);
-
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                existingBlog.AppUserId = userId;
-
-                if (NewImageFile != null)
-                {
-                    existingBlog.Image = await _fileHelper.UpdateAsync(NewImageFile, _uploadPath, existingBlog.Image);
-                }
-
-                var success = await _blogService.UpdateAsync(existingBlog);
-
-                if (!success)
-                {
-                    SetToastMessage("Güncelleme işlemi başarısız", "error");
-                    return View(model);
-                }
-
-                SetToastMessage("Blog başarıyla güncellendi", "success");
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                SetToastMessage("Güncelleme işlemi başarısız: " + ex.Message, "error");
-                return View(model);
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var data = await _blogService.GetByIDAsync(id.Value);
-
-            if (data == null)
-            {
-                return NotFound();
-            }
-
-            var vm = new GenericDeleteViewModel
-            {
-                Id = data.Id,
-                Title = data.Title,
-                SubHeading = data.SubTitle,
-                ImagePath = data.Image,
-                EntityName = "Blok"
-            };
-
-            return View("/Views/Shared/Delete.cshtml", vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
-        {
-            if (id <= 0 || id == null)
-            {
-                return NotFound("ID bulunamadı");
-            }
-
-            var data = await _blogService.GetByIDAsync(id.Value);
-
-            if (data == null)
-            {
-                return NotFound("Veri bulunamadı");
-            }
-
-            if (!string.IsNullOrEmpty(data.Image))
-            {
-                _fileHelper.Delete(data.Image);
-            }
-
-            var result = await _blogService.DeleteAsync(id.Value);
-
-            if (!result)
-            {
-                SetToastMessage("Silme işleminde bir sorun oldu!", "error");
-                return View(data);
-            }
-
-            SetToastMessage("Blok başarıyla silindi", "success");
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Ortak kategori select list metodu
-        private async Task<List<SelectListItem>> GetCategorySelectList()
-        {
-            var categories = await _catagoryService.GetListAsync();
-            return categories.Select(x => new SelectListItem
-            {
-                Text = x.Title,
-                Value = x.Id.ToString()
-            }).ToList();
-        }
+        var data = await query.Where(b => !categoryId.HasValue || b.CatagoryId == categoryId)
+            .Include(b => b.AppUser).Include(b => b.Catagory).OrderByDescending(b => b.CreatedDate).ToListAsync();
+        ViewBag.blogCount = data.Count;
+        ViewBag.SelectedCategory = categoryId;
+        ViewBag.Categories = await CategoryList();
+        return View(data);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        ViewBag.Categories = await CategoryList();
+        return View();
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(BlogCreateDto model, IFormFile? ImageFile)
+    {
+        if (!ModelState.IsValid) { ViewBag.Categories = await CategoryList(); return View(model); }
+        var image = ImageFile is null ? null : await files.UploadAsync(ImageFile, UploadPath);
+        await workflow.CreateAsync(new Blog { Title = model.Title, SubTitle = model.SubTitle,
+            Content = model.Content, Slug = ToSlug(model.Title), CatagoryId = model.CatagoryId, Image = image });
+        SetToastMessage("Blog taslak olarak kaydedildi", "success");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id is null or <= 0) return NotFound();
+        var blog = await blogs.GetByIDAsync(id.Value);
+        if (blog is null) return NotFound();
+        if (!await CanManage(blog)) return Forbid();
+        ViewBag.Categories = await CategoryList();
+        return View(mapper.Map<BlogUpdateDto>(blog));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(BlogUpdateDto model, int id, IFormFile? NewImageFile)
+    {
+        if (id != model.Id) return NotFound();
+        var blog = await blogs.GetByIDAsync(id);
+        if (blog is null) return NotFound();
+        if (!await CanManage(blog)) return Forbid();
+        if (!ModelState.IsValid) { model.Image = blog.Image; ViewBag.Categories = await CategoryList(); return View(model); }
+        var image = NewImageFile is null ? null : await files.UploadAsync(NewImageFile, UploadPath);
+        if (!await workflow.UpdateAsync(id, model.Title, model.SubTitle, model.Content, model.CatagoryId, image)) return NotFound();
+        SetToastMessage("Blog güncellendi", "success");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id is null or <= 0) return NotFound();
+        var blog = await blogs.GetByIDAsync(id.Value);
+        if (blog is null) return NotFound();
+        if (!await CanManage(blog)) return Forbid();
+        return View("/Views/Shared/Delete.cshtml", new GenericDeleteViewModel {
+            Id = blog.Id, Title = blog.Title, SubHeading = blog.SubTitle, ImagePath = blog.Image, EntityName = "Blog" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int? id)
+    {
+        if (id is null or <= 0) return NotFound();
+        var blog = await blogs.GetByIDAsync(id.Value);
+        if (blog is null) return NotFound();
+        if (!await CanManage(blog)) return Forbid();
+        if (!await workflow.DeleteAsync(id.Value)) return NotFound();
+        SetToastMessage("Blog çöp kutusuna taşındı. Görsel korundu.", "success");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitForReview(int id)
+    {
+        var blog = await blogs.GetByIDAsync(id);
+        if (blog is null) return NotFound();
+        if (!await CanManage(blog)) return Forbid();
+        if (!await workflow.ChangeStatusAsync(id, PublishStatus.PendingReview)) return NotFound();
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Policy = AccessPolicies.ContentManager)]
+    public async Task<IActionResult> Review(int id, PublishStatus status)
+    {
+        if (status is not (PublishStatus.Published or PublishStatus.Rejected or PublishStatus.Draft)) return BadRequest();
+        if (!await workflow.ChangeStatusAsync(id, status)) return NotFound();
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet, Authorize(Policy = AccessPolicies.ContentManager)]
+    public async Task<IActionResult> Trash() => View(await workflow.GetTrashAsync());
+
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Policy = AccessPolicies.ContentManager)]
+    public async Task<IActionResult> Restore(int id)
+    {
+        if (!await workflow.RestoreAsync(id)) return NotFound();
+        SetToastMessage("Blog görseliyle birlikte taslak olarak geri yüklendi", "success");
+        return RedirectToAction(nameof(Trash));
+    }
+
+    private async Task<List<SelectListItem>> CategoryList() => (await categories.GetListAsync())
+        .Select(c => new SelectListItem(c.Title, c.Id.ToString())).ToList();
 }

@@ -7,7 +7,7 @@ namespace EntityLayer.Concrete
         public int Id { get; set; }
 
         [Display(Name = "Eklenme Tarihi")]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Oluşturan Kullanıcı")]
         public string? CreatedBy { get; set; }

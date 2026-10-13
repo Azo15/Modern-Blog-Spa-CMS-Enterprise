@@ -20,6 +20,8 @@ namespace BusinessLayer.Container
 
             services.AddScoped<IBlogDal, EFBlogDal>();
             services.AddScoped<IBlogService, BlogManager>();
+            services.AddScoped<IBlogWorkflowService, BlogWorkflowService>();
+            services.AddScoped<IHtmlContentSanitizer, HtmlContentSanitizer>();
 
             services.AddScoped<IAboutDal, EFAboutDal>();
             services.AddScoped<IAboutService, AboutManager>();

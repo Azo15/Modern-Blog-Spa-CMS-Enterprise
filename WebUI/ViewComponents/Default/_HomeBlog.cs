@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
@@ -17,7 +17,7 @@ namespace WebUI.ViewComponents.Default
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var data = await _blogService.GetListAsync(
-                filter: x => x.IsPublish == true,
+                filter: x => !x.IsDeleted && x.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
                 orderBy: q => q.OrderByDescending(x => x.CreatedDate),
                 take: 8,
                 includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }

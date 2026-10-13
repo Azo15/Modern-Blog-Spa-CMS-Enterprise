@@ -1,3 +1,7 @@
+using BusinessLayer.Security;
+using DataAccesLayer.Abstract;
+using WebUI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
@@ -31,12 +35,17 @@ builder.Host.UseSerilog();
 
 // 1. Uygulama ayarlarını al
 var configuration = builder.Configuration;
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddAuthorization(AccessPolicies.Configure);
+builder.Services.AddSingleton<IAuthorizationHandler, BlogOwnerAuthorizationHandler>();
 
 // 2. Katman bağımlılıklarını çöz
 builder.Services.ContainerDependencies();
 
 // 3. DbContext'i DI sistemine ekle ve SQL Server bağlantısını ayarla
-var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+var connection = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings__DefaultConnection ortam değişkenini veya User Secrets ayarını tanımlayın.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connection));
@@ -81,7 +90,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
-    options.LoginPath = "/Error/AccessDenied"; // Giriş yapılmadıysa buraya gider
+    options.LoginPath = "/dashboard/giris"; // Giriş yapılmadıysa buraya gider
     options.AccessDeniedPath = "/Error/AccessDenied"; // Yetki yoksa buraya gider
     options.SlidingExpiration = true;
     options.Cookie.Name = ".SpaMerkezi.Auth";
@@ -103,8 +112,10 @@ if (app.Environment.IsDevelopment())
     await context.Database.MigrateAsync();
 }
 
-// 8. Örnek verileri yükle (tablolar boşsa)
-await DataSeeder.SeedAsync(app.Services);
+// Roles are safe to provision in all environments; demo users/content are development-only.
+await DataSeeder.SeedRolesAsync(app.Services);
+if (app.Environment.IsDevelopment())
+    await DataSeeder.SeedAsync(app.Services);
 
 // 9. Geliştirme ve üretim ortamlarına göre hata sayfası
 if (app.Environment.IsDevelopment())

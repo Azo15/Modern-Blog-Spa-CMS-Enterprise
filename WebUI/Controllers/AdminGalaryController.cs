@@ -1,11 +1,11 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminGalaryController : BaseController
     {
         private readonly IGalaryService _galaryService;

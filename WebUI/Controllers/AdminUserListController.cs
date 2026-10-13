@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +8,7 @@ using WebUI.Models;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireAdmin")]
     public class AdminUserListController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;

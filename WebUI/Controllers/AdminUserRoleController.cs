@@ -7,7 +7,7 @@ using WebUI.Models;
 
 namespace WebUI.Controllers
 {
-    [Authorize(Roles = "System Admin")]
+    [Authorize(Policy = "RequireAdmin")]
     public class AdminUserRoleController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;

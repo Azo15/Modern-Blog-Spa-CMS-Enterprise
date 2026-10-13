@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +6,7 @@ using WebUI.Models;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireModerator")]
     public class AdminMessageController : BaseController
     {
         private readonly IContactFormService _contactFormService;

@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +29,7 @@ namespace WebUI.Controllers
         // Giriş (POST)
         [AllowAnonymous]
         [HttpPost("giris")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(SignInViewModel model)
         {
             if (!ModelState.IsValid)
@@ -65,7 +66,7 @@ namespace WebUI.Controllers
                     user.FailedLoginCount = 0;
                     user.LastFailedLogin = null;
                     await _userManager.UpdateAsync(user);
-                    return RedirectToAction("UserList", "AdminUserList");
+                    return await LandingPage(user);
                 }
 
                 // Başarısız giriş
@@ -97,6 +98,7 @@ namespace WebUI.Controllers
 
         [AllowAnonymous]
         [HttpPost("kayit")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
             if (!ModelState.IsValid)
@@ -121,7 +123,9 @@ namespace WebUI.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("UserList", "AdminUserList");
+                var roleResult = await _userManager.AddToRoleAsync(user, BusinessLayer.Security.AppRoles.RegisteredUser);
+                if (!roleResult.Succeeded) throw new InvalidOperationException("Üye rolü atanamadı.");
+                return RedirectToAction(nameof(SignIn));
             }
 
             foreach (var error in result.Errors)
@@ -130,6 +134,18 @@ namespace WebUI.Controllers
             }
 
             return View(model);
+        }
+
+        private async Task<IActionResult> LandingPage(AppUser user)
+        {
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin))
+                return RedirectToAction("UserList", "AdminUserList");
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.ContentManager)
+                || await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Author))
+                return RedirectToAction("Index", "AdminBlog");
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Moderator))
+                return RedirectToAction("Index", "AdminMessage");
+            return RedirectToAction("Index", "Default");
         }
 
         private TimeSpan GetDelayForFailedCount(int failedCount)
@@ -147,6 +163,7 @@ namespace WebUI.Controllers
 
         [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

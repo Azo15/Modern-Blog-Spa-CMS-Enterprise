@@ -26,14 +26,14 @@ namespace BusinessLayer.CQRS.Handlers
             var cachedBlogs = await _cacheService.GetAsync<List<Blog>>(cacheKey);
             if (cachedBlogs != null && cachedBlogs.Any())
             {
-                return cachedBlogs;
+                return cachedBlogs.Where(b => !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published).ToList();
             }
 
             List<Blog> blogs;
             if (request.CategoryId.HasValue && request.CategoryId.Value > 0)
             {
                 blogs = await _blogService.GetListAsync(
-                    filter: b => b.CatagoryId == request.CategoryId.Value && b.IsPublish == true,
+                    filter: b => b.CatagoryId == request.CategoryId.Value && !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
                     orderBy: q => q.OrderByDescending(b => b.CreatedDate),
                     includes: new System.Linq.Expressions.Expression<Func<Blog, object>>[] { b => b.Catagory, b => b.AppUser }
                 );
@@ -41,7 +41,7 @@ namespace BusinessLayer.CQRS.Handlers
             else
             {
                 blogs = await _blogService.GetListAsync(
-                    filter: b => b.IsPublish == true,
+                    filter: b => !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
                     orderBy: q => q.OrderByDescending(b => b.CreatedDate),
                     includes: new System.Linq.Expressions.Expression<Func<Blog, object>>[] { b => b.Catagory, b => b.AppUser }
                 );
@@ -73,11 +73,11 @@ namespace BusinessLayer.CQRS.Handlers
             var cachedBlog = await _cacheService.GetAsync<Blog>(cacheKey);
             if (cachedBlog != null)
             {
-                return cachedBlog;
+                return !cachedBlog.IsDeleted && cachedBlog.PublishStatus == EntityLayer.Enum.PublishStatus.Published ? cachedBlog : null;
             }
 
             var blog = await _blogService.FirstOrDefaultAsync(
-                predicate: b => b.Id == request.Id,
+                predicate: b => b.Id == request.Id && !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
                 includes: new System.Linq.Expressions.Expression<Func<Blog, object>>[] { b => b.Catagory, b => b.AppUser }
             );
 
@@ -90,101 +90,22 @@ namespace BusinessLayer.CQRS.Handlers
         }
     }
 
-    public class CreateBlogCommandHandler : IRequestHandler<CreateBlogCommand, int>
+    public class CreateBlogCommandHandler(IBlogWorkflowService workflow) : IRequestHandler<CreateBlogCommand, int>
     {
-        private readonly IBlogService _blogService;
-        private readonly ICacheService _cacheService;
-
-        public CreateBlogCommandHandler(IBlogService blogService, ICacheService cacheService)
-        {
-            _blogService = blogService;
-            _cacheService = cacheService;
-        }
-
-        public async Task<int> Handle(CreateBlogCommand request, CancellationToken cancellationToken)
-        {
-            var blog = new Blog
-            {
-                Title = request.Title,
-                SubTitle = request.SubTitle,
-                Content = request.Content,
-                Image = request.Image ?? string.Empty,
-                CatagoryId = request.CatagoryId,
-                AppUserId = request.AppUserId,
-                IsPublish = true
-            };
-
-            await _blogService.AddAsync(blog);
-
-            // 📌 Önbellek Temizleme (Cache Invalidation)
-            await _cacheService.RemoveAsync("all_blogs_cache");
-            await _cacheService.RemoveAsync($"blogs_category_{request.CatagoryId}");
-
-            return blog.Id;
-        }
+        public Task<int> Handle(CreateBlogCommand request, CancellationToken cancellationToken)
+            => workflow.CreateAsync(new Blog { Title = request.Title, SubTitle = request.SubTitle, Content = request.Content,
+                Image = request.Image, CatagoryId = request.CatagoryId }, cancellationToken);
     }
 
-    public class UpdateBlogCommandHandler : IRequestHandler<UpdateBlogCommand, bool>
+    public class UpdateBlogCommandHandler(IBlogWorkflowService workflow) : IRequestHandler<UpdateBlogCommand, bool>
     {
-        private readonly IBlogService _blogService;
-        private readonly ICacheService _cacheService;
-
-        public UpdateBlogCommandHandler(IBlogService blogService, ICacheService cacheService)
-        {
-            _blogService = blogService;
-            _cacheService = cacheService;
-        }
-
-        public async Task<bool> Handle(UpdateBlogCommand request, CancellationToken cancellationToken)
-        {
-            var blog = await _blogService.GetByIDAsync(request.Id);
-            if (blog == null) return false;
-
-            blog.Title = request.Title;
-            blog.SubTitle = request.SubTitle;
-            blog.Content = request.Content;
-            if (!string.IsNullOrEmpty(request.Image))
-            {
-                blog.Image = request.Image;
-            }
-            blog.CatagoryId = request.CatagoryId;
-
-            var result = await _blogService.UpdateAsync(blog);
-
-            if (result)
-            {
-                // 📌 Önbellek Temizleme (Cache Invalidation)
-                await _cacheService.RemoveAsync("all_blogs_cache");
-                await _cacheService.RemoveAsync($"blog_detail_{request.Id}");
-                await _cacheService.RemoveAsync($"blogs_category_{request.CatagoryId}");
-            }
-
-            return result;
-        }
+        public Task<bool> Handle(UpdateBlogCommand request, CancellationToken cancellationToken)
+            => workflow.UpdateAsync(request.Id, request.Title, request.SubTitle, request.Content, request.CatagoryId, request.Image, cancellationToken);
     }
 
-    public class DeleteBlogCommandHandler : IRequestHandler<DeleteBlogCommand, bool>
+    public class DeleteBlogCommandHandler(IBlogWorkflowService workflow) : IRequestHandler<DeleteBlogCommand, bool>
     {
-        private readonly IBlogService _blogService;
-        private readonly ICacheService _cacheService;
-
-        public DeleteBlogCommandHandler(IBlogService blogService, ICacheService cacheService)
-        {
-            _blogService = blogService;
-            _cacheService = cacheService;
-        }
-
-        public async Task<bool> Handle(DeleteBlogCommand request, CancellationToken cancellationToken)
-        {
-            var blog = await _blogService.GetByIDAsync(request.Id);
-            if (blog != null)
-            {
-                await _cacheService.RemoveAsync("all_blogs_cache");
-                await _cacheService.RemoveAsync($"blog_detail_{request.Id}");
-                await _cacheService.RemoveAsync($"blogs_category_{blog.CatagoryId}");
-            }
-
-            return await _blogService.DeleteAsync(request.Id);
-        }
+        public Task<bool> Handle(DeleteBlogCommand request, CancellationToken cancellationToken)
+            => workflow.DeleteAsync(request.Id, cancellationToken);
     }
 }

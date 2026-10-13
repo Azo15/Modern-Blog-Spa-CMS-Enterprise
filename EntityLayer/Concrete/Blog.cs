@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer.Concrete
 {
     public class Blog : BaseEntity
     {
+        public EntityLayer.Enum.PublishStatus PublishStatus { get; set; } = EntityLayer.Enum.PublishStatus.Draft;
         [Display(Name = "Başlık")]
         public string? Title { get; set; }
 

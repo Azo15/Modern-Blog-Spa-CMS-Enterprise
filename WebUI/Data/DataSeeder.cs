@@ -6,6 +6,22 @@ namespace WebUI.Data
 {
     public static class DataSeeder
     {
+        private static void Ensure(IdentityResult result)
+        {
+            if (!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+        }
+
+        public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var manager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+            foreach (var role in BusinessLayer.Security.AppRoles.All)
+                if (!await manager.RoleExistsAsync(role)) Ensure(await manager.CreateAsync(new IdentityRole<int>(role)));
+            // Visitor is an anonymous access profile, never an Identity role.
+            var visitor = await manager.FindByNameAsync("Visitor");
+            if (visitor != null) Ensure(await manager.DeleteAsync(visitor));
+        }
+
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
@@ -13,35 +29,39 @@ namespace WebUI.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-            // ──────────────────── ROLLER ────────────────────
-            string[] roles = new[] { "System Admin", "Content Manager", "Author", "Moderator", "Registered User", "Visitor" };
-            foreach (var roleName in roles)
+            // SeedAsync itself also checks the environment so it cannot be called accidentally in production.
+            if (!scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment()) return;
+            await SeedRolesAsync(serviceProvider);
+            var accounts = new[] {
+                ("admin@spa.com", BusinessLayer.Security.AppRoles.Admin),
+                ("editor@spa.com", BusinessLayer.Security.AppRoles.ContentManager),
+                ("author@spa.com", BusinessLayer.Security.AppRoles.Author),
+                ("moderator@spa.com", BusinessLayer.Security.AppRoles.Moderator),
+                ("user@spa.com", BusinessLayer.Security.AppRoles.RegisteredUser)
+            };
+            foreach (var (email, role) in accounts)
             {
-                if (!await roleManager.RoleExistsAsync(roleName))
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
                 {
-                    await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
+                    user = new AppUser { UserName = email, Email = email, FirstName = "Test", LastName = role, EmailConfirmed = true };
+                    Ensure(await userManager.CreateAsync(user, "P@ssword123!"));
                 }
-            }
-
-            // ──────────────────── KULLANICI ────────────────────
-            AppUser? seederUser = await userManager.FindByEmailAsync("admin@spa.com");
-            if (seederUser == null)
-            {
-                seederUser = new AppUser
+                else
                 {
-                    UserName = "admin@spa.com",
-                    Email = "admin@spa.com",
-                    FirstName = "Spa",
-                    LastName = "Admin",
-                    EmailConfirmed = true
-                };
-                await userManager.CreateAsync(seederUser, "Admin123!");
+                    user.EmailConfirmed = true;
+                    Ensure(await userManager.UpdateAsync(user));
+                    if (!await userManager.CheckPasswordAsync(user, "P@ssword123!"))
+                        Ensure(await userManager.ResetPasswordAsync(user, await userManager.GeneratePasswordResetTokenAsync(user), "P@ssword123!"));
+                }
+                // Keep demo accounts deterministic and prevent stale elevated roles.
+                var existingRoles = await userManager.GetRolesAsync(user);
+                if (existingRoles.Any(r => r != role))
+                    Ensure(await userManager.RemoveFromRolesAsync(user, existingRoles.Where(r => r != role)));
+                if (!await userManager.IsInRoleAsync(user, role)) Ensure(await userManager.AddToRoleAsync(user, role));
             }
-
-            if (!await userManager.IsInRoleAsync(seederUser, "System Admin"))
-            {
-                await userManager.AddToRoleAsync(seederUser, "System Admin");
-            }
+            var seederUser = await userManager.FindByEmailAsync("admin@spa.com")
+                ?? throw new InvalidOperationException("Development admin account was not created.");
 
             // ──────────────────── KATEGORİLER ────────────────────
             if (!context.Catagories.Any())
@@ -72,53 +92,53 @@ namespace WebUI.Data
                 var blogs = new List<Blog>
                 {
                     // Cilt Bakımı (CatId 1)
-                    new() { Title = "Kış Aylarında Cilt Neminin Önemi", SubTitle = "Soğuk havada cildinizi koruyun", Content = "<p>Kış aylarında hava nemi düşer ve cildiniz kurumaya başlar. Günde en az 2 litre su içmek ve nemlendirici kullanmak cildinizin sağlığını korur. Doğal zeytinyağlı kremler bu dönemde idealdir.</p>", Image = "blog/cilt-nem.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-29) },
-                    new() { Title = "C Vitamini Serumu Neden Kullanmalısınız?", SubTitle = "Parlaklık ve canlılık için", Content = "<p>C vitamini serumu cilt tonu eşitsizliklerini giderir, leke açar ve antioksidan koruması sağlar. Sabah rutininize ekleyin ve farkı haftalarca görün.</p>", Image = "blog/c-vitamini.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-27) },
-                    new() { Title = "Peeling Nedir ve Ne Zaman Yapılmalı?", SubTitle = "Hücre yenilemenin sırrı", Content = "<p>Kimyasal ya da mekanik peeling, ölü hücreleri uzaklaştırır ve cildi yeniler. Haftada 1-2 kez uygulamak yeterlidir; hassas ciltler için daha az sıklık önerilir.</p>", Image = "blog/peeling.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-25) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Kış Aylarında Cilt Neminin Önemi", SubTitle = "Soğuk havada cildinizi koruyun", Content = "<p>Kış aylarında hava nemi düşer ve cildiniz kurumaya başlar. Günde en az 2 litre su içmek ve nemlendirici kullanmak cildinizin sağlığını korur. Doğal zeytinyağlı kremler bu dönemde idealdir.</p>", Image = "blog/cilt-nem.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-29) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "C Vitamini Serumu Neden Kullanmalısınız?", SubTitle = "Parlaklık ve canlılık için", Content = "<p>C vitamini serumu cilt tonu eşitsizliklerini giderir, leke açar ve antioksidan koruması sağlar. Sabah rutininize ekleyin ve farkı haftalarca görün.</p>", Image = "blog/c-vitamini.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-27) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Peeling Nedir ve Ne Zaman Yapılmalı?", SubTitle = "Hücre yenilemenin sırrı", Content = "<p>Kimyasal ya da mekanik peeling, ölü hücreleri uzaklaştırır ve cildi yeniler. Haftada 1-2 kez uygulamak yeterlidir; hassas ciltler için daha az sıklık önerilir.</p>", Image = "blog/peeling.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-25) },
 
                     // Masaj Teknikleri (CatId 2)
-                    new() { Title = "İsveç Masajı ve Faydaları", SubTitle = "Kasları gevşeten klasik teknik", Content = "<p>İsveç masajı, uzun ve kayıcı vuruşlarla yapılır. Kan dolaşımını iyileştirir, kas gerginliğini azaltır ve derin bir rahatlama sağlar. Haftada bir seans uzun vadeli fayda sunar.</p>", Image = "blog/isvec-masaj.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-24) },
-                    new() { Title = "Derin Doku Masajı Kimler İçin Uygundur?", SubTitle = "Kronik ağrılar için çözüm", Content = "<p>Derin doku masajı, kasların alt katmanlarına ulaşarak kronik ağrıyı ve kas spazmını çözer. Atletler ve masa başı çalışanlar için özellikle önerilir.</p>", Image = "blog/derin-doku.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-22) },
-                    new() { Title = "Refleksoloji: Ayak Noktalarından Şifa", SubTitle = "Vücudun haritası ayaklarda", Content = "<p>Refleksoloji, ayakta bulunan basınç noktalarına belirli tekniklerle baskı uygulanarak organların uyarılması prensibine dayanır. Stres azaltmada ve enerji dengelenmesinde etkilidir.</p>", Image = "blog/refleksoloji.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-20) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "İsveç Masajı ve Faydaları", SubTitle = "Kasları gevşeten klasik teknik", Content = "<p>İsveç masajı, uzun ve kayıcı vuruşlarla yapılır. Kan dolaşımını iyileştirir, kas gerginliğini azaltır ve derin bir rahatlama sağlar. Haftada bir seans uzun vadeli fayda sunar.</p>", Image = "blog/isvec-masaj.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-24) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Derin Doku Masajı Kimler İçin Uygundur?", SubTitle = "Kronik ağrılar için çözüm", Content = "<p>Derin doku masajı, kasların alt katmanlarına ulaşarak kronik ağrıyı ve kas spazmını çözer. Atletler ve masa başı çalışanlar için özellikle önerilir.</p>", Image = "blog/derin-doku.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-22) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Refleksoloji: Ayak Noktalarından Şifa", SubTitle = "Vücudun haritası ayaklarda", Content = "<p>Refleksoloji, ayakta bulunan basınç noktalarına belirli tekniklerle baskı uygulanarak organların uyarılması prensibine dayanır. Stres azaltmada ve enerji dengelenmesinde etkilidir.</p>", Image = "blog/refleksoloji.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-20) },
 
                     // Wellness & Meditasyon (CatId 3)
-                    new() { Title = "5 Dakikalık Nefes Meditasyonu", SubTitle = "İş yerinde yapabileceğiniz teknikler", Content = "<p>Derin nefes alma teknikleri kortizol seviyesini düşürür ve anı farkındalığı artırır. Gözlerinizi kapatın, 4 saniye nefes alın, 4 saniye tutun, 6 saniye verin. Beş tekrar yeterlidir.</p>", Image = "blog/meditasyon.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-18) },
-                    new() { Title = "Mindfulness ve Günlük Hayat", SubTitle = "Her anda tam anlamıyla var olmak", Content = "<p>Mindfulness, geçmiş ya da geleceğe takılmadan şu ana odaklanmaktır. Yemek yerken, yürürken veya uyumadan önce birkaç dakika bilinçli nefes egzersizi yapmak başlangıç için yeterlidir.</p>", Image = "blog/mindfulness.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-16) },
-                    new() { Title = "Dijital Detoks: Telefondan Uzak Kalmak", SubTitle = "Zihin sağlığı için ekran molası", Content = "<p>Günde en az 2 saat ekrandan uzak bir 'dijital suskunluk' dönemi geçirmek uyku kalitesini ve odaklanmayı istatistiksel olarak %37 artırmaktadır. Yatmadan 1 saat önce başlayın.</p>", Image = "blog/digital-detoks.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-14) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "5 Dakikalık Nefes Meditasyonu", SubTitle = "İş yerinde yapabileceğiniz teknikler", Content = "<p>Derin nefes alma teknikleri kortizol seviyesini düşürür ve anı farkındalığı artırır. Gözlerinizi kapatın, 4 saniye nefes alın, 4 saniye tutun, 6 saniye verin. Beş tekrar yeterlidir.</p>", Image = "blog/meditasyon.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-18) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Mindfulness ve Günlük Hayat", SubTitle = "Her anda tam anlamıyla var olmak", Content = "<p>Mindfulness, geçmiş ya da geleceğe takılmadan şu ana odaklanmaktır. Yemek yerken, yürürken veya uyumadan önce birkaç dakika bilinçli nefes egzersizi yapmak başlangıç için yeterlidir.</p>", Image = "blog/mindfulness.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-16) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Dijital Detoks: Telefondan Uzak Kalmak", SubTitle = "Zihin sağlığı için ekran molası", Content = "<p>Günde en az 2 saat ekrandan uzak bir 'dijital suskunluk' dönemi geçirmek uyku kalitesini ve odaklanmayı istatistiksel olarak %37 artırmaktadır. Yatmadan 1 saat önce başlayın.</p>", Image = "blog/digital-detoks.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-14) },
 
                     // Aromaterapi (CatId 4)
-                    new() { Title = "Lavanta Yağının 7 Faydası", SubTitle = "Doğanın en çok yönlü esansı", Content = "<p>Lavanta esansiyel yağı; uyku düzenini iyileştirir, kaygıyı azaltır, hafıza ağrısını dindirir, cilt tahrişini giderir, yara iyileşmesini hızlandırır, böcekleri uzaklaştırır ve saç büyümesini destekler.</p>", Image = "blog/lavanta.jpg", CatagoryId = cats[3].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-13) },
-                    new() { Title = "Difüzör Kullanımı Rehberi", SubTitle = "Odanızı aromaterapi cennetine çevirin", Content = "<p>Difüzör seçerken ultrasonik modeller tercih edin. Dam başına 3-5 damla yağ yeterlidir. Çay ağacı ve ökaliptüs kombinasyonu sabah, lavanta ve papatya karışımı gece için idealdir.</p>", Image = "blog/difuzor.jpg", CatagoryId = cats[3].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-11) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Lavanta Yağının 7 Faydası", SubTitle = "Doğanın en çok yönlü esansı", Content = "<p>Lavanta esansiyel yağı; uyku düzenini iyileştirir, kaygıyı azaltır, hafıza ağrısını dindirir, cilt tahrişini giderir, yara iyileşmesini hızlandırır, böcekleri uzaklaştırır ve saç büyümesini destekler.</p>", Image = "blog/lavanta.jpg", CatagoryId = cats[3].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-13) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Difüzör Kullanımı Rehberi", SubTitle = "Odanızı aromaterapi cennetine çevirin", Content = "<p>Difüzör seçerken ultrasonik modeller tercih edin. Dam başına 3-5 damla yağ yeterlidir. Çay ağacı ve ökaliptüs kombinasyonu sabah, lavanta ve papatya karışımı gece için idealdir.</p>", Image = "blog/difuzor.jpg", CatagoryId = cats[3].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-11) },
 
                     // Beslenme & Detoks (CatId 5)
-                    new() { Title = "3 Günlük Bahar Detoks Programı", SubTitle = "İçinizi baharla temizleyin", Content = "<p>1. gün: Yalnızca sıvı gıdalar. 2. gün: Çiğ sebze ve meyve. 3. gün: Hafif pişirilmiş yiyecekler. Bol su, yeşil çay ve taze sıkılmış meyve suları tüm program boyunca serbesttir.</p>", Image = "blog/detoks.jpg", CatagoryId = cats[4].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-10) },
-                    new() { Title = "Kolajen Üretimini Artıran 8 Besin", SubTitle = "Mutfağınızdan güzellik reçetesi", Content = "<p>C vitamini (kivi, biber), çinko (kabak çekirdeği, yumurta), bakır (kakao, susam) ve glisin (kemik suyu, jelatin) kolajen sentezini destekler. Bu besinleri günlük diyetinize ekleyin.</p>", Image = "blog/kollajen.jpg", CatagoryId = cats[4].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-9) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "3 Günlük Bahar Detoks Programı", SubTitle = "İçinizi baharla temizleyin", Content = "<p>1. gün: Yalnızca sıvı gıdalar. 2. gün: Çiğ sebze ve meyve. 3. gün: Hafif pişirilmiş yiyecekler. Bol su, yeşil çay ve taze sıkılmış meyve suları tüm program boyunca serbesttir.</p>", Image = "blog/detoks.jpg", CatagoryId = cats[4].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-10) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Kolajen Üretimini Artıran 8 Besin", SubTitle = "Mutfağınızdan güzellik reçetesi", Content = "<p>C vitamini (kivi, biber), çinko (kabak çekirdeği, yumurta), bakır (kakao, susam) ve glisin (kemik suyu, jelatin) kolajen sentezini destekler. Bu besinleri günlük diyetinize ekleyin.</p>", Image = "blog/kollajen.jpg", CatagoryId = cats[4].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-9) },
 
                     // Hamam & Sauna (CatId 6)
-                    new() { Title = "Türk Hamamı Deneyimi: Neler Beklemelisiniz?", SubTitle = "Geleneksel temizlik ritüeli", Content = "<p>Geleneksel Türk hamamında önce soyunma odası (camekan), ardından ılıklık (ılıcak) ve sıcaklık (hararet) bölümlerine geçilir. Kese ve köpük masajı cildi derinlemesine temizler.</p>", Image = "blog/hamam.jpg", CatagoryId = cats[5].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-8) },
-                    new() { Title = "Sauna ve Bağışıklık Sistemi İlişkisi", SubTitle = "Düzenli saunanın bilimsel kanıtları", Content = "<p>Haftada 2-3 kez yapılan sauna seanları, belediyenin bağışıklık hücrelerini aktive eder. Finlandiya'da yapılan uzun dönem araştırmalar kalp hastalığı riskini %40 azalttığını göstermiştir.</p>", Image = "blog/sauna.jpg", CatagoryId = cats[5].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-7) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Türk Hamamı Deneyimi: Neler Beklemelisiniz?", SubTitle = "Geleneksel temizlik ritüeli", Content = "<p>Geleneksel Türk hamamında önce soyunma odası (camekan), ardından ılıklık (ılıcak) ve sıcaklık (hararet) bölümlerine geçilir. Kese ve köpük masajı cildi derinlemesine temizler.</p>", Image = "blog/hamam.jpg", CatagoryId = cats[5].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-8) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Sauna ve Bağışıklık Sistemi İlişkisi", SubTitle = "Düzenli saunanın bilimsel kanıtları", Content = "<p>Haftada 2-3 kez yapılan sauna seanları, belediyenin bağışıklık hücrelerini aktive eder. Finlandiya'da yapılan uzun dönem araştırmalar kalp hastalığı riskini %40 azalttığını göstermiştir.</p>", Image = "blog/sauna.jpg", CatagoryId = cats[5].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-7) },
 
                     // Anti-Aging (CatId 7)
-                    new() { Title = "Retinol Kullanımının Püf Noktaları", SubTitle = "Yanlış kullanmaktan kaçının", Content = "<p>Retinol güçlü bir A vitamini türevidir. Başlangıçta haftada 2 gece kullanın. Güneş koruyucu olmadan gündüz uygulamayın. Hamilelikte kesinlikle kullanmayın. 6-8 haftada sonuç görürsünüz.</p>", Image = "blog/retinol.jpg", CatagoryId = cats[6].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-6) },
-                    new() { Title = "Gözaltı Kırışıklıklarına Karşı Doğal Yöntemler", SubTitle = "Kimyasal olmadan genç görünün", Content = "<p>Soğuk papatya çayı poşeti, buz küresi masajı ve göz çevresi için özel jeller gözaltı kırışıklıklarını belirgin biçimde azaltır. Uyku düzeni ve güneş koruyucu en büyük destekçinizdir.</p>", Image = "blog/gozalti.jpg", CatagoryId = cats[6].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-5) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Retinol Kullanımının Püf Noktaları", SubTitle = "Yanlış kullanmaktan kaçının", Content = "<p>Retinol güçlü bir A vitamini türevidir. Başlangıçta haftada 2 gece kullanın. Güneş koruyucu olmadan gündüz uygulamayın. Hamilelikte kesinlikle kullanmayın. 6-8 haftada sonuç görürsünüz.</p>", Image = "blog/retinol.jpg", CatagoryId = cats[6].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-6) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Gözaltı Kırışıklıklarına Karşı Doğal Yöntemler", SubTitle = "Kimyasal olmadan genç görünün", Content = "<p>Soğuk papatya çayı poşeti, buz küresi masajı ve göz çevresi için özel jeller gözaltı kırışıklıklarını belirgin biçimde azaltır. Uyku düzeni ve güneş koruyucu en büyük destekçinizdir.</p>", Image = "blog/gozalti.jpg", CatagoryId = cats[6].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-5) },
 
                     // Saç Bakımı (CatId 8)
-                    new() { Title = "Keratin Tedavisi Nedir ve Ne Kadar Sürer?", SubTitle = "Pürüzsüz saçların sırrı", Content = "<p>Keratin tedavisi, saçın dış katmanını doldurarak friziness ve kıvrımı azaltır. Teknik olarak 2-4 saat sürer ve 3-5 ay kalıcı olabilir. Sülfatsız şampuan kullanımı ömrü uzatır.</p>", Image = "blog/keratin.jpg", CatagoryId = cats[7].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-4) },
-                    new() { Title = "Hindistan Cevizi Yağının Saça Faydaları", SubTitle = "Mutfak malzemesiyle saç bakımı", Content = "<p>Saf hindistan cevizi yağı, saç teline nüfuz ederek protein kaybını önler. Yıkama öncesi maske olarak 30 dakika uygulamak yeterlidir. Yağlı saçlar için ucuçlardan köklere gidin.</p>", Image = "blog/hindistan-cevizi-yag.jpg", CatagoryId = cats[7].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-3) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Keratin Tedavisi Nedir ve Ne Kadar Sürer?", SubTitle = "Pürüzsüz saçların sırrı", Content = "<p>Keratin tedavisi, saçın dış katmanını doldurarak friziness ve kıvrımı azaltır. Teknik olarak 2-4 saat sürer ve 3-5 ay kalıcı olabilir. Sülfatsız şampuan kullanımı ömrü uzatır.</p>", Image = "blog/keratin.jpg", CatagoryId = cats[7].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-4) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Hindistan Cevizi Yağının Saça Faydaları", SubTitle = "Mutfak malzemesiyle saç bakımı", Content = "<p>Saf hindistan cevizi yağı, saç teline nüfuz ederek protein kaybını önler. Yıkama öncesi maske olarak 30 dakika uygulamak yeterlidir. Yağlı saçlar için ucuçlardan köklere gidin.</p>", Image = "blog/hindistan-cevizi-yag.jpg", CatagoryId = cats[7].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-3) },
 
                     // Yoga & Pilates (CatId 9)
-                    new() { Title = "Sabah Yogası: 10 Dakikada Güne Başlangıç", SubTitle = "Uyku sersemliğini hızla atın", Content = "<p>Yataktan kalkar kalkmaz; kedi-inek hareketi, çocuk pozu ve güneş selamlama serisi kan dolaşımını hızlandırır ve enerji verir. DVD ya da uygulama gerekmez, birkaç mat yeterli.</p>", Image = "blog/sabah-yoga.jpg", CatagoryId = cats[8].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-2) },
-                    new() { Title = "Pilates ve Duruş Bozukluğu", SubTitle = "Masa başı çalışanlar için çözüm", Content = "<p>Pilates core kaslarını güçlendirerek omurga desteğini artırır. Haftada 3 seans düzenli pilates, 3 ay içinde postür bozukluğunu gözle görülür şekilde iyileştirir.</p>", Image = "blog/pilates-durus.jpg", CatagoryId = cats[8].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-1) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Sabah Yogası: 10 Dakikada Güne Başlangıç", SubTitle = "Uyku sersemliğini hızla atın", Content = "<p>Yataktan kalkar kalkmaz; kedi-inek hareketi, çocuk pozu ve güneş selamlama serisi kan dolaşımını hızlandırır ve enerji verir. DVD ya da uygulama gerekmez, birkaç mat yeterli.</p>", Image = "blog/sabah-yoga.jpg", CatagoryId = cats[8].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-2) },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Pilates ve Duruş Bozukluğu", SubTitle = "Masa başı çalışanlar için çözüm", Content = "<p>Pilates core kaslarını güçlendirerek omurga desteğini artırır. Haftada 3 seans düzenli pilates, 3 ay içinde postür bozukluğunu gözle görülür şekilde iyileştirir.</p>", Image = "blog/pilates-durus.jpg", CatagoryId = cats[8].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now.AddDays(-1) },
 
                     // Genel Sağlık (CatId 10)
-                    new() { Title = "Düzenli Su İçmenin Cilde Etkisi", SubTitle = "En ucuz güzellik sırrı", Content = "<p>Günlük 2-2,5 litre su içmek; cilt nem dengesini korur, gözeneklerin görünümünü azaltır ve toksik maddelerin atılımını hızlandırır. Sabah aç karnına içilen 1 bardak ılık su özellikle faydalıdır.</p>", Image = "blog/su-icleme.jpg", CatagoryId = cats[9].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Uyku Kalitesi Cilt Sağlığını Nasıl Etkiler?", SubTitle = "Güzellik uykusu gerçek mi?", Content = "<p>Uyku sırasında salgılanan büyüme hormonu hücre yenilenmesini tetikler. 7-9 saat kaliteli uyku alan bireylerin ciltleri %30 daha verimli onarılır. Yan uyumak kırışıklık oluşturabilir; sırtüstü uyumak önerilir.</p>", Image = "blog/uyku-cilt.jpg", CatagoryId = cats[9].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Egzersiz Sonrası Cilt Bakımı Rutini", SubTitle = "Terin ardından ne yapmalısınız", Content = "<p>Egzersiz sonrası ilk 20 dakika içinde yüzünüzü yıkayın. Gözenekleri tıkamayan hafif nemlendirici kullanın. Ter birikimi akne ve cilt tahrişine yol açar; bu nedenle temizlik önemlidir.</p>", Image = "blog/egzersiz-cilt.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Stres ve Cilt: Kortizolün Etkisi", SubTitle = "Stres neden sivilce yapar?", Content = "<p>Kortizol hormonu yağ bezlerini uyararak sebum üretimini artırır. Kronik stres; akne, egzema ve sedef hastalığını tetikleyebilir. Meditasyon ve egzersiz kortizolü doğal yolla düşürür.</p>", Image = "blog/stres-cilt.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Güneş Koruyucu Her Mevsim Şart mı?", SubTitle = "Bulutlu günlerde de UV var", Content = "<p>UVA ışınları bulutları geçer ve cam camı deler. Kış ve ilkbaharda da SPF 30+ kullanmak erken yaşlanmayı ve cilt kanserini önler. Kimyasal filtreler güneş öncesi, mineral filtreler hemen uygulanabilir.</p>", Image = "blog/gunes-koruyucu.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Spa Öncesi Yapılmaması Gerekenler", SubTitle = "Seans veriminizi artırın", Content = "<p>Spa randevusundan 24 saat önce tüy alma işlemi yaptırmayın. Ağır yemek yemeyin, alkol almayın. Yoğun egzersiz yapmaktan kaçının. Bu önlemler hem konforunuzu artırır hem de ürünlerin emilimini iyileştirir.</p>", Image = "blog/spa-oncesi.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "Hamilelikte Güvenli Spa Hizmetleri", SubTitle = "Anneye uygun dokunuşlar", Content = "<p>Hamileliğin 2. trimesterinden itibaren prenatal masaj güvenlidir; 45 dakikayı geçmemeli ve yüzüstü pozisyon kesinlikle kullanılmamalıdır. Esansiyel yağlar için doktor onayı alın.</p>", Image = "blog/hamilelik-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
-                    new() { Title = "İlk Kez Spa'ya Gidenler İçin Rehber", SubTitle = "Ne giyilir, ne beklenir?", Content = "<p>İlk spa ziyaretinizde rahat iç çamaşırı giyin; tesis genellikle havlu sağlar. Değerli takı ve elektronik cihazlarınızı evde bırakın. Seans öncesi 15 dakika erken gelinmesi önerilir.</p>", Image = "blog/ilk-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Düzenli Su İçmenin Cilde Etkisi", SubTitle = "En ucuz güzellik sırrı", Content = "<p>Günlük 2-2,5 litre su içmek; cilt nem dengesini korur, gözeneklerin görünümünü azaltır ve toksik maddelerin atılımını hızlandırır. Sabah aç karnına içilen 1 bardak ılık su özellikle faydalıdır.</p>", Image = "blog/su-icleme.jpg", CatagoryId = cats[9].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Uyku Kalitesi Cilt Sağlığını Nasıl Etkiler?", SubTitle = "Güzellik uykusu gerçek mi?", Content = "<p>Uyku sırasında salgılanan büyüme hormonu hücre yenilenmesini tetikler. 7-9 saat kaliteli uyku alan bireylerin ciltleri %30 daha verimli onarılır. Yan uyumak kırışıklık oluşturabilir; sırtüstü uyumak önerilir.</p>", Image = "blog/uyku-cilt.jpg", CatagoryId = cats[9].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Egzersiz Sonrası Cilt Bakımı Rutini", SubTitle = "Terin ardından ne yapmalısınız", Content = "<p>Egzersiz sonrası ilk 20 dakika içinde yüzünüzü yıkayın. Gözenekleri tıkamayan hafif nemlendirici kullanın. Ter birikimi akne ve cilt tahrişine yol açar; bu nedenle temizlik önemlidir.</p>", Image = "blog/egzersiz-cilt.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Stres ve Cilt: Kortizolün Etkisi", SubTitle = "Stres neden sivilce yapar?", Content = "<p>Kortizol hormonu yağ bezlerini uyararak sebum üretimini artırır. Kronik stres; akne, egzema ve sedef hastalığını tetikleyebilir. Meditasyon ve egzersiz kortizolü doğal yolla düşürür.</p>", Image = "blog/stres-cilt.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Güneş Koruyucu Her Mevsim Şart mı?", SubTitle = "Bulutlu günlerde de UV var", Content = "<p>UVA ışınları bulutları geçer ve cam camı deler. Kış ve ilkbaharda da SPF 30+ kullanmak erken yaşlanmayı ve cilt kanserini önler. Kimyasal filtreler güneş öncesi, mineral filtreler hemen uygulanabilir.</p>", Image = "blog/gunes-koruyucu.jpg", CatagoryId = cats[0].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Spa Öncesi Yapılmaması Gerekenler", SubTitle = "Seans veriminizi artırın", Content = "<p>Spa randevusundan 24 saat önce tüy alma işlemi yaptırmayın. Ağır yemek yemeyin, alkol almayın. Yoğun egzersiz yapmaktan kaçının. Bu önlemler hem konforunuzu artırır hem de ürünlerin emilimini iyileştirir.</p>", Image = "blog/spa-oncesi.jpg", CatagoryId = cats[1].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Hamilelikte Güvenli Spa Hizmetleri", SubTitle = "Anneye uygun dokunuşlar", Content = "<p>Hamileliğin 2. trimesterinden itibaren prenatal masaj güvenlidir; 45 dakikayı geçmemeli ve yüzüstü pozisyon kesinlikle kullanılmamalıdır. Esansiyel yağlar için doktor onayı alın.</p>", Image = "blog/hamilelik-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
+                    new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "İlk Kez Spa'ya Gidenler İçin Rehber", SubTitle = "Ne giyilir, ne beklenir?", Content = "<p>İlk spa ziyaretinizde rahat iç çamaşırı giyin; tesis genellikle havlu sağlar. Değerli takı ve elektronik cihazlarınızı evde bırakın. Seans öncesi 15 dakika erken gelinmesi önerilir.</p>", Image = "blog/ilk-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
                 };
                 context.Blogs.AddRange(blogs);
                 await context.SaveChangesAsync();

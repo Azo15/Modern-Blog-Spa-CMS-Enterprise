@@ -14,7 +14,7 @@ using WebUI.Models;
 
 namespace WebUI.Controllers
 {
-    [AllowAnonymous]
+    [Authorize(Policy = BusinessLayer.Security.AccessPolicies.Visitor)]
     [Route("yapilan-isler")]
     public class BlogController : Controller
     {
@@ -65,7 +65,7 @@ namespace WebUI.Controllers
             }
 
             var blog = await _blogService.FirstOrDefaultAsync(
-                predicate: b => b.Slug == slug,
+                predicate: b => b.Slug == slug && !b.IsDeleted && b.PublishStatus == EntityLayer.Enum.PublishStatus.Published,
                 orderBy: null,
                 includes: new Expression<Func<Blog, object>>[] { x => x.AppUser, x => x.Catagory }
             );

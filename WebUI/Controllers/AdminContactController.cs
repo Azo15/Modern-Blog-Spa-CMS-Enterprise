@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebUI.Models;
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminContactController : BaseController
     {
         private readonly IContactService _contactService;

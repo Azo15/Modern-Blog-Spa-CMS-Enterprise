@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +6,7 @@ using WebUI.Models;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminAboutCardController : BaseController
     {
         private readonly IAboutCardService _aboutCardService;

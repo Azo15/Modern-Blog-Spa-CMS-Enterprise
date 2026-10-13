@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminSliderController : BaseController
     {
         private readonly ISliderService _sliderService;

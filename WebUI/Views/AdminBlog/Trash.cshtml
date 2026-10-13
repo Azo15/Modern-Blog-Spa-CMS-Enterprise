@@ -1,0 +1,22 @@
+@model IEnumerable<Blog>
+@{
+    ViewData["Title"] = "Blog Çöp Kutusu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card p-4">
+    <h5>Blog Çöp Kutusu</h5>
+    <p>Geri yüklenen bloglar taslak olarak kaydedilir. Mevcut görseller korunur.</p>
+    <a asp-action="Index">Bloglara dön</a>
+    <table class="table"><thead><tr><th>Başlık</th><th>Silinme zamanı (UTC)</th><th>Silen kullanıcı ID</th><th>İşlem</th></tr></thead>
+    <tbody>
+    @foreach (var blog in Model)
+    {
+        <tr><td>@blog.Title</td><td>@blog.DeletedDate</td><td>@blog.DeletedBy</td><td>
+            <form asp-action="Restore" method="post">
+                <input type="hidden" name="id" value="@blog.Id" />
+                <button class="btn btn-success" type="submit">Geri yükle</button>
+            </form>
+        </td></tr>
+    }
+    </tbody></table>
+</div>

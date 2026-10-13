@@ -1,3 +1,4 @@
+using DataAccesLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -7,8 +8,11 @@ namespace DataAccesLayer.Concrete
 {
     public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        private readonly ICurrentUserService? _currentUser;
+
+        public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService? currentUser = null) : base(options)
         {
+            _currentUser = currentUser;
         }
 
         public DbSet<About> Abouts { get; set; }
@@ -98,39 +102,54 @@ namespace DataAccesLayer.Concrete
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+            => SaveChangesAsync(true, cancellationToken);
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
-            return base.SaveChangesAsync(cancellationToken);
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
-        public override int SaveChanges()
+        public override int SaveChanges() => SaveChanges(true);
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             ApplyAuditInformation();
-            return base.SaveChanges();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         private void ApplyAuditInformation()
         {
-            var entries = ChangeTracker.Entries<BaseEntity>();
-
-            foreach (var entry in entries)
+            var now = DateTime.UtcNow;
+            var userId = _currentUser?.UserId;
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {
+                if (entry.State == EntityState.Deleted)
+                {
+                    entry.State = EntityState.Modified;
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedDate = now;
+                    entry.Entity.DeletedBy = userId;
+                }
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedDate = DateTime.Now;
+                        entry.Entity.CreatedDate = now;
+                        entry.Entity.CreatedBy = userId;
                         entry.Entity.IsDeleted = false;
+                        entry.Entity.DeletedDate = null;
+                        entry.Entity.DeletedBy = null;
                         break;
-
                     case EntityState.Modified:
-                        entry.Entity.UpdatedDate = DateTime.Now;
-                        break;
-
-                    case EntityState.Deleted:
-                        // Soft Delete dönüşümü
-                        entry.State = EntityState.Modified;
-                        entry.Entity.IsDeleted = true;
-                        entry.Entity.DeletedDate = DateTime.Now;
+                        entry.Property(e => e.CreatedDate).IsModified = false;
+                        entry.Property(e => e.CreatedBy).IsModified = false;
+                        entry.Entity.UpdatedDate = now;
+                        entry.Entity.UpdatedBy = userId;
+                        if (entry.Entity.IsDeleted && !entry.Property(e => e.IsDeleted).OriginalValue)
+                        {
+                            entry.Entity.DeletedDate = now;
+                            entry.Entity.DeletedBy = userId;
+                        }
                         break;
                 }
             }

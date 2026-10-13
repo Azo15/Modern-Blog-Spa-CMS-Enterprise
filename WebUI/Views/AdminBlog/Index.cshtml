@@ -1,9 +1,14 @@
+@using BusinessLayer.Security
+@using EntityLayer.Enum
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Authorization
 @model IEnumerable<Blog>
 
 @{
     ViewData["Title"] = "Blog Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
+    var canReview = (await Authorization.AuthorizeAsync(User, AccessPolicies.ContentManager)).Succeeded;
 }
 
 <div class="card">
@@ -35,6 +40,7 @@
             </div>
         </form>
 
+        @if (canReview) { <a asp-action="Trash" class="btn btn-outline-secondary">Çöp Kutusu</a> }
         <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Yeni Bilgi Ekle</a>
     </div>
 
@@ -65,6 +71,20 @@
                     <tr>
                         <td>
                             @sayac
+                            <div class="small">@item.PublishStatus</div>
+                            <form asp-action="SubmitForReview" method="post">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">İncelemeye gönder</button>
+                            </form>
+                            @if (canReview)
+                            {
+                                <form asp-action="Review" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button name="status" value="Published" class="btn btn-sm btn-success">Yayımla</button>
+                                    <button name="status" value="Rejected" class="btn btn-sm btn-danger">Reddet</button>
+                                    <button name="status" value="Draft" class="btn btn-sm btn-secondary">Taslağa al</button>
+                                </form>
+                            }
                         </td>
 
                         <td>
