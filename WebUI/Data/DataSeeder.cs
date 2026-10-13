@@ -140,6 +140,7 @@ namespace WebUI.Data
                     new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "Hamilelikte Güvenli Spa Hizmetleri", SubTitle = "Anneye uygun dokunuşlar", Content = "<p>Hamileliğin 2. trimesterinden itibaren prenatal masaj güvenlidir; 45 dakikayı geçmemeli ve yüzüstü pozisyon kesinlikle kullanılmamalıdır. Esansiyel yağlar için doktor onayı alın.</p>", Image = "blog/hamilelik-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
                     new() { PublishStatus = EntityLayer.Enum.PublishStatus.Published, Title = "İlk Kez Spa'ya Gidenler İçin Rehber", SubTitle = "Ne giyilir, ne beklenir?", Content = "<p>İlk spa ziyaretinizde rahat iç çamaşırı giyin; tesis genellikle havlu sağlar. Değerli takı ve elektronik cihazlarınızı evde bırakın. Seans öncesi 15 dakika erken gelinmesi önerilir.</p>", Image = "blog/ilk-spa.jpg", CatagoryId = cats[2].Id, AppUserId = userId, IsPublish = true, CreatedDate = DateTime.Now },
                 };
+                foreach (var blog in blogs) blog.Slug = WebUI.Helpers.GlobalHelper.ToSlug(blog.Title ?? "");
                 context.Blogs.AddRange(blogs);
                 await context.SaveChangesAsync();
             }

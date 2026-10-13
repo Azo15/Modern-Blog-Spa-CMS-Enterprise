@@ -24,7 +24,7 @@ builder.Services.AddSignalR();
 
 // 📌 Distributed Cache (Redis / In-Memory Fallback)
 var redis = builder.Configuration.GetConnectionString("Redis");
-if (string.IsNullOrWhiteSpace(redis)) builder.Services.AddDistributedMemoryCache();
+if (string.IsNullOrWhiteSpace(redis)) builder.Services.AddDistributedMemoryCache(options => options.SizeLimit = 50 * 1024 * 1024);
 else builder.Services.AddStackExchangeRedisCache(options =>
 {
     var configuration = StackExchange.Redis.ConfigurationOptions.Parse(redis);
@@ -120,8 +120,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// 📌 Global Exception Middleware (Merkezi Hata Yakalama)
-app.UseMiddleware<GlobalExceptionMiddleware>();
+// Business exceptions are mapped below, inside the environment exception handler.
 
 // Yerel geliştirmede örnek verilerden önce veritabanını hazırla.
 if (app.Environment.IsDevelopment())
@@ -146,6 +145,9 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+// Map validation/authorization exceptions before DeveloperExceptionPage can turn them into 500.
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // 10. HTTP ve statik dosya ayarları
 if (!app.Environment.IsDevelopment())

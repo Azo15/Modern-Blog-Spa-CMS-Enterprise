@@ -11,7 +11,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=xspa_db;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD};TrustServerCertificate=True;
-      - Redis__ConnectionString=redis:6379
+      - ConnectionStrings__Redis=redis:6379
     depends_on:
       - sqlserver
       - redis
