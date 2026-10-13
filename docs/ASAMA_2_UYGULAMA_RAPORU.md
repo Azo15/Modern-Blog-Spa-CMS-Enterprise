@@ -158,7 +158,7 @@ Site: http://localhost:5157. Moderasyon: /AdminComment/Index. Giriş: /dashboard
 
 ## 4. Test ve doğrulama sonuçları
 
-- Son test çalıştırmasının toplamı ve kanıtı stage2-tests.trx dosyasındadır. SQL ilişkileri ve kurallar SQLite üzerinde gerçek sorgularla, migration'lar ayrıca SQL Server LocalDB üzerinde doğrulanmıştır.
+- **68 xUnit testi geçti; hata ve atlanan test yok.** Kanıt: BusinessLayer.Tests/TestResults/stage2-tests.trx. SQL ilişkileri ve kurallar SQLite üzerinde gerçek sorgularla, migration'lar ayrıca SQL Server LocalDB üzerinde doğrulanmıştır.
 - Gerçek HTTP: üye yorum oluşturur; onay öncesi anonim sayfada görünmez; Moderator onayı sonrası görünür. Onaylı yanıta üçüncü seviye eklenemez. Başka kullanıcının güncellemesi ve Content Manager moderasyon paneli 403'tür. Düzenlenen ana yorum yeniden onaya düşer ve yanıtlarıyla birlikte gizlenir. Red/silme soft delete olarak çalışır.
 - HTML saldırı metni yorumda, kuyrukta ve public ekranda encode edilmiştir; script olarak render edilmemiştir. Anti-forgery token'ları gerçek HTTP işlemlerinde kullanılmıştır.
 - Anonim hub isteği girişe yönlenir; Registered User 403, Moderator 200 alır. Client broadcast metodu yoktur.
