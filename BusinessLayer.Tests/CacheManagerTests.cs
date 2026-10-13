@@ -45,6 +45,21 @@ public class CacheManagerTests
     {
         var redis = new RedisDouble(); var cache = new CacheManager(redis.Mock.Object, new CacheFallbackStore(), NullLogger<CacheManager>.Instance); await cache.SetAsync("blogs_all:p1", "cached"); redis.Data.Clear(); Assert.Null(await cache.GetAsync<string>("blogs_all:p1"));
     }
+
+    [Fact]
+    public async Task OfflineWriteCannotResurrectTheOldRemoteValueOnRecovery()
+    {
+        var redis = new RedisDouble();
+        var clock = new Clock();
+        var cache = new CacheManager(redis.Mock.Object, new CacheFallbackStore(), NullLogger<CacheManager>.Instance, clock);
+        await cache.SetAsync("blogs_all:p1", "old value");
+        redis.Down = true;
+        await cache.SetAsync("blogs_all:p1", "new offline value");
+        Assert.Equal("new offline value", await cache.GetAsync<string>("blogs_all:p1"));
+        redis.Down = false;
+        clock.Now = clock.Now.AddSeconds(6);
+        Assert.Null(await cache.GetAsync<string>("blogs_all:p1"));
+    }
     [Fact]
     public async Task CorruptJsonIsACacheMissInsteadOfAnApplicationFailure()
     {
