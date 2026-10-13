@@ -25,12 +25,12 @@ namespace WebUI.Data
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
+            if (!scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment()) return;
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-            // SeedAsync itself also checks the environment so it cannot be called accidentally in production.
-            if (!scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment()) return;
+            // Test accounts and sample content are development-only.
             await SeedRolesAsync(serviceProvider);
             var accounts = new[] {
                 ("admin@spa.com", BusinessLayer.Security.AppRoles.Admin),

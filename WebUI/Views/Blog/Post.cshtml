@@ -1,3 +1,4 @@
+@inject BusinessLayer.Abstract.IHtmlContentSanitizer HtmlSanitizer
 @model Blog
 
 @{
@@ -43,7 +44,7 @@
                 </div>
 
                 <div class="blog-content-wrapper" data-aos="fade-up" data-aos-delay="100">
-                    @Html.Raw(Model.Content)
+                    @Html.Raw(HtmlSanitizer.Sanitize(Model.Content))
                 </div>
             </div>
         </div>

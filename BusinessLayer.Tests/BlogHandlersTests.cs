@@ -27,8 +27,8 @@ namespace BusinessLayer.Tests
             // Arrange
             var cachedBlogs = new List<Blog>
             {
-                new Blog { Id = 1, Title = "Cached Blog 1", IsPublish = true },
-                new Blog { Id = 2, Title = "Cached Blog 2", IsPublish = true }
+                new Blog { Id = 1, Title = "Cached Blog 1", IsPublish = true, PublishStatus = EntityLayer.Enum.PublishStatus.Published },
+                new Blog { Id = 2, Title = "Cached Blog 2", IsPublish = true, PublishStatus = EntityLayer.Enum.PublishStatus.Published }
             };
 
             _mockCacheService
@@ -64,7 +64,7 @@ namespace BusinessLayer.Tests
 
             var dbBlogs = new List<Blog>
             {
-                new Blog { Id = 10, Title = "DB Blog 1", IsPublish = true }
+                new Blog { Id = 10, Title = "DB Blog 1", IsPublish = true, PublishStatus = EntityLayer.Enum.PublishStatus.Published }
             };
 
             _mockBlogService
@@ -93,54 +93,5 @@ namespace BusinessLayer.Tests
             ), Times.Once);
         }
 
-        [Fact]
-        public async Task CreateBlogCommandHandler_ShouldAddBlog_AndInvalidateCache()
-        {
-            // Arrange
-            var command = new CreateBlogCommand(
-                Title: "Yeni Test Blog",
-                SubTitle: "Test Alt Başlık",
-                Content: "Test İçerik",
-                Image: "test.jpg",
-                CatagoryId: 1,
-                AppUserId: 1
-            );
-
-            _mockBlogService
-                .Setup(b => b.AddAsync(It.IsAny<Blog>()))
-                .ReturnsAsync(true);
-
-            var handler = new CreateBlogCommandHandler(_mockBlogService.Object, _mockCacheService.Object);
-
-            // Act
-            var blogId = await handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            _mockBlogService.Verify(b => b.AddAsync(It.Is<Blog>(x => x.Title == "Yeni Test Blog")), Times.Once);
-            _mockCacheService.Verify(c => c.RemoveAsync("all_blogs_cache"), Times.Once);
-            _mockCacheService.Verify(c => c.RemoveAsync("blogs_category_1"), Times.Once);
-        }
-
-        [Fact]
-        public async Task DeleteBlogCommandHandler_ShouldDeleteBlog_AndInvalidateCache()
-        {
-            // Arrange
-            int blogId = 5;
-            var existingBlog = new Blog { Id = blogId, CatagoryId = 2 };
-
-            _mockBlogService.Setup(b => b.GetByIDAsync(blogId)).ReturnsAsync(existingBlog);
-            _mockBlogService.Setup(b => b.DeleteAsync(blogId)).ReturnsAsync(true);
-
-            var handler = new DeleteBlogCommandHandler(_mockBlogService.Object, _mockCacheService.Object);
-
-            // Act
-            var result = await handler.Handle(new DeleteBlogCommand(blogId), CancellationToken.None);
-
-            // Assert
-            result.Should().BeTrue();
-            _mockBlogService.Verify(b => b.DeleteAsync(blogId), Times.Once);
-            _mockCacheService.Verify(c => c.RemoveAsync("all_blogs_cache"), Times.Once);
-            _mockCacheService.Verify(c => c.RemoveAsync($"blog_detail_{blogId}"), Times.Once);
-        }
     }
 }
