@@ -18,7 +18,7 @@ public class NotificationHubTests
     {
         var attribute = typeof(NotificationHub).GetCustomAttributes(typeof(AuthorizeAttribute), true).Cast<AuthorizeAttribute>().Single(); Assert.Equal(AccessPolicies.Moderator, attribute.Policy);
         using var provider = AuthorizationTests.Provider(); var auth = provider.GetRequiredService<IAuthorizationService>(); Assert.Equal(allowed, (await auth.AuthorizeAsync(AuthorizationTests.Principal(role, authenticated: role != null), attribute.Policy!)).Succeeded);
-        Assert.Empty(typeof(NotificationHub).GetMethods(System.Reflection.BindingFlags.DeclaredOnly | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).Where(m => !m.IsSpecialName && !m.Name.StartsWith("On")));
+        Assert.DoesNotContain(typeof(NotificationHub).GetMethods(System.Reflection.BindingFlags.DeclaredOnly | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance), m => !m.IsSpecialName && !m.Name.StartsWith("On"));
     }
     [Fact]
     public async Task AuthorizedConnectionJoinsOnlyManagersGroup()

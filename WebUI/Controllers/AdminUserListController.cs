@@ -71,12 +71,17 @@ namespace WebUI.Controllers
                 return RedirectToAction(nameof(UserList));
             }
 
-            if (!string.IsNullOrEmpty(user.Image))
+            IdentityResult result;
+            try
             {
-                _fileHelper.Delete(user.Image);
+                result = await _userManager.DeleteAsync(user);
             }
-
-            var result = await _userManager.DeleteAsync(user);
+            catch (DbUpdateException)
+            {
+                // Restrict preserves comment/audit history, including soft-deleted comments.
+                SetToastMessage("İlişkili kayıtları bulunan kullanıcı silinemez. Hesabı kilitleyebilirsiniz.", "warning");
+                return RedirectToAction(nameof(UserList));
+            }
 
             if (!result.Succeeded)
             {
@@ -84,6 +89,7 @@ namespace WebUI.Controllers
             }
             else
             {
+                if (!string.IsNullOrEmpty(user.Image)) _fileHelper.Delete(user.Image);
                 SetToastMessage("Kullanıcı başarıyla silindi", "success");
             }
 
