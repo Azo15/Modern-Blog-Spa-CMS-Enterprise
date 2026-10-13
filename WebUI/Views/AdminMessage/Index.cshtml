@@ -1,7 +1,7 @@
-﻿@model IEnumerable<ContactForm>
+@model IEnumerable<ContactForm>
 
 @{
-    ViewData["Title"] = "Gelen Mesaj Listesi";
+    ViewData["Title"] = L["Messages"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -13,6 +13,10 @@
 <div class="card">
     <div class="justify-content-between d-flex align-items-center px-4">
         <h5 class="card-header">@ViewData["Title"]</h5>
+        <div class="d-flex gap-2">
+            <a asp-controller="Reports" asp-action="Contacts" asp-route-format="Excel" class="btn btn-outline-success">@L["ExportExcel"]</a>
+            <a asp-controller="Reports" asp-action="Contacts" asp-route-format="Pdf" class="btn btn-outline-danger">@L["ExportPdf"]</a>
+        </div>
     </div>
 
     <div class="table-responsive text-nowrap">
@@ -30,9 +34,9 @@
                         @Html.DisplayNameFor(model => model.Subject)
                     </th>
                     <th>
-                        Gönderilme Tarihi
+                        @L["DateUtc"]
                     </th>
-                    <th>Eylemler</th>
+                    <th>@L["Actions"]</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -51,7 +55,7 @@
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item text-warning" asp-action="Details" asp-route-id="@item.Id">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Detay
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> @L["Details"]
                                     </a>
                                 </div>
                             </div>

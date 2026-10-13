@@ -465,4 +465,154 @@
   <data name="E-posta" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="Contact.ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Contact.ValidationRequired" xml:space="preserve">
+    <value>Please check the required fields.</value>
+  </data>
+  <data name="Contact.RateLimitTitle" xml:space="preserve">
+    <value>Please wait</value>
+  </data>
+  <data name="Contact.RateLimit" xml:space="preserve">
+    <value>Please wait before sending another message.</value>
+  </data>
+  <data name="Contact.CaptchaTitle" xml:space="preserve">
+    <value>Verification required</value>
+  </data>
+  <data name="Contact.CaptchaRequired" xml:space="preserve">
+    <value>Please complete the security verification.</value>
+  </data>
+  <data name="Contact.SuccessTitle" xml:space="preserve">
+    <value>Message received</value>
+  </data>
+  <data name="Contact.Success" xml:space="preserve">
+    <value>Your message was saved. Email notification was queued.</value>
+  </data>
+  <data name="Contact.SaveFailed" xml:space="preserve">
+    <value>Your message could not be saved. Please try again.</value>
+  </data>
+  <data name="ContactSubtitle" xml:space="preserve">
+    <value>Contact us to book an appointment</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Tell us about your request...</value>
+  </data>
+  <data name="SendContact" xml:space="preserve">
+    <value>Send appointment request</value>
+  </data>
+  <data name="Okay" xml:space="preserve">
+    <value>Okay</value>
+  </data>
+  <data name="BlogNotPublished" xml:space="preserve">
+    <value>The blog is not published or could not be found.</value>
+  </data>
+  <data name="InvalidReaction" xml:space="preserve">
+    <value>Invalid reaction type.</value>
+  </data>
+  <data name="CannotLockSelf" xml:space="preserve">
+    <value>You cannot lock your own account.</value>
+  </data>
+  <data name="LockDaysRange" xml:space="preserve">
+    <value>The lockout duration must be between 1 and 3650 days.</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>The username or password is incorrect.</value>
+  </data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve">
+    <value>This email address is already registered.</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>The passwords do not match.</value>
+  </data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve">
+    <value>The field {0} must be a string with a maximum length of {1}.</value>
+  </data>
+  <data name="The field {0} must be a string with a minimum length of {2} and a maximum length of {1}." xml:space="preserve">
+    <value>The field {0} must be a string with a minimum length of {2} and a maximum length of {1}.</value>
+  </data>
+  <data name="'{0}' and '{1}' do not match." xml:space="preserve">
+    <value>'{0}' and '{1}' do not match.</value>
+  </data>
+  <data name="CommentSubmitted" xml:space="preserve">
+    <value>Your comment was submitted for approval.</value>
+  </data>
+  <data name="CommentUpdated" xml:space="preserve">
+    <value>Your comment was updated and is awaiting approval again.</value>
+  </data>
+  <data name="AutomaticSlug" xml:space="preserve">
+    <value>Generated automatically from the title</value>
+  </data>
+  <data name="DataCount" xml:space="preserve">
+    <value>Total records</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="AdminPanel" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="CommentLength" xml:space="preserve">
+    <value>Comments must contain 1–1000 characters.</value>
+  </data>
+  <data name="CommentProfanity" xml:space="preserve">
+    <value>The comment contains prohibited words.</value>
+  </data>
+  <data name="ReplyApprovedParent" xml:space="preserve">
+    <value>Replies require an approved parent comment on the same blog.</value>
+  </data>
+  <data name="CommentDepth" xml:space="preserve">
+    <value>A third comment level is not allowed.</value>
+  </data>
+  <data name="CommentParentVisible" xml:space="preserve">
+    <value>The parent comment must be approved and visible.</value>
+  </data>
+  <data name="NewCommentTitle" xml:space="preserve">
+    <value>New comment</value>
+  </data>
+  <data name="NewCommentPending" xml:space="preserve">
+    <value>Comment #{0} is awaiting approval.</value>
+  </data>
+  <data name="UpdatedCommentTitle" xml:space="preserve">
+    <value>Comment updated</value>
+  </data>
+  <data name="UpdatedCommentPending" xml:space="preserve">
+    <value>Comment #{0} is awaiting approval again.</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Remember me</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="SignUp" xml:space="preserve">
+    <value>Sign up</value>
+  </data>
+  <data name="SigningIn" xml:space="preserve">
+    <value>Signing in...</value>
+  </data>
+  <data name="RetrySeconds" xml:space="preserve">
+    <value>seconds until you can try again</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Change theme</value>
+  </data>
+  <data name="AccountHasHistory" xml:space="preserve">
+    <value>Accounts with comment or interaction history cannot be deleted; use account moderation.</value>
+  </data>
+  <data name="InteractionConflict" xml:space="preserve">
+    <value>The action conflicted with another request. Please try again.</value>
+  </data>
 </root>

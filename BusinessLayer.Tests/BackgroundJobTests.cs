@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -232,7 +233,8 @@ public sealed class BackgroundJobTests
     [InlineData(null, false)]
     public void HangfireDashboardAllowsOnlyAuthenticatedSystemAdmin(string? role, bool allowed)
     {
-        var http = new DefaultHttpContext { User = AuthorizationTests.Principal(role, authenticated: role != null) };
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var http = new DefaultHttpContext { RequestServices = services, User = AuthorizationTests.Principal(role, authenticated: role != null) };
         var context = new AspNetCoreDashboardContext(Mock.Of<JobStorage>(), new DashboardOptions(), http);
         Assert.Equal(allowed, new HangfireCustomAuthorizationFilter().Authorize(context));
     }
@@ -240,7 +242,8 @@ public sealed class BackgroundJobTests
     [Fact]
     public void AnonymousRoleClaimCannotAccessHangfireDashboard()
     {
-        var http = new DefaultHttpContext { User = AuthorizationTests.Principal(AppRoles.Admin, authenticated: false) };
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var http = new DefaultHttpContext { RequestServices = services, User = AuthorizationTests.Principal(AppRoles.Admin, authenticated: false) };
         var context = new AspNetCoreDashboardContext(Mock.Of<JobStorage>(), new DashboardOptions(), http);
         Assert.False(new HangfireCustomAuthorizationFilter().Authorize(context));
     }

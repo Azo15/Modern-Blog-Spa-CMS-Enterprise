@@ -20,26 +20,27 @@
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
                     <!-- Default controller ve Index action'ı aktifse 'active' klasını ekler -->
-                    <a class="nav-link @Html.IsActive("Default", "Index")" asp-controller="Default" asp-action="Index">Ana Sayfa</a>
+                    <a class="nav-link @Html.IsActive("Default", "Index")" asp-controller="Default" asp-action="Index">@L["Home"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("About", "Index")" asp-controller="About" asp-action="Index">Hakkımızda</a>
+                    <a class="nav-link @Html.IsActive("About", "Index")" asp-controller="About" asp-action="Index">@L["About"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Service", "Index")" asp-controller="Service" asp-action="Index">Hizmetlerimiz</a>
+                    <a class="nav-link @Html.IsActive("Service", "Index")" asp-controller="Service" asp-action="Index">@L["Services"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Blog")" asp-controller="Blog" asp-action="Index">Blog</a>
+                    <a class="nav-link @Html.IsActive("Blog")" asp-controller="Blog" asp-action="Index">@L["Blog"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Galary", "Index")" asp-controller="Galary" asp-action="Index">Galeri</a>
+                    <a class="nav-link @Html.IsActive("Galary", "Index")" asp-controller="Galary" asp-action="Index">@L["Gallery"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Contact", "Index")" asp-controller="Contact" asp-action="Index">İletişim</a>
+                    <a class="nav-link @Html.IsActive("Contact", "Index")" asp-controller="Contact" asp-action="Index">@L["Contact"]</a>
                 </li>
             </ul>
 
             <div class="navbar-button-area">
+                @await Html.PartialAsync("_LanguageSelector")
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <i class="fas fa-sun"></i>
                 </button>
@@ -48,7 +49,7 @@
                 {
                     <!-- Admin panelinin aktifliğini de kontrol edebilirsiniz -->
                     <a class="theme-toggle adminButton ms-2 @Html.IsActive("AdminUserList", "UserList")"
-                       asp-controller="AdminUserList" asp-action="UserList">
+                       asp-controller="Profile" asp-action="Index" title="@L["Profile"]">
                         <i class="fa fa-user-circle" aria-hidden="true"></i>
                     </a>
                 }

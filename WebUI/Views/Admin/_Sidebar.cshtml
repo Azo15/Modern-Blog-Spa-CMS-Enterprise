@@ -7,40 +7,49 @@
     var blog = (await Authorization.AuthorizeAsync(User, AccessPolicies.BlogAuthor)).Succeeded;
     var comments = (await Authorization.AuthorizeAsync(User, AccessPolicies.CommentModerator)).Succeeded;
     var moderation = (await Authorization.AuthorizeAsync(User, AccessPolicies.Moderator)).Succeeded;
+    var accounts = (await Authorization.AuthorizeAsync(User, AccessPolicies.AccountModerator)).Succeeded;
 }
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo"><a asp-controller="Default" asp-action="Index" class="app-brand-link"><span class="app-brand-text demo menu-text fw-bold ms-2">X Spa</span></a></div>
     <ul class="menu-inner py-5">
+    <li class="menu-item"><a asp-controller="Profile" asp-action="Index" class="menu-link">@L["Profile"]</a></li>
     @if (admin)
     {
-        <li class="menu-header">Sistem Yönetimi</li>
-        <li class="menu-item"><a asp-controller="AdminUserList" asp-action="UserList" class="menu-link">Kullanıcılar</a></li>
-        <li class="menu-item"><a asp-controller="AdminUserRole" asp-action="Index" class="menu-link">Rol Yönetimi</a></li>
-        <li class="menu-item"><a asp-controller="AdminSiteInfo" asp-action="Index" class="menu-link">Site Ayarları</a></li>
+        <li class="menu-header">@L["SystemManagement"]</li>
+        <li class="menu-item"><a asp-controller="AdminUserList" asp-action="UserList" class="menu-link">@L["Users"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminUserRole" asp-action="Index" class="menu-link">@L["Roles"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminSiteInfo" asp-action="Index" class="menu-link">@L["Settings"]</a></li>
+        <li class="menu-item"><a href="/hangfire" class="menu-link">@L["Jobs"]</a></li>
+        <li class="menu-item"><a asp-controller="Reports" asp-action="Users" asp-route-format="Excel" class="menu-link">@L["Users"] — @L["ExportExcel"]</a></li>
+        <li class="menu-item"><a asp-controller="Reports" asp-action="Users" asp-route-format="Pdf" class="menu-link">@L["Users"] — @L["ExportPdf"]</a></li>
     }
     @if (blog)
     {
-        <li class="menu-header">Blog Yönetimi</li>
-        <li class="menu-item"><a asp-controller="AdminBlog" asp-action="Index" class="menu-link">Bloglar</a></li>
+        <li class="menu-header">@L["BlogManagement"]</li>
+        <li class="menu-item"><a asp-controller="AdminBlog" asp-action="Index" class="menu-link">@L["Blogs"]</a></li>
     }
     @if (content)
     {
-        <li class="menu-item"><a asp-controller="AdminBlog" asp-action="Trash" class="menu-link">Çöp Kutusu</a></li>
-        <li class="menu-item"><a asp-controller="AdminCatagory" asp-action="Index" class="menu-link">Kategoriler</a></li>
-        <li class="menu-item"><a asp-controller="AdminAbout" asp-action="Index" class="menu-link">Hakkımızda</a></li>
-        <li class="menu-item"><a asp-controller="AdminAboutCard" asp-action="Index" class="menu-link">Hakkımızda Kartları</a></li>
-        <li class="menu-item"><a asp-controller="AdminContact" asp-action="Index" class="menu-link">İletişim Bilgileri</a></li>
-        <li class="menu-item"><a asp-controller="AdminSlider" asp-action="Index" class="menu-link">Slider</a></li>
-        <li class="menu-item"><a asp-controller="AdminGalary" asp-action="Index" class="menu-link">Galeri</a></li>
-        <li class="menu-item"><a asp-controller="AdminService" asp-action="Index" class="menu-link">Hizmetler</a></li>
+        <li class="menu-item"><a asp-controller="AdminBlog" asp-action="Trash" class="menu-link">@L["Trash"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminCatagory" asp-action="Index" class="menu-link">@L["Categories"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminAbout" asp-action="Index" class="menu-link">@L["About"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminAboutCard" asp-action="Index" class="menu-link">@L["AboutCards"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminContact" asp-action="Index" class="menu-link">@L["ContactInfo"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminSlider" asp-action="Index" class="menu-link">@L["Slider"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminGalary" asp-action="Index" class="menu-link">@L["Gallery"]</a></li>
+        <li class="menu-item"><a asp-controller="AdminService" asp-action="Index" class="menu-link">@L["Services"]</a></li>
     }
     @if (comments)
     {
-        <li class="menu-item"><a asp-controller="AdminComment" asp-action="Index" class="menu-link">Bekleyen Yorumlar</a></li>
+        <li class="menu-item"><a asp-controller="AdminComment" asp-action="Index" class="menu-link">@L["PendingComments"]</a></li>
     }
     @if (moderation)
     {
-        <li class="menu-item"><a asp-controller="AdminMessage" asp-action="Index" class="menu-link">Gelen Mesajlar</a></li>
+        <li class="menu-item"><a asp-controller="AdminMessage" asp-action="Index" class="menu-link">@L["Messages"]</a></li>
+    }
+    @if (accounts)
+    {
+        <li class="menu-item"><a asp-controller="AdminAccount" asp-action="Index" class="menu-link">@L["AccountModeration"]</a></li>
     }
     </ul>
 </aside>

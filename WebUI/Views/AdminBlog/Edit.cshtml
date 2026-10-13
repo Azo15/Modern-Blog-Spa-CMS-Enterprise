@@ -2,7 +2,7 @@
 @model BlogUpdateDto
 
 @{
-    ViewData["Title"] = "Blog Güncelleme";
+    ViewData["Title"] = L["EditBlog"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -40,9 +40,9 @@
 
                 <div class="mb-3 col-lg-6">
                     <div class="form-group">
-                        <label>Kategori Seçin</label>
+                        <label>@L["Category"]</label>
                         <select asp-for="CatagoryId" asp-items="ViewBag.Categories" class="form-control">
-                            <option value="">Kategori seçiniz</option>
+                            <option value="">@L["ChooseCategory"]</option>
                         </select>
                         <span asp-validation-for="CatagoryId" class="text-danger"></span>
                     </div>
@@ -54,7 +54,7 @@
                     <div class="mb-3">
                         <label class="form-label"></label>
                         <input type="file" name="NewImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
-                        <small class="text-muted">Yeni bir görsel yüklemezseniz mevcut görsel kullanılacaktır.</small>
+                        <small class="text-muted">@L["ExistingImage"]</small>
                         <div class="mt-2">
                             @if (!string.IsNullOrEmpty(Model.Image))
                             {
@@ -78,9 +78,9 @@
 
                 <div class="mt-4 d-flex justify-content-between">
                     <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                        <i class="fas fa-arrow-left me-1"></i> @L["Back"]
                     </a>
-                    <button type="submit" class="btn btn-success">Güncelle</button>
+                    <button type="submit" class="btn btn-success">@L["Save"]</button>
                 </div>
             </div>
         </form>

@@ -13,6 +13,8 @@ namespace DataAccesLayer.Concrete
         public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService? currentUser = null) : base(options)
         {
             _currentUser = currentUser;
+            // Soft-deletes are converted before EF processes required dependent relationships.
+            ChangeTracker.CascadeDeleteTiming = Microsoft.EntityFrameworkCore.ChangeTracking.CascadeTiming.OnSaveChanges;
         }
 
         public DbSet<About> Abouts { get; set; }
@@ -26,10 +28,15 @@ namespace DataAccesLayer.Concrete
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Catagory> Catagories { get; set; }
+        public DbSet<BlogFavorite> BlogFavorites { get; set; }
+        public DbSet<BlogReaction> BlogReactions { get; set; }
+        public DbSet<ContactEmailDelivery> ContactEmailDeliveries { get; set; }
+        public DbSet<TrashArchiveEntry> TrashArchiveEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
 
             // ============================

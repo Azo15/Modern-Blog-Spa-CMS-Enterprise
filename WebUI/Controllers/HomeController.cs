@@ -18,6 +18,19 @@ namespace WebUI.Controllers
             _logger = logger;
         }
 
+        [HttpPost, Microsoft.AspNetCore.Authorization.AllowAnonymous, ValidateAntiForgeryToken]
+        public IActionResult SetLanguage(string culture, string? returnUrl = null)
+        {
+            if (!LanguageSettings.Supported.Contains(culture, StringComparer.Ordinal)) return BadRequest();
+            Response.Cookies.Append(Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
+                Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)), new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true,
+                    HttpOnly = true, Secure = Request.IsHttps, SameSite = SameSiteMode.Lax
+                });
+            return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

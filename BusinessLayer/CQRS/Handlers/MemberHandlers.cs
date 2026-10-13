@@ -3,6 +3,7 @@ using BusinessLayer.CQRS.Commands;
 using BusinessLayer.CQRS.Queries;
 using BusinessLayer.Dtos;
 using BusinessLayer.Security;
+using BusinessLayer.Exceptions;
 using DataAccesLayer.Abstract;
 using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
@@ -11,6 +12,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace BusinessLayer.CQRS.Handlers;
 
@@ -31,14 +33,14 @@ internal static class InteractionProjection
         => db.Blogs.AnyAsync(b => b.Id == id && !b.IsDeleted && b.PublishStatus == PublishStatus.Published, ct);
 }
 
-public sealed class MemberInteractionHandlers(AppDbContext db, IActiveMemberService members) :
+public sealed class MemberInteractionHandlers(AppDbContext db, IActiveMemberService members, IStringLocalizer<SharedResource> text) :
     IRequestHandler<ToggleBlogFavoriteCommand, BlogInteractionDto>, IRequestHandler<SetBlogReactionCommand, BlogInteractionDto>,
     IRequestHandler<GetUserFavoritesQuery, PaginatedList<FavoriteBlogDto>>
 {
     private async Task<int> RequirePublished(int blogId, CancellationToken ct)
     {
         var id = await members.RequireAsync(ct);
-        if (!await InteractionProjection.IsPublished(db, blogId, ct)) throw new ValidationException("Blog yayında değil veya bulunamadı.");
+        if (!await InteractionProjection.IsPublished(db, blogId, ct)) throw new ValidationException(text["BlogNotPublished"]);
         return id;
     }
 
@@ -70,29 +72,49 @@ public sealed class MemberInteractionHandlers(AppDbContext db, IActiveMemberServ
     public async Task<BlogInteractionDto> Handle(SetBlogReactionCommand r, CancellationToken ct)
     {
         var id = await RequirePublished(r.BlogId, ct);
-        if (r.ReactionType.HasValue && !System.Enum.IsDefined(r.ReactionType.Value)) throw new ValidationException("Geçersiz tepki.");
+        if (r.ReactionType.HasValue && !System.Enum.IsDefined(r.ReactionType.Value)) throw new ValidationException(text["InvalidReaction"]);
         var existing = await db.Set<BlogReaction>().SingleOrDefaultAsync(x => x.AppUserId == id && x.BlogId == r.BlogId, ct);
-        if (existing is not null && (r.ReactionType is null || existing.ReactionType == r.ReactionType)) db.Remove(existing);
-        else if (existing is not null) existing.ReactionType = r.ReactionType!.Value;
-        else if (r.ReactionType.HasValue)
+        // Resolve toggle once. Retries replay this desired state rather than toggling
+        // again against a concurrent winner that already has the requested type.
+        var desired = existing is not null && existing.ReactionType == r.ReactionType ? null : r.ReactionType;
+        Exception? conflict = null;
+        for (var attempt = 0; attempt < 3; attempt++)
         {
-            var created = new BlogReaction { AppUserId = id, BlogId = r.BlogId, ReactionType = r.ReactionType.Value, CreatedDate = DateTime.UtcNow };
-            db.Add(created);
-            try { await db.SaveChangesAsync(ct); }
-            catch (DbUpdateException)
+            if (attempt > 0)
             {
-                db.Entry(created).State = EntityState.Detached;
-                var concurrent = await db.Set<BlogReaction>().SingleOrDefaultAsync(x => x.AppUserId == id && x.BlogId == r.BlogId, ct);
-                if (concurrent is null) throw;
-                concurrent.ReactionType = r.ReactionType.Value;
-                await db.SaveChangesAsync(ct);
+                await RequirePublished(r.BlogId, ct);
+                existing = await db.Set<BlogReaction>().SingleOrDefaultAsync(x => x.AppUserId == id && x.BlogId == r.BlogId, ct);
             }
-            return await InteractionProjection.Read(db, r.BlogId, id, ct);
+            if (desired is null)
+            {
+                if (existing is null) return await InteractionProjection.Read(db, r.BlogId, id, ct);
+                db.Remove(existing);
+            }
+            else if (existing is not null) existing.ReactionType = desired.Value;
+            else
+            {
+                existing = new BlogReaction { AppUserId = id, BlogId = r.BlogId, ReactionType = desired.Value, CreatedDate = DateTime.UtcNow };
+                db.Add(existing);
+            }
+            try
+            {
+                await db.SaveChangesAsync(ct);
+                return await InteractionProjection.Read(db, r.BlogId, id, ct);
+            }
+            catch (DbUpdateConcurrencyException ex) when (ex.Entries.All(e => e.Entity is BlogReaction))
+            {
+                db.Entry(existing).State = EntityState.Detached;
+                conflict = ex;
+            }
+            catch (DbUpdateException ex) when (db.Entry(existing).State == EntityState.Added && ex.Entries.All(e => e.Entity is BlogReaction))
+            {
+                // A competing insert may win the unique user/blog index and then
+                // be withdrawn before we reload. Both cases replay the set intent.
+                db.Entry(existing).State = EntityState.Detached;
+                conflict = ex;
+            }
         }
-        try { await db.SaveChangesAsync(ct); }
-        catch (DbUpdateConcurrencyException) when (existing is not null && db.Entry(existing).State == EntityState.Deleted)
-        { db.Entry(existing).State = EntityState.Detached; }
-        return await InteractionProjection.Read(db, r.BlogId, id, ct);
+        throw new InteractionConflictException(conflict);
     }
 
     public async Task<PaginatedList<FavoriteBlogDto>> Handle(GetUserFavoritesQuery r, CancellationToken ct)
@@ -115,7 +137,7 @@ public sealed class BlogInteractionQueryHandler(AppDbContext db, ICurrentUserSer
     }
 }
 
-public sealed class AccountModerationHandlers(AppDbContext db, ICurrentUserService currentUser, IActiveMemberService members, IAuthorizationService authorization) :
+public sealed class AccountModerationHandlers(AppDbContext db, ICurrentUserService currentUser, IActiveMemberService members, IAuthorizationService authorization, IStringLocalizer<SharedResource> text) :
     IRequestHandler<SetAccountLockoutCommand, bool>, IRequestHandler<GetModerationAccountsQuery, PaginatedList<ModerationAccountDto>>
 {
     private async Task<int> RequireModerator(CancellationToken ct)
@@ -129,7 +151,7 @@ public sealed class AccountModerationHandlers(AppDbContext db, ICurrentUserServi
     public async Task<bool> Handle(SetAccountLockoutCommand r, CancellationToken ct)
     {
         var ownId = await RequireModerator(ct);
-        if (r.UserId == ownId) throw new ValidationException("Kendi hesabınızı engelleyemezsiniz.");
+        if (r.UserId == ownId) throw new ValidationException(text["CannotLockSelf"]);
         if (!currentUser.User.IsInRole(AppRoles.Admin) && await AdminIds.ContainsAsync(r.UserId, ct)) throw new UnauthorizedAccessException();
         var account = await db.Users.SingleOrDefaultAsync(u => u.Id == r.UserId, ct);
         if (account is null) return false;
@@ -137,7 +159,13 @@ public sealed class AccountModerationHandlers(AppDbContext db, ICurrentUserServi
         account.LockoutEnd = r.IsLocked ? DateTimeOffset.UtcNow.AddDays(r.Days) : null;
         account.SecurityStamp = Guid.NewGuid().ToString("N");
         account.ConcurrencyStamp = Guid.NewGuid().ToString("N");
-        await db.SaveChangesAsync(ct);
+        try { await db.SaveChangesAsync(ct); }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Preserve a newer profile/lockout change rather than overwriting it.
+            db.Entry(account).State = EntityState.Detached;
+            throw new InteractionConflictException(ex);
+        }
         return true;
     }
 

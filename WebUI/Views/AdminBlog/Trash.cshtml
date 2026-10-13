@@ -1,20 +1,20 @@
 @model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.BlogAdminDto>
 @{
-    ViewData["Title"] = "Blog Çöp Kutusu";
+    ViewData["Title"] = L["Trash"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="card p-4">
-    <h5>Blog Çöp Kutusu</h5>
-    <p>Geri yüklenen bloglar taslak olarak kaydedilir. Mevcut görseller korunur.</p>
-    <a asp-action="Index">Bloglara dön</a>
-    <table class="table"><thead><tr><th>Başlık</th><th>Silinme zamanı (UTC)</th><th>Silen kullanıcı ID</th><th>İşlem</th></tr></thead>
+    <h5>@L["Trash"]</h5>
+    <p>@L["TrashGuidance"]</p>
+    <a asp-action="Index">@L["Back"]</a>
+    <table class="table"><thead><tr><th>@L["Title"]</th><th>@L["DeletedDateUtc"]</th><th>@L["DeletedBy"]</th><th>@L["Actions"]</th></tr></thead>
     <tbody>
     @foreach (var blog in Model.Items)
     {
         <tr><td>@blog.Title</td><td>@blog.DeletedDate</td><td>@blog.DeletedBy</td><td>
             <form asp-action="Restore" method="post">
                 <input type="hidden" name="id" value="@blog.Id" />
-                <button class="btn btn-success" type="submit">Geri yükle</button>
+                <button class="btn btn-success" type="submit">@L["Restore"]</button>
             </form>
         </td></tr>
     }
@@ -22,7 +22,7 @@
 </div>
 
 <nav>
-@if(Model.HasPreviousPage){<a asp-action="Trash" asp-route-page="@(Model.PageIndex-1)">Önceki</a>}
-<span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
-@if(Model.HasNextPage){<a asp-action="Trash" asp-route-page="@(Model.PageIndex+1)">Sonraki</a>}
+@if(Model.HasPreviousPage){<a asp-action="Trash" asp-route-page="@(Model.PageIndex-1)">@L["Previous"]</a>}
+<span>@L["Page"] @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+@if(Model.HasNextPage){<a asp-action="Trash" asp-route-page="@(Model.PageIndex+1)">@L["Next"]</a>}
 </nav>

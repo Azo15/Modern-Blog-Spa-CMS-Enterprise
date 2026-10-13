@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Models;
+using DataAccesLayer.Concrete;
+using BusinessLayer;
+using Microsoft.Extensions.Localization;
 
 namespace WebUI.Controllers
 {
@@ -13,11 +16,15 @@ namespace WebUI.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IFileHelper _fileHelper;
+        private readonly AppDbContext _db;
+        private readonly IStringLocalizer<SharedResource> _text;
 
-        public AdminUserListController(UserManager<AppUser> userManager, IFileHelper fileHelper)
+        public AdminUserListController(UserManager<AppUser> userManager, IFileHelper fileHelper, AppDbContext db, IStringLocalizer<SharedResource> text)
         {
             _userManager = userManager;
             _fileHelper = fileHelper;
+            _db = db;
+            _text = text;
         }
 
         [HttpGet]
@@ -71,6 +78,16 @@ namespace WebUI.Controllers
                 return RedirectToAction(nameof(UserList));
             }
 
+            // Inspect all history, including hidden comments and interactions on trashed blogs,
+            // before Identity marks the user Deleted in the shared context.
+            if (await _db.Comments.IgnoreQueryFilters().AnyAsync(c => c.AppUserId == id)
+                || await _db.BlogFavorites.AnyAsync(f => f.AppUserId == id)
+                || await _db.BlogReactions.AnyAsync(r => r.AppUserId == id))
+            {
+                SetToastMessage(_text["AccountHasHistory"], "warning");
+                return RedirectToAction(nameof(UserList));
+            }
+
             IdentityResult result;
             try
             {
@@ -78,8 +95,8 @@ namespace WebUI.Controllers
             }
             catch (DbUpdateException)
             {
-                // Restrict preserves comment/audit history, including soft-deleted comments.
-                SetToastMessage("İlişkili kayıtları bulunan kullanıcı silinemez. Hesabı kilitleyebilirsiniz.", "warning");
+                // A concurrent interaction may be inserted after the preflight check.
+                SetToastMessage(_text["AccountHasHistory"], "warning");
                 return RedirectToAction(nameof(UserList));
             }
 

@@ -2,7 +2,7 @@
 @model BlogCreateDto
 
 @{
-    ViewData["Title"] = "Blog Oluşturma";
+    ViewData["Title"] = L["CreateBlog"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -30,7 +30,7 @@
                 <div class="mb-3 col-lg-6">
                     <div class="form-group">
                         <label asp-for="Slug" class="form-label"></label>
-                        <input asp-for="Slug" class="form-control" readonly placeholder="Başlık girilince otomatik oluşur" />
+                        <input asp-for="Slug" class="form-control" readonly placeholder="@L["AutomaticSlug"]" />
                         <span asp-validation-for="Slug" class="text-danger"></span>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                     <div class="form-group">
                         <label asp-for="CatagoryId" class="form-label"></label>
                         <select asp-for="CatagoryId" asp-items="ViewBag.Categories" class="form-control">
-                            <option value="">Kategori seçiniz</option>
+                            <option value="">@L["ChooseCategory"]</option>
                         </select>
                         <span asp-validation-for="CatagoryId" class="text-danger"></span>
                     </div>
@@ -56,7 +56,7 @@
                 <!-- Görsel -->
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label">Görsel</label>
+                        <label class="form-label">@L["Image"]</label>
                         <input type="file" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />
                         <div class="mt-2">
                             <img id="imagePreview" src="~/img/default-image.jpg" class="img-fluid" style="max-height: 200px; border-radius: 5px;" alt="Görsel Önizleme" />
@@ -74,9 +74,9 @@
 
                 <div class="mt-4 d-flex justify-content-between">
                     <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                        <i class="fas fa-arrow-left me-1"></i> @L["Back"]
                     </a>
-                    <button type="submit" class="btn btn-success">Kaydet</button>
+                    <button type="submit" class="btn btn-success">@L["Save"]</button>
                 </div>
             </div>
         </form>

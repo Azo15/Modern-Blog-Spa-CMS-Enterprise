@@ -6,6 +6,9 @@ using DataAccesLayer.Abstract;
 using DataAccesLayer.EntityFramework;
 using DataAccesLayer.Repository;
 using Microsoft.Extensions.DependencyInjection;
+using BusinessLayer.Security;
+using BusinessLayer.Jobs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BusinessLayer.Container
 {
@@ -13,6 +16,15 @@ namespace BusinessLayer.Container
     {
         public static void ContainerDependencies(this IServiceCollection services)
         {
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddScoped<IActiveMemberService, ActiveMemberService>();
+            services.AddScoped<IAuthorizationHandler, ActiveMemberAuthorizationHandler>();
+            services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
+            services.AddScoped<IContactEmailQueue, HangfireContactEmailQueue>();
+            services.AddScoped<ContactEmailJob>();
+            services.AddScoped<ContactEmailRecoveryJob>();
+            services.AddScoped<TrashMaintenanceJob>();
+            services.AddScoped<IReportService, ReportService>();
             services.AddScoped(typeof(IGenericDal<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IGenericService<>), typeof(GenericManager<>));
 

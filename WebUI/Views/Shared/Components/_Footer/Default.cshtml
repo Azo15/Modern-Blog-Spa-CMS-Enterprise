@@ -1,4 +1,4 @@
-﻿@model FooterViewModel
+@model FooterViewModel
 
 <footer class="footer">
     <div class="container">
@@ -11,8 +11,7 @@
                     <h3 class="footer-title mb-0">@Model.SiteTitle</h3>
                 </div>
                 <p class="text-light">
-                    Huzur, güzellik ve sağlığın buluştuğu özel mekanınız.
-                    Uzman ekibimizle size en iyi spa deneyimini sunuyoruz.
+                    @L["FooterDescription"]
                 </p>
                 <div class="social-icons">
                     <a href="@Model.Contact.FacebookUrl" target="_blank"><i class="fab fa-facebook-f"></i></a>
@@ -23,16 +22,16 @@
             </div>
 
             <div class="col-lg-2 col-md-6 mb-4">
-                <h4 class="footer-title">Hızlı Linkler</h4>
-                <a asp-controller="Default" class="footer-link">Ana Sayfa</a>
-                <a asp-controller="About" class="footer-link">Hakkımızda</a>
-                <a asp-controller="Service" class="footer-link">Hizmetlerimiz</a>
-                <a asp-controller="Blog" class="footer-link">Blog</a>
-                <a asp-controller="Contact" class="footer-link">İletişim</a>
+                <h4 class="footer-title">@L["QuickLinks"]</h4>
+                <a asp-controller="Default" class="footer-link">@L["Home"]</a>
+                <a asp-controller="About" class="footer-link">@L["About"]</a>
+                <a asp-controller="Service" class="footer-link">@L["Services"]</a>
+                <a asp-controller="Blog" class="footer-link">@L["Blog"]</a>
+                <a asp-controller="Contact" class="footer-link">@L["Contact"]</a>
             </div>
 
             <div class="col-lg-3 col-md-6 mb-4">
-                <h4 class="footer-title">Hizmetlerimiz</h4>
+                <h4 class="footer-title">@L["Services"]</h4>
                 @if (Model != null && Model.Services != null)
                 {
                     @foreach (var item in Model.Services)
@@ -43,7 +42,7 @@
             </div>
 
             <div class="col-lg-3 col-md-6 mb-4">
-                <h4 class="footer-title">İletişim Bilgileri</h4>
+                <h4 class="footer-title">@L["ContactInfo"]</h4>
                 <p class="text-light">
                     <i class="fas fa-map-marker-alt me-2"></i>
                     @Model.Contact.Adres
@@ -63,7 +62,7 @@
         <div class="row">
             <div class="col-12 text-center">
                 <p class="text-light mb-0">
-                    &copy; 2025 X Spa. Tüm hakları saklıdır.
+                    &copy; @DateTime.UtcNow.Year X Spa. @L["AllRightsReserved"]
                 </p>
             </div>
         </div>

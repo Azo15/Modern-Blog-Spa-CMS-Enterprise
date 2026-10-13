@@ -42,7 +42,7 @@ public sealed class ProfileController(UserManager<AppUser> users, SignInManager<
         try { avatar = await images.StoreAsync(model.Avatar, "avatars", ct); }
         catch (ValidationException ex) { ModelState.AddModelError(nameof(model.Avatar), ex.Message); return View("Index", await Build(user, model, ct)); }
         user.FirstName = model.FirstName.Trim(); user.LastName = model.LastName.Trim();
-        if (avatar is not null) user.Image = avatar;
+        if (avatar is not null) user.Image = $"uploads/avatars/{avatar}";
         var result = await users.UpdateAsync(user);
         if (!result.Succeeded)
         {

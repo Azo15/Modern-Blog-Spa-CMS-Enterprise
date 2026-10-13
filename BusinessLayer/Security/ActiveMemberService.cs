@@ -4,11 +4,12 @@ using DataAccesLayer.Abstract;
 using DataAccesLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace BusinessLayer.Security;
 
 // Read database state on every mutation: an already-issued cookie must not bypass lockout.
-public sealed class ActiveMemberService(AppDbContext db, ICurrentUserService currentUser) : IActiveMemberService
+public sealed class ActiveMemberService(AppDbContext db, ICurrentUserService currentUser, IStringLocalizer<SharedResource> text) : IActiveMemberService
 {
     public async Task<bool> IsActiveAsync(ClaimsPrincipal principal, CancellationToken ct = default)
     {
@@ -22,7 +23,7 @@ public sealed class ActiveMemberService(AppDbContext db, ICurrentUserService cur
     public async Task<int> RequireAsync(CancellationToken ct = default)
     {
         if (!await IsActiveAsync(currentUser.User, ct))
-            throw new UnauthorizedAccessException("Hesap engellenmiş veya oturum geçersiz.");
+            throw new UnauthorizedAccessException(text["AccountDisabled"]);
         return int.Parse(currentUser.UserId!);
     }
 }

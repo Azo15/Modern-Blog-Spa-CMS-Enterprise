@@ -1,23 +1,24 @@
 using BusinessLayer.Dtos;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace BusinessLayer.ValidationRules
 {
     public class CatagoryCreateValidator : AbstractValidator<CatagoryCreateDto>
     {
-        public CatagoryCreateValidator()
+        public CatagoryCreateValidator(IStringLocalizer<SharedResource>? localizer = null)
         {
-            RuleFor(x => x.Title).NotEmpty().WithMessage("Kategori adı boş geçilemez")
-                .MinimumLength(2).WithMessage("Kategori adı en az 2 karakter olmalıdır");
+            RuleFor(x => x.Title).NotEmpty().Localized(localizer, "Required")
+                .MinimumLength(2).Localized(localizer, "MinLength", 2);
         }
     }
 
     public class CatagoryUpdateValidator : AbstractValidator<CatagoryUpdateDto>
     {
-        public CatagoryUpdateValidator()
+        public CatagoryUpdateValidator(IStringLocalizer<SharedResource>? localizer = null)
         {
-            RuleFor(x => x.Id).NotEmpty();
-            RuleFor(x => x.Title).NotEmpty().WithMessage("Kategori adı boş geçilemez");
+            RuleFor(x => x.Id).NotEmpty().Localized(localizer, "PositiveId");
+            RuleFor(x => x.Title).NotEmpty().Localized(localizer, "Required");
         }
     }
 }

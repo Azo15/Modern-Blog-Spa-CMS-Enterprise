@@ -13,7 +13,7 @@
                 <div class="col-lg-8 mx-auto text-center">
                     <h1 class="section-title font-playfair" data-aos="fade-up">Blog</h1>
                     <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
-                        Sağlık, güzellik ve wellness hakkında faydalı bilgiler
+                        @L["BlogSubtitle"]
                     </p>
                 </div>
             </div>
@@ -23,9 +23,9 @@
             </div>
             
             <nav class="mt-4" aria-label="Blog sayfaları">
-                @if(Model.HasPreviousPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.CategoryId">Önceki</a>}
-                <span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
-                @if(Model.HasNextPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.CategoryId">Sonraki</a>}
+                @if(Model.HasPreviousPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.CategoryId">@L["Previous"]</a>}
+                <span>@L["Page"] @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+                @if(Model.HasNextPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.CategoryId">@L["Next"]</a>}
             </nav>
         </div>
     </section>

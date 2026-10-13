@@ -5,13 +5,23 @@
 @model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.BlogAdminDto>
 
 @{
-    ViewData["Title"] = "Blog Listesi";
+    ViewData["Title"] = L["BlogList"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
     var canReview = (await Authorization.AuthorizeAsync(User, AccessPolicies.ContentManager)).Succeeded;
+    var canReport = (await Authorization.AuthorizeAsync(User, AccessPolicies.Admin)).Succeeded;
 }
 
 <div class="card">
+    @if (canReport)
+    {
+        <div class="d-flex flex-wrap gap-2 p-3">
+            <a asp-controller="Reports" asp-action="Blogs" asp-route-format="Excel" class="btn btn-outline-success">@L["Blog"] — @L["ExportExcel"]</a>
+            <a asp-controller="Reports" asp-action="Blogs" asp-route-format="Pdf" class="btn btn-outline-danger">@L["Blog"] — @L["ExportPdf"]</a>
+            <a asp-controller="Reports" asp-action="Interactions" asp-route-format="Excel" class="btn btn-outline-success">@L["Interaction"] — @L["ExportExcel"]</a>
+            <a asp-controller="Reports" asp-action="Interactions" asp-route-format="Pdf" class="btn btn-outline-danger">@L["Interaction"] — @L["ExportPdf"]</a>
+        </div>
+    }
     <div class="justify-content-between d-flex align-items-center px-4">
         <h5 class="card-header">@ViewData["Title"]</h5>
 
@@ -21,11 +31,11 @@
 
             <div class="row g-2 align-items-center">
                 <div class="col-auto">
-                    <label for="categoryId" class="col-form-label">Kategori:</label>
+                    <label for="categoryId" class="col-form-label">@L["Category"]:</label>
                 </div>
                 <div class="col-auto">
                     <select name="categoryId" id="categoryId" class="form-select" onchange="this.form.submit()">
-                        <option value="">Tümü</option>
+                        <option value="">@L["All"]</option>
                         @if (ViewBag.Categories is List<SelectListItem> categoryList)
                         {
                             foreach (var cat in categoryList)
@@ -40,8 +50,8 @@
             </div>
         </form>
 
-        @if (canReview) { <a asp-action="Trash" class="btn btn-outline-secondary">Çöp Kutusu</a> }
-        <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>Yeni Bilgi Ekle</a>
+        @if (canReview) { <a asp-action="Trash" class="btn btn-outline-secondary">@L["Trash"]</a> }
+        <a asp-action="Create" class="btn btn-outline-primary"><i class="fa-solid fa-plus me-md-2"></i>@L["CreateBlog"]</a>
     </div>
 
     <div class="table-responsive text-nowrap">
@@ -50,18 +60,18 @@
                 <tr>
                     <th>#</th>
                     <th>
-                        Başlık
+                        @L["Title"]
                     </th>
                     <th>
-                        İçerik
+                        @L["Content"]
                     </th>
                     <th>
-                        Görsel
+                        @L["Image"]
                     </th>
                     <th>
-                        Güncelleme
+                        @L["Updated"]
                     </th>
-                    <th>Eylemler</th>
+                    <th>@L["Actions"]</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -71,18 +81,18 @@
                     <tr>
                         <td>
                             @sayac
-                            <div class="small">@item.PublishStatus</div>
+                            <div class="small">@L[item.PublishStatus.ToString()]</div>
                             <form asp-action="SubmitForReview" method="post">
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary">İncelemeye gönder</button>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">@L["SubmitReview"]</button>
                             </form>
                             @if (canReview)
                             {
                                 <form asp-action="Review" method="post">
                                     <input type="hidden" name="id" value="@item.Id" />
-                                    <button name="status" value="Published" class="btn btn-sm btn-success">Yayımla</button>
-                                    <button name="status" value="Rejected" class="btn btn-sm btn-danger">Reddet</button>
-                                    <button name="status" value="Draft" class="btn btn-sm btn-secondary">Taslağa al</button>
+                                    <button name="status" value="Published" class="btn btn-sm btn-success">@L["Publish"]</button>
+                                    <button name="status" value="Rejected" class="btn btn-sm btn-danger">@L["Reject"]</button>
+                                    <button name="status" value="Draft" class="btn btn-sm btn-secondary">@L["MoveDraft"]</button>
                                 </form>
                             }
                         </td>
@@ -120,12 +130,12 @@
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item text-warning" asp-action="Edit" asp-route-id="@item.Id">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i>Düzenle
+                                        <i class="fa-solid fa-pen-to-square me-1"></i>@L["Edit"]
                                     </a>
                                     <a class="dropdown-item text-danger"
                                        asp-action="Delete"
                                        asp-route-id="@item.Id">
-                                        <i class="fa-solid fa-trash me-1"></i>Sil
+                                        <i class="fa-solid fa-trash me-1"></i>@L["Delete"]
                                     </a>
                                 </div>
                             </div>
@@ -142,7 +152,7 @@
     </div>
 </div>
 <nav class="p-3" aria-label="Blog sayfaları">
-@if (Model.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.SelectedCategory">Önceki</a> }
-<span>Sayfa @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
-@if (Model.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.SelectedCategory">Sonraki</a> }
+@if (Model.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex-1)" asp-route-categoryId="@ViewBag.SelectedCategory">@L["Previous"]</a> }
+<span>@L["Page"] @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+@if (Model.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.SelectedCategory">@L["Next"]</a> }
 </nav>

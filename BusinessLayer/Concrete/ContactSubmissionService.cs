@@ -5,15 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using BusinessLayer.ValidationRules;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace BusinessLayer.Concrete;
 
 public sealed class ContactSubmissionService(AppDbContext db, IContactEmailQueue queue,
-    ILogger<ContactSubmissionService> logger) : IContactSubmissionService
+    ILogger<ContactSubmissionService> logger, IStringLocalizer<SharedResource>? localizer = null) : IContactSubmissionService
 {
     public async Task<ContactSubmissionResult> SubmitAsync(ContactForm form, CancellationToken cancellationToken = default)
     {
-        new ContactFormValidators().ValidateAndThrow(form);
+        new ContactFormValidators(localizer).ValidateAndThrow(form);
         // Never accept audit, moderation or identity fields from the anonymous form.
         var message = new ContactForm
         {

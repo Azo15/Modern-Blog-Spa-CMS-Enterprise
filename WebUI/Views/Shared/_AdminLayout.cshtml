@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="~/assets/"
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name" class="layout-menu-fixed layout-compact" data-assets-path="~/assets/"
       data-template="vertical-menu-template-free">
 
 <head>
@@ -15,6 +15,7 @@
             <div class="layout-page">
 
                 @await Component.InvokeAsync("_TopHeader")
+                <div class="px-4 pt-2 text-end">@await Html.PartialAsync("_LanguageSelector")</div>
 
                 <div class="content-wrapper px-xxl-5">
                     <div class="container-fluid flex-grow-1 container-p-y">

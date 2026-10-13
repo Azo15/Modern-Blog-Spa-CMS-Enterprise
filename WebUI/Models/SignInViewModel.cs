@@ -4,18 +4,18 @@ namespace WebUI.Models
 {
     public class SignInViewModel
     {
-        [Required(ErrorMessage = "Lütfen e-postanızı giriniz.")]
-        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz.")]
-        [Display(Name = "E-Posta")]
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
         public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Şifrenizi giriniz.")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Şifre")]
+        [Display(Name = "Password")]
         public string? Password { get; set; }
 
-        [Display(Name = "Beni hatırla")]
+        [Display(Name = "RememberMe")]
         public bool RememberMe { get; set; }
     }
 }

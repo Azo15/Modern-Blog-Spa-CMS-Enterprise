@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Models;
+using BusinessLayer;
+using Microsoft.Extensions.Localization;
 
 namespace WebUI.Controllers
 {
@@ -14,11 +16,13 @@ namespace WebUI.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IStringLocalizer<SharedResource> _text;
 
-        public DashboardController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public DashboardController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IStringLocalizer<SharedResource> text)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _text = text;
         }
 
         // Giriş (GET)
@@ -38,6 +42,11 @@ namespace WebUI.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
+                if (!user.IsActive || await _userManager.IsLockedOutAsync(user))
+                {
+                    ModelState.AddModelError("", _text["AccountDisabled"]);
+                    return View(model);
+                }
                 var now = DateTime.UtcNow;
 
                 if (user.FailedLoginCount > 0 && user.LastFailedLogin.HasValue)
@@ -81,12 +90,12 @@ namespace WebUI.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Geçersiz e-posta veya şifre.");
+                    ModelState.AddModelError("", _text["InvalidCredentials"]);
                 }
                 return View(model);
             }
 
-            ModelState.AddModelError("", "Geçersiz e-posta veya şifre.");
+            ModelState.AddModelError("", _text["InvalidCredentials"]);
             return View(model);
         }
         // Kayıt (GET)
@@ -107,7 +116,7 @@ namespace WebUI.Controllers
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
             {
-                ModelState.AddModelError("", "Bu e-posta adresi zaten kayıtlı.");
+                ModelState.AddModelError("", _text["EmailAlreadyRegistered"]);
                 return View(model);
             }
 

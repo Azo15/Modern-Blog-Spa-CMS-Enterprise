@@ -10,6 +10,21 @@ namespace BusinessLayer.Tests;
 public class ExceptionMappingTests
 {
     [Fact]
+    public async Task ConcurrentMutationReturnsConflictWithoutDatabaseDetails()
+    {
+        using var services = new ServiceCollection().AddLogging().AddOptions().BuildServiceProvider();
+        var context = new DefaultHttpContext { RequestServices = services };
+        context.Response.Body = new MemoryStream();
+        var middleware = new GlobalExceptionMiddleware(_ => throw new BusinessLayer.Exceptions.InteractionConflictException(
+            new InvalidOperationException("secret database details")), NullLogger<GlobalExceptionMiddleware>.Instance);
+        await middleware.InvokeAsync(context);
+        Assert.Equal(StatusCodes.Status409Conflict, context.Response.StatusCode);
+        context.Response.Body.Position = 0;
+        var body = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        Assert.Contains("conflicted", body);
+        Assert.DoesNotContain("secret database", body);
+    }
+    [Fact]
     public async Task ImperativeAuthorizationFailureMapsToForbidden()
     {
         var context = new DefaultHttpContext();

@@ -12,6 +12,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Controllers;
+using BusinessLayer;
+using Microsoft.Extensions.Localization;
+using Moq;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using WebUI.Models;
+using BusinessLayer.Abstract;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace BusinessLayer.Tests;
 
@@ -200,6 +211,125 @@ public sealed class MemberFeatureTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ApproveCommentCommand(comment)));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new SetAccountLockoutCommand(2, true)));
     }
+
+    [Fact]
+    public async Task AdministratorCanLockModeratorWithoutRemovingIdentityRoles()
+    {
+        using var f = new Stage2Fixture(); f.As(AppRoles.Admin, 1);
+        f.Db.Roles.Add(new IdentityRole<int>(AppRoles.Moderator) { Id = 10 });
+        f.Db.UserRoles.Add(new IdentityUserRole<int> { UserId = 3, RoleId = 10 }); await f.Db.SaveChangesAsync();
+        Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(3, true, 2)));
+        Assert.True((await f.Db.Users.SingleAsync(u => u.Id == 3)).LockoutEnabled);
+        var link = await f.Db.UserRoles.SingleAsync(); Assert.Equal(3, link.UserId); Assert.Equal(10, link.RoleId);
+        await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new SetAccountLockoutCommand(1, true)));
+    }
+
+    [Fact]
+    public async Task UnlockDoesNotRequireAPositiveLockDurationAndMissingTargetReturnsFalse()
+    {
+        using var f = new Stage2Fixture(); f.As(AppRoles.Moderator, 3);
+        await f.Sender.Send(new SetAccountLockoutCommand(2, true));
+        Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, false, 0)));
+        Assert.Null((await f.Db.Users.SingleAsync(u => u.Id == 2)).LockoutEnd);
+        Assert.False(await f.Sender.Send(new SetAccountLockoutCommand(99, true)));
+    }
+
+    [Fact]
+    public async Task SoftDeletedBlogKeepsInteractionsHiddenUntilRestore()
+    {
+        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        await f.Sender.Send(new ToggleBlogFavoriteCommand(1));
+        await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Like));
+        var blog = await f.Db.Blogs.SingleAsync(); f.Db.Remove(blog); await f.Db.SaveChangesAsync();
+        Assert.Single(await f.Db.Set<BlogFavorite>().ToListAsync()); Assert.Single(await f.Db.Set<BlogReaction>().ToListAsync());
+        Assert.Empty((await f.Sender.Send(new GetUserFavoritesQuery())).Items);
+        Assert.Equal(0, (await f.Sender.Send(new GetBlogInteractionQuery(1))).LikeCount);
+        blog.IsDeleted = false; await f.Db.SaveChangesAsync();
+        Assert.Single((await f.Sender.Send(new GetUserFavoritesQuery())).Items);
+        Assert.Equal(1, (await f.Sender.Send(new GetBlogInteractionQuery(1))).LikeCount);
+    }
+
+    [Theory]
+    [InlineData("2", true, true)]
+    [InlineData("999", true, false)]
+    [InlineData("invalid", true, false)]
+    [InlineData(null, true, false)]
+    [InlineData("2", false, false)]
+    public async Task ActivePolicyRequiresARealAuthenticatedDatabaseUser(string? id, bool authenticated, bool expected)
+    {
+        using var f = new Stage2Fixture();
+        var principal = AuthorizationTests.Principal(AppRoles.RegisteredUser, id, authenticated);
+        var service = new ActiveMemberService(f.Db, f.User, Mock.Of<IStringLocalizer<SharedResource>>());
+        var handler = new ActiveMemberAuthorizationHandler(service);
+        var context = new AuthorizationHandlerContext([new ActiveMemberRequirement()], principal, null);
+        await handler.HandleAsync(context);
+        Assert.Equal(expected, context.HasSucceeded);
+        var user = await f.Db.Users.SingleAsync(u => u.Id == 2); user.LockoutEnabled = true; user.LockoutEnd = DateTimeOffset.UtcNow.AddDays(1); await f.Db.SaveChangesAsync();
+        context = new AuthorizationHandlerContext([new ActiveMemberRequirement()], principal, null);
+        await handler.HandleAsync(context);
+        Assert.False(context.HasSucceeded);
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public async Task BlockedAccountCannotCreateANewSessionOrIncrementPasswordFailureCounters(bool locked, bool inactive)
+    {
+        var user = new AppUser { Id = 2, UserName = "user@spa.com", Email = "user@spa.com", IsActive = !inactive, FailedLoginCount = 2 };
+        var users = UserManagerMock();
+        users.Setup(x => x.FindByEmailAsync(user.Email)).ReturnsAsync(user);
+        users.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(locked);
+        var signIn = new Mock<SignInManager<AppUser>>(users.Object, Mock.Of<IHttpContextAccessor>(),
+            Mock.Of<IUserClaimsPrincipalFactory<AppUser>>(), Options.Create(new IdentityOptions()),
+            NullLogger<SignInManager<AppUser>>.Instance, Mock.Of<IAuthenticationSchemeProvider>(), Mock.Of<IUserConfirmation<AppUser>>());
+        var text = new Mock<IStringLocalizer<SharedResource>>();
+        text.Setup(x => x["AccountDisabled"]).Returns(new LocalizedString("AccountDisabled", "Account is disabled."));
+        var controller = new DashboardController(users.Object, signIn.Object, text.Object);
+        Assert.IsType<ViewResult>(await controller.SignIn(new SignInViewModel { Email = user.Email, Password = "P@ssword123!" }));
+        Assert.False(controller.ModelState.IsValid); Assert.Equal(2, user.FailedLoginCount);
+        signIn.Verify(x => x.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
+        users.Verify(x => x.UpdateAsync(It.IsAny<AppUser>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData("Favorite")]
+    [InlineData("Reaction")]
+    [InlineData("DeletedComment")]
+    public async Task LegacyAdminDeletionPreservesAccountsWithInteractionOrHiddenCommentHistory(string history)
+    {
+        using var f = new Stage2Fixture();
+        if (history == "Favorite") f.Db.Add(new BlogFavorite { AppUserId = 2, BlogId = 1 });
+        else if (history == "Reaction") f.Db.Add(new BlogReaction { AppUserId = 2, BlogId = 1, ReactionType = ReactionType.Like });
+        else f.Db.Comments.Add(new Comment { BlogId = 1, AppUserId = 2, Content = "Retained audit history" });
+        await f.Db.SaveChangesAsync();
+        if (history == "DeletedComment") { f.Db.Remove(await f.Db.Comments.SingleAsync()); await f.Db.SaveChangesAsync(); }
+        var target = await f.Db.Users.SingleAsync(u => u.Id == 2);
+        var users = UserManagerMock();
+        users.Setup(x => x.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>())).ReturnsAsync(await f.Db.Users.SingleAsync(u => u.Id == 1));
+        users.Setup(x => x.FindByIdAsync("2")).ReturnsAsync(target);
+        var files = new Mock<IFileHelper>();
+        var text = new Mock<IStringLocalizer<SharedResource>>();
+        text.Setup(x => x["AccountHasHistory"]).Returns(new LocalizedString("AccountHasHistory", "Use account moderation."));
+        var controller = new AdminUserListController(users.Object, files.Object, f.Db, text.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = AuthorizationTests.Principal(AppRoles.Admin) } },
+            TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
+        };
+        Assert.IsType<RedirectToActionResult>(await controller.Delete(2));
+        Assert.Equal("warning", controller.TempData["ToastType"]);
+        Assert.Equal("Use account moderation.", controller.TempData["ToastMessage"]);
+        users.Verify(x => x.DeleteAsync(It.IsAny<AppUser>()), Times.Never); files.Verify(x => x.Delete(It.IsAny<string>()), Times.Never);
+        Assert.Equal(EntityState.Unchanged, f.Db.Entry(target).State);
+        Assert.True(await f.Db.Users.AnyAsync(u => u.Id == 2));
+        Assert.Equal(history == "Favorite" ? 1 : 0, await f.Db.BlogFavorites.CountAsync());
+        Assert.Equal(history == "Reaction" ? 1 : 0, await f.Db.BlogReactions.CountAsync());
+        Assert.Equal(history == "DeletedComment" ? 1 : 0, await f.Db.Comments.IgnoreQueryFilters().CountAsync());
+    }
+
+    private static Mock<UserManager<AppUser>> UserManagerMock()
+        => new(Mock.Of<IUserStore<AppUser>>(), Options.Create(new IdentityOptions()), Mock.Of<IPasswordHasher<AppUser>>(),
+            Array.Empty<IUserValidator<AppUser>>(), Array.Empty<IPasswordValidator<AppUser>>(), Mock.Of<ILookupNormalizer>(),
+            new IdentityErrorDescriber(), Mock.Of<IServiceProvider>(), NullLogger<UserManager<AppUser>>.Instance);
 
     [Fact]
     public async Task ValidationRejectsInvalidReactionAndPaginationBeforePersistence()

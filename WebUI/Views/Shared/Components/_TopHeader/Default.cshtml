@@ -44,8 +44,8 @@
                         <li><div class="dropdown-divider my-1"></div></li>
 
                         <li>
-                            <a class="dropdown-item" href="/admin/setting/profiledit">
-                                <i class="fa-solid fa-user icon-md me-3"></i><span>Profilim</span>
+                            <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                <i class="fa-solid fa-user icon-md me-3"></i><span>@L["Profile"]</span>
                             </a>
                         </li>
 
@@ -61,7 +61,7 @@
                             <form method="post" asp-controller="dashboard" asp-action="logout">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="dropdown-item exit-button">
-                                    <i class="fa-solid fa-right-from-bracket icon-md me-3"></i><span>Çıkış Yap</span>
+                                    <i class="fa-solid fa-right-from-bracket icon-md me-3"></i><span>@L["SignOut"]</span>
                                 </button>
                             </form>
                         </li>

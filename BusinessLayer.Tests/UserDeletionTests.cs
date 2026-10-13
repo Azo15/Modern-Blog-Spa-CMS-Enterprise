@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using WebUI.Controllers;
+using BusinessLayer;
+using Microsoft.Extensions.Localization;
 
 namespace BusinessLayer.Tests;
 
@@ -15,13 +17,16 @@ public class UserDeletionTests
     [Fact]
     public async Task RestrictedUserDeletionPreservesPhotoAndReturnsToUserList()
     {
+        using var fixture = new Stage2Fixture();
         var users = new Mock<UserManager<AppUser>>(Mock.Of<IUserStore<AppUser>>(), null!, null!, null!, null!, null!, null!, null!, null!);
         users.Setup(u => u.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>())).ReturnsAsync(new AppUser { Id = 4 });
         users.Setup(u => u.FindByIdAsync("2")).ReturnsAsync(new AppUser { Id = 2, Image = "users/photo.png" });
         users.Setup(u => u.DeleteAsync(It.IsAny<AppUser>())).ThrowsAsync(new DbUpdateException("Restricted relation"));
         var files = new Mock<IFileHelper>(MockBehavior.Strict);
         var context = new DefaultHttpContext();
-        var controller = new AdminUserListController(users.Object, files.Object)
+        var text = new Mock<IStringLocalizer<SharedResource>>();
+        text.Setup(t => t["AccountHasHistory"]).Returns(new LocalizedString("AccountHasHistory", "Related history prevents deletion."));
+        var controller = new AdminUserListController(users.Object, files.Object, fixture.Db, text.Object)
         {
             ControllerContext = new ControllerContext { HttpContext = context },
             TempData = new TempDataDictionary(context, Mock.Of<ITempDataProvider>())

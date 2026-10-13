@@ -276,6 +276,66 @@ namespace DataAccesLayer.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.BlogFavorite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BlogId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogId");
+
+                    b.HasIndex("AppUserId", "BlogId")
+                        .IsUnique();
+
+                    b.ToTable("BlogFavorites");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.BlogReaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BlogId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReactionType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId", "BlogId")
+                        .IsUnique();
+
+                    b.HasIndex("BlogId", "ReactionType");
+
+                    b.ToTable("BlogReactions", t =>
+                        {
+                            t.HasCheckConstraint("CK_BlogReactions_ReactionType", "[ReactionType] IN (1, 2, 3)");
+                        });
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Catagory", b =>
                 {
                     b.Property<int>("Id")
@@ -436,6 +496,59 @@ namespace DataAccesLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.ContactEmailDelivery", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContactFormId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HangfireJobId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("LastEnqueuedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("LeaseExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LeaseToken")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("MessageId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("SentAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactFormId")
+                        .IsUnique();
+
+                    b.HasIndex("SentAtUtc", "LastEnqueuedAtUtc");
+
+                    b.ToTable("ContactEmailDeliveries");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.ContactForm", b =>
@@ -704,6 +817,37 @@ namespace DataAccesLayer.Migrations
                     b.ToTable("Sliders");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.TrashArchiveEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ArchivedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("SnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .IsUnique();
+
+                    b.ToTable("TrashArchiveEntries");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -854,6 +998,44 @@ namespace DataAccesLayer.Migrations
                     b.Navigation("Catagory");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.BlogFavorite", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.Blog", "Blog")
+                        .WithMany()
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Blog");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.BlogReaction", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.Blog", "Blog")
+                        .WithMany()
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Blog");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Comment", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.AppUser", "AppUser")
@@ -878,6 +1060,17 @@ namespace DataAccesLayer.Migrations
                     b.Navigation("Blog");
 
                     b.Navigation("ParentComment");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.ContactEmailDelivery", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.ContactForm", "ContactForm")
+                        .WithOne()
+                        .HasForeignKey("EntityLayer.Concrete.ContactEmailDelivery", "ContactFormId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ContactForm");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

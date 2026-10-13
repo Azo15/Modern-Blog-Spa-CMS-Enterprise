@@ -10,7 +10,7 @@
     <div class="row g-4">
         <div class="col-lg-6">
             <form asp-action="Update" method="post" enctype="multipart/form-data" class="border rounded p-4">
-                @if (!string.IsNullOrEmpty(Model.Avatar)) { <img src="~/uploads/avatars/@Model.Avatar" alt="@Text["Avatar"]" class="rounded-circle mb-3" width="96" height="96" style="object-fit:cover" /> }
+                @if (!string.IsNullOrEmpty(Model.Avatar)) { <img src="~/@Model.Avatar" alt="@Text["Avatar"]" class="rounded-circle mb-3" width="96" height="96" style="object-fit:cover" /> }
                 <div class="mb-3"><label for="firstName">@Text["FirstName"]</label><input id="firstName" name="FirstName" value="@Model.Profile.FirstName" maxlength="100" required class="form-control" autocomplete="given-name" /></div>
                 <div class="mb-3"><label for="lastName">@Text["LastName"]</label><input id="lastName" name="LastName" value="@Model.Profile.LastName" maxlength="100" required class="form-control" autocomplete="family-name" /></div>
                 <div class="mb-3"><label for="avatar">@Text["Avatar"] (5 MB)</label><input id="avatar" name="Avatar" type="file" accept="image/jpeg,image/png,image/webp" class="form-control" /></div>

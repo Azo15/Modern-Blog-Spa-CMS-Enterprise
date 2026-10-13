@@ -42,7 +42,7 @@ public sealed class ReportService(AppDbContext db, ICurrentUserService currentUs
                 var data = await query.OrderByDescending(c => c.CreatedDate).ThenBy(c => c.Id).Take(MaximumRows + 1)
                     .Select(c => new { c.Id, c.FullName, c.Email, c.Subject, c.Status, c.CreatedDate }).ToListAsync(cancellationToken);
                 EnsureSize(data.Count);
-                rows = data.Select(c => new object?[] { c.Id, c.FullName, c.Email, c.Subject, c.Status.ToString(), c.CreatedDate }).ToList();
+                rows = data.Select(c => new object?[] { c.Id, c.FullName, c.Email, c.Subject, ContactStatusLabel(c.Status, english), c.CreatedDate }).ToList();
                 break;
             }
             case ReportKind.Blogs:
@@ -74,11 +74,11 @@ public sealed class ReportService(AppDbContext db, ICurrentUserService currentUs
                 var favorites = from f in db.Set<BlogFavorite>().AsNoTracking()
                                 join b in db.Blogs.AsNoTracking() on f.BlogId equals b.Id
                                 join u in db.Users.AsNoTracking() on f.AppUserId equals u.Id
-                                select new ActivityRow(u.Id, u.FirstName + " " + u.LastName, b.Id, b.Title, 0, f.CreatedDate);
+                                select new { UserId = u.Id, UserName = u.FirstName + " " + u.LastName, BlogId = b.Id, BlogTitle = b.Title, Kind = 0, f.CreatedDate };
                 var reactions = from r in db.Set<BlogReaction>().AsNoTracking()
                                 join b in db.Blogs.AsNoTracking() on r.BlogId equals b.Id
                                 join u in db.Users.AsNoTracking() on r.AppUserId equals u.Id
-                                select new ActivityRow(u.Id, u.FirstName + " " + u.LastName, b.Id, b.Title, (int)r.ReactionType, r.CreatedDate);
+                                select new { UserId = u.Id, UserName = u.FirstName + " " + u.LastName, BlogId = b.Id, BlogTitle = b.Title, Kind = (int)r.ReactionType, r.CreatedDate };
                 var query = favorites.Concat(reactions);
                 if (filter.FromUtc.HasValue) query = query.Where(r => r.CreatedDate >= filter.FromUtc.Value);
                 if (filter.ToUtc.HasValue) query = query.Where(r => r.CreatedDate < filter.ToUtc.Value);
@@ -130,6 +130,16 @@ public sealed class ReportService(AppDbContext db, ICurrentUserService currentUs
     private void EnsureSize(int count) { if (count > MaximumRows) throw new ValidationException(text["ReportTooLarge"]); }
     private static string StatusLabel(PublishStatus status, bool english) => english ? status.ToString() : status switch
     { PublishStatus.Draft => "Taslak", PublishStatus.PendingReview => "İnceleme Bekliyor", PublishStatus.Published => "Yayında", PublishStatus.Rejected => "Reddedildi", _ => status.ToString() };
+    private static string ContactStatusLabel(ReservationStatus status, bool english) => status switch
+    {
+        ReservationStatus.SoforBeklemede => english ? "Awaiting Driver Assignment" : "Şoför Ataması Bekleniyor",
+        ReservationStatus.SoforYolda => english ? "Driver En Route" : "Şoför Yolda",
+        ReservationStatus.SoforAraciAldi => english ? "Vehicle Collected" : "Şoför Aracı Aldı",
+        ReservationStatus.MusteriOnayBeklemede => english ? "Awaiting Customer Approval" : "Müşteri Onayı Bekleniyor",
+        ReservationStatus.MusteriOnayladi => english ? "Customer Approved" : "Müşteri Onayladı",
+        ReservationStatus.AracTeslimEdildi => english ? "Vehicle Delivered" : "Araç Teslim Edildi",
+        _ => status.ToString()
+    };
     private static string ReactionLabel(int kind, bool english) => kind switch
     { 0 => english ? "Favorite" : "Favori", 1 => english ? "Like" : "Beğeni", 2 => english ? "Heart" : "Kalp", 3 => english ? "Clap" : "Alkış", _ => "?" };
     private static string FilterDescription(ReportFilter filter, bool english)
@@ -140,5 +150,4 @@ public sealed class ReportService(AppDbContext db, ICurrentUserService currentUs
             ? $"UTC dates: {from} (inclusive) / {to} (exclusive). User: {filter.UserId?.ToString() ?? "*"}; Blog: {filter.BlogId?.ToString() ?? "*"}."
             : $"UTC tarihleri: {from} (dahil) / {to} (hariç). Üye: {filter.UserId?.ToString() ?? "*"}; Blog: {filter.BlogId?.ToString() ?? "*"}.";
     }
-    private sealed record ActivityRow(int UserId, string UserName, int BlogId, string? BlogTitle, int Kind, DateTime CreatedDate);
 }

@@ -15,6 +15,14 @@ using WebUI.Data;
 using WebUI.Middleware;
 using WebUI.Hubs;
 using Serilog;
+using BusinessLayer;
+using BusinessLayer.Jobs;
+using Hangfire;
+using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using WebUI.Models;
+using WebUI.Security;
 using static WebUI.Helpers.GlobalHelper;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,13 +44,15 @@ else builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "spa:";
 });
 builder.Services.AddScoped<IBlogImageStorage, BlogImageStorage>();
+builder.Services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
 builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
+builder.Services.AddHttpClient<IReCaptchaVerifier, ReCaptchaVerifier>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
-    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File(Path.Combine(builder.Environment.ContentRootPath, "logs", "log-.txt"), rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -63,6 +73,14 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection")
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connection));
+
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("Hangfire") ?? connection,
+        new SqlServerStorageOptions { QueuePollInterval = TimeSpan.Zero, SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5) }));
+builder.Services.AddHangfireServer(options => options.WorkerCount = Math.Max(1, Math.Min(Environment.ProcessorCount, 4)));
 
 
 // 4. Identity sistemini `int` tipiyle yapılandır (IdentityUser<int>, IdentityRole<int>)
@@ -87,11 +105,23 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
 
 // 5. Razor runtime compilation ve FluentValidation
 builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization(options => options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)))
     .AddRazorRuntimeCompilation()
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.Load("BusinessLayer")));
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var cultures = LanguageSettings.Supported.Select(name => new CultureInfo(name)).ToList();
+    options.DefaultRequestCulture = new RequestCulture(LanguageSettings.Default);
+    options.SupportedCultures = cultures;
+    options.SupportedUICultures = cultures;
+    options.RequestCultureProviders = [new CookieRequestCultureProvider()];
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
 
 // 6. Güvenlik mührü (her istek için yeniden kontrol yapılır)
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>
@@ -135,6 +165,16 @@ await DataSeeder.SeedRolesAsync(app.Services);
 if (app.Environment.IsDevelopment())
     await DataSeeder.SeedAsync(app.Services);
 
+using (var scope = app.Services.CreateScope())
+{
+    var jobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    var timeZone = TimeZoneInfo.FindSystemTimeZoneById(OperatingSystem.IsWindows() ? "Turkey Standard Time" : "Europe/Istanbul");
+    jobs.AddOrUpdate<TrashMaintenanceJob>("nightly-trash-maintenance", job => job.RunAsync(CancellationToken.None),
+        Cron.Daily(2), new RecurringJobOptions { TimeZone = timeZone });
+    jobs.AddOrUpdate<ContactEmailRecoveryJob>("recover-contact-emails", job => job.RecoverAsync(CancellationToken.None),
+        Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
+}
+
 // 9. Geliştirme ve üretim ortamlarına göre hata sayfası
 if (app.Environment.IsDevelopment())
 {
@@ -147,6 +187,7 @@ else
 }
 
 // Map validation/authorization exceptions before DeveloperExceptionPage can turn them into 500.
+app.UseRequestLocalization();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // 10. HTTP ve statik dosya ayarları
@@ -160,6 +201,12 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication(); // [Authorize] için gerekli
 app.UseAuthorization();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = [new HangfireCustomAuthorizationFilter()],
+    IgnoreAntiforgeryToken = false,
+    AppPath = "/AdminBlog"
+});
 
 // 12. Route ayarları
 app.MapControllerRoute(

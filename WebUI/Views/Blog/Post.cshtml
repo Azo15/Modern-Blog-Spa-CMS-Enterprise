@@ -5,7 +5,7 @@
     ViewData["Title"] = "Post";
     Layout = "~/Views/Shared/_UILayout.cshtml";
 }
-<section class="blog-detail-header" style="background-image: url('~/blogImage/@Model.Blog.Image')">
+<section class="blog-detail-header" style="background-image: url('@Url.Content("~/" + (Model.Blog.Image ?? "img/default-image.jpg"))')">
     <div class="container">
         <div class="blog-detail-category" data-aos="fade-up">
             Spa & Wellness
@@ -24,7 +24,7 @@
             </span>
             <span>
                 <i class="fas fa-clock"></i>
-                @ViewBag.ReadingTime dk okuma
+                @ViewBag.ReadingTime @L["ReadingMinutes"]
             </span>
         </div>
     </div>
@@ -39,13 +39,14 @@
                 <div class="blog-navigation" data-aos="fade-up">
                     <a asp-controller="Blog" asp-action="Index" class="nav-btn back-btn">
                         <i class="fas fa-arrow-left"></i>
-                        Tüm Blog Yazıları
+                        @L["AllPosts"]
                     </a>
                 </div>
 
                 <div class="blog-content-wrapper" data-aos="fade-up" data-aos-delay="100">
                     @Html.Raw(HtmlSanitizer.Sanitize(Model.Blog.Content))
                 </div>
+                @await Component.InvokeAsync("BlogInteraction", new { blogId = Model.Blog.Id, slug = Model.Blog.Slug })
             </div>
         </div>
     </div>
@@ -59,7 +60,7 @@
     {
         <section class="related-posts">
             <div class="container">
-                <h2 class="section-title font-playfair" data-aos="fade-up">İlgili Yazılar (@relatedBlogs.First().CategoryTitle)</h2>
+                <h2 class="section-title font-playfair" data-aos="fade-up">@L["RelatedPosts"] (@relatedBlogs.First().CategoryTitle)</h2>
                 
                 <div class="row g-3">
                     @await Html.PartialAsync("_BlogCardPartial", relatedBlogs)

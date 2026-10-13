@@ -465,4 +465,154 @@
   <data name="E-posta" xml:space="preserve">
     <value>E-posta</value>
   </data>
+  <data name="Contact.ErrorTitle" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Contact.ValidationRequired" xml:space="preserve">
+    <value>Lütfen gerekli alanları kontrol edin.</value>
+  </data>
+  <data name="Contact.RateLimitTitle" xml:space="preserve">
+    <value>Biraz bekleyin</value>
+  </data>
+  <data name="Contact.RateLimit" xml:space="preserve">
+    <value>Yeni bir mesaj göndermeden önce lütfen bekleyin.</value>
+  </data>
+  <data name="Contact.CaptchaTitle" xml:space="preserve">
+    <value>Doğrulama gerekli</value>
+  </data>
+  <data name="Contact.CaptchaRequired" xml:space="preserve">
+    <value>Lütfen güvenlik doğrulamasını tamamlayın.</value>
+  </data>
+  <data name="Contact.SuccessTitle" xml:space="preserve">
+    <value>Mesaj alındı</value>
+  </data>
+  <data name="Contact.Success" xml:space="preserve">
+    <value>Mesajınız kaydedildi. E-posta bildirimi sıraya alındı.</value>
+  </data>
+  <data name="Contact.SaveFailed" xml:space="preserve">
+    <value>Mesaj kaydedilemedi. Lütfen tekrar deneyin.</value>
+  </data>
+  <data name="ContactSubtitle" xml:space="preserve">
+    <value>Bizimle iletişime geçin ve randevunuzu alın</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Özel isteklerinizi belirtiniz...</value>
+  </data>
+  <data name="SendContact" xml:space="preserve">
+    <value>Randevu talebi gönder</value>
+  </data>
+  <data name="Okay" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="BlogNotPublished" xml:space="preserve">
+    <value>Blog yayında değil veya bulunamadı.</value>
+  </data>
+  <data name="InvalidReaction" xml:space="preserve">
+    <value>Geçersiz tepki türü.</value>
+  </data>
+  <data name="CannotLockSelf" xml:space="preserve">
+    <value>Kendi hesabınızı engelleyemezsiniz.</value>
+  </data>
+  <data name="LockDaysRange" xml:space="preserve">
+    <value>Engelleme süresi 1–3650 gün arasında olmalıdır.</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Kullanıcı adı veya şifre hatalı.</value>
+  </data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve">
+    <value>Bu e-posta adresi zaten kayıtlı.</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>Şifreler eşleşmiyor.</value>
+  </data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve">
+    <value>{0} en fazla {1} karakter olmalıdır.</value>
+  </data>
+  <data name="The field {0} must be a string with a minimum length of {2} and a maximum length of {1}." xml:space="preserve">
+    <value>{0} {2}–{1} karakter arasında olmalıdır.</value>
+  </data>
+  <data name="'{0}' and '{1}' do not match." xml:space="preserve">
+    <value>{0} ve {1} eşleşmiyor.</value>
+  </data>
+  <data name="CommentSubmitted" xml:space="preserve">
+    <value>Yorumunuz onay için gönderildi.</value>
+  </data>
+  <data name="CommentUpdated" xml:space="preserve">
+    <value>Yorum güncellendi; yeniden onay bekliyor.</value>
+  </data>
+  <data name="AutomaticSlug" xml:space="preserve">
+    <value>Başlık girilince otomatik oluşur</value>
+  </data>
+  <data name="DataCount" xml:space="preserve">
+    <value>Toplam kayıt</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Detay</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Giriş yap</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Çıkış yap</value>
+  </data>
+  <data name="AdminPanel" xml:space="preserve">
+    <value>Yönetim paneli</value>
+  </data>
+  <data name="CommentLength" xml:space="preserve">
+    <value>Yorum 1–1000 karakter arasında olmalıdır.</value>
+  </data>
+  <data name="CommentProfanity" xml:space="preserve">
+    <value>Yorum uygunsuz kelimeler içeriyor.</value>
+  </data>
+  <data name="ReplyApprovedParent" xml:space="preserve">
+    <value>Yanıt yalnızca aynı blogdaki onaylı yoruma eklenebilir.</value>
+  </data>
+  <data name="CommentDepth" xml:space="preserve">
+    <value>Yorumlarda üçüncü seviyeye izin verilmez.</value>
+  </data>
+  <data name="CommentParentVisible" xml:space="preserve">
+    <value>Üst yorum onaylı ve görünür olmalıdır.</value>
+  </data>
+  <data name="NewCommentTitle" xml:space="preserve">
+    <value>Yeni yorum</value>
+  </data>
+  <data name="NewCommentPending" xml:space="preserve">
+    <value>Yorum #{0} onay bekliyor.</value>
+  </data>
+  <data name="UpdatedCommentTitle" xml:space="preserve">
+    <value>Yorum güncellendi</value>
+  </data>
+  <data name="UpdatedCommentPending" xml:space="preserve">
+    <value>Yorum #{0} yeniden onay bekliyor.</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Beni hatırla</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="SignUp" xml:space="preserve">
+    <value>Kayıt ol</value>
+  </data>
+  <data name="SigningIn" xml:space="preserve">
+    <value>Giriş yapılıyor...</value>
+  </data>
+  <data name="RetrySeconds" xml:space="preserve">
+    <value>saniye sonra tekrar deneyebilirsiniz</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Temayı değiştir</value>
+  </data>
+  <data name="AccountHasHistory" xml:space="preserve">
+    <value>Yorum veya etkileşim geçmişi olan hesap silinemez; hesap engelleme ekranını kullanın.</value>
+  </data>
+  <data name="InteractionConflict" xml:space="preserve">
+    <value>İşlem başka bir istekle çakıştı. Lütfen yeniden deneyin.</value>
+  </data>
 </root>

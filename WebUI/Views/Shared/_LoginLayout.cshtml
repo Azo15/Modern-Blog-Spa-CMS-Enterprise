@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
 <body>
 
     <div class="container">
+        <div class="text-end p-3">@await Html.PartialAsync("_LanguageSelector")</div>
         @RenderBody()
     </div>
 
@@ -23,16 +24,16 @@
 
             window.addEventListener('load', () => {
                 const rememberedEmail = localStorage.getItem('rememberedEmail');
-                if (rememberedEmail) {
+                if (rememberedEmail && emailInput && rememberCheckbox) {
                     emailInput.value = rememberedEmail;
                     rememberCheckbox.checked = true;
                 }
             });
 
-            document.getElementById('loginForm').addEventListener('submit', function () {
+            document.getElementById('loginForm')?.addEventListener('submit', function () {
                 const btn = document.getElementById('loginBtn');
                 btn.disabled = true;
-                btn.textContent = "Giriş yapılıyor...";
+                btn.textContent = @Html.Raw(Json.Serialize(L["SigningIn"].Value));
 
                 if (rememberCheckbox.checked) {
                     localStorage.setItem('rememberedEmail', emailInput.value);
