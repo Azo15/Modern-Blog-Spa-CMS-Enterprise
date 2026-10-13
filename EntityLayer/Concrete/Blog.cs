@@ -5,6 +5,7 @@ namespace EntityLayer.Concrete
 {
     public class Blog : BaseEntity
     {
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public EntityLayer.Enum.PublishStatus PublishStatus { get; set; } = EntityLayer.Enum.PublishStatus.Draft;
         [Display(Name = "Başlık")]
         public string? Title { get; set; }

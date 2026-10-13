@@ -7,7 +7,7 @@ namespace WebUI.Hubs
     [Authorize(Policy = AccessPolicies.Moderator)]
     public class NotificationHub : Hub
     {
-        public const string ModerationGroup = "moderation-notifications";
+        public const string ModerationGroup = "Managers";
 
         public override async Task OnConnectedAsync()
         {

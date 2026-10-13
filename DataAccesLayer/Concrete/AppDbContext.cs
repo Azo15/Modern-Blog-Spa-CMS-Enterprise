@@ -23,6 +23,7 @@ namespace DataAccesLayer.Concrete
         public DbSet<ContactForm> ContactForms { get; set; }
         public DbSet<Galary> Galaries { get; set; }
         public DbSet<SiteTable> SiteTables { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Catagory> Catagories { get; set; }
 
@@ -85,6 +86,17 @@ namespace DataAccesLayer.Concrete
                 .WithMany(c => c.Blogs)
                 .HasForeignKey(b => b.CatagoryId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Comment>().HasOne(c => c.Blog).WithMany(b => b.Comments)
+                .HasForeignKey(c => c.BlogId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Comment>().HasOne(c => c.AppUser).WithMany()
+                .HasForeignKey(c => c.AppUserId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Comment>().HasOne(c => c.ParentComment).WithMany(c => c.Children)
+                .HasForeignKey(c => c.ParentCommentId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Comment>().Property(c => c.Content).HasMaxLength(1000).IsRequired();
+            modelBuilder.Entity<Comment>().Property(c => c.IsApproved).HasDefaultValue(false);
+            modelBuilder.Entity<Comment>().HasIndex(c => new { c.BlogId, c.IsApproved, c.IsDeleted });
+            modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
 
             // =============================
             // 📌 GLOBAL QUERY FILTERS (SOFT DELETE)

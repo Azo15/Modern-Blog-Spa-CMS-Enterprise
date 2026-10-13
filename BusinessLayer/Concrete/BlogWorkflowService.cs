@@ -20,10 +20,10 @@ public sealed class BlogWorkflowService(AppDbContext db, ICurrentUserService cur
 
     private async Task InvalidateAsync(Blog blog, int? oldCategory = null)
     {
-        await cache.RemoveAsync("all_blogs_cache");
-        await cache.RemoveAsync($"blog_detail_{blog.Id}");
-        await cache.RemoveAsync($"blogs_category_{blog.CatagoryId}");
-        if (oldCategory != blog.CatagoryId) await cache.RemoveAsync($"blogs_category_{oldCategory}");
+        await cache.RemoveByPrefixAsync("blogs_all");
+        await cache.RemoveByPrefixAsync($"blogs_cat_{blog.CatagoryId}");
+        if (oldCategory != blog.CatagoryId) await cache.RemoveByPrefixAsync($"blogs_cat_{oldCategory}");
+        await cache.RemoveByPrefixAsync($"blog_detail_{blog.Id}");
     }
 
     private static string CreateSlug(string? title)
