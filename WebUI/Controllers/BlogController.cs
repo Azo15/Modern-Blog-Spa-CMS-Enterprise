@@ -9,7 +9,7 @@ namespace WebUI.Controllers;
 
 [Authorize(Policy=AccessPolicies.Visitor)]
 [Route("yapilan-isler")]
-public sealed class BlogController(ISender sender) : Controller
+public sealed class BlogController(ISender sender, IAuthorizationService authorization) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index(int page=1,int? categoryId=null,CancellationToken ct=default)
@@ -25,7 +25,7 @@ public sealed class BlogController(ISender sender) : Controller
         var blog=await sender.Send(new GetPublicBlogBySlugQuery(slug),ct);
         if(blog is null)return NotFound();
         var comments=await sender.Send(new GetPublicCommentsQuery(blog.Id,commentPage),ct);
-        var own=User.Identity?.IsAuthenticated==true ? await sender.Send(new GetMyCommentsQuery(blog.Id),ct) : new List<OwnCommentDto>();
+        var own=(await authorization.AuthorizeAsync(User,AccessPolicies.Member)).Succeeded ? await sender.Send(new GetMyCommentsQuery(blog.Id),ct) : new List<OwnCommentDto>();
         ViewBag.RelatedBlogs=(await sender.Send(new GetPublicBlogsQuery(1,4,blog.CatagoryId,blog.Id),ct)).Items;
         ViewBag.ReadingTime=BlogUtils.CalculateReadingTime(blog.Content);
         return View(new BlogPostViewModel(blog,comments,own));

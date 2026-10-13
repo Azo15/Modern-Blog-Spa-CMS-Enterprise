@@ -8,8 +8,9 @@ using StackExchange.Redis;
 
 namespace BusinessLayer.Concrete;
 
-public sealed class CacheManager(IDistributedCache primary, CacheFallbackStore fallback, ILogger<CacheManager> logger) : ICacheService
+public sealed class CacheManager(IDistributedCache primary, CacheFallbackStore fallback, ILogger<CacheManager> logger, TimeProvider? timeProvider = null) : ICacheService
 {
+    private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
     private readonly ConcurrentDictionary<string, PendingMutation> pending = new();
     private readonly SemaphoreSlim recovery = new(1, 1);
     private long unavailableUntil;
@@ -19,7 +20,7 @@ public sealed class CacheManager(IDistributedCache primary, CacheFallbackStore f
 
     private async Task<(bool Success, T? Value)> TryPrimary<T>(Func<Task<T>> operation)
     {
-        if (DateTime.UtcNow.Ticks < Interlocked.Read(ref unavailableUntil)) return (false, default);
+        if (clock.GetUtcNow().UtcTicks < Interlocked.Read(ref unavailableUntil)) return (false, default);
         try
         {
             await recovery.WaitAsync();
@@ -37,7 +38,7 @@ public sealed class CacheManager(IDistributedCache primary, CacheFallbackStore f
         }
         catch (Exception ex) when (CacheFailure(ex))
         {
-            Interlocked.Exchange(ref unavailableUntil, DateTime.UtcNow.AddSeconds(5).Ticks);
+            Interlocked.Exchange(ref unavailableUntil, clock.GetUtcNow().AddSeconds(5).UtcTicks);
             // Log the type, not Redis configuration/credentials contained in exception details.
             logger.LogWarning("Distributed cache unavailable ({ExceptionType}); using memory fallback.", ex.GetType().Name);
             return (false, default);
@@ -74,7 +75,13 @@ public sealed class CacheManager(IDistributedCache primary, CacheFallbackStore f
         var bytes = JsonSerializer.SerializeToUtf8Bytes(data);
         var options = new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromMinutes(10) };
         await fallback.Cache.SetAsync(actualKey, bytes, options);
-        await TryPrimary(async () => { await primary.SetAsync(actualKey, bytes, options); return true; });
+        var stored = await TryPrimary(async () => { await primary.SetAsync(actualKey, bytes, options); return true; });
+        if (!stored.Success)
+        {
+            // Invalidate the whole remote namespace on recovery, never resurrect pre-outage data.
+            // One pending token per namespace also bounds the backlog during long outages.
+            pending["__version:" + key.Split(':', 2)[0]] = new PendingMutation(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString("N")));
+        }
     }
 
     public async Task RemoveAsync(string key)
