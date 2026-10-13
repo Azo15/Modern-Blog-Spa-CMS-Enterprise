@@ -23,7 +23,7 @@ namespace DataAccesLayer.Repository
             bool tracking = true,
             params Expression<Func<T, object>>[] includes)
         {
-            IQueryable<T> query = _dbSet;
+            IQueryable<T> query = tracking ? _dbSet : _dbSet.AsNoTracking();
 
             // Filtre
             if (filter != null)
@@ -76,11 +76,6 @@ namespace DataAccesLayer.Repository
 
         public async Task TInsert(T entity)
         {
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.UpdatedDate = DateTime.Now;
-                baseEntity.CreatedDate = DateTime.Now;
-            }
 
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
@@ -88,37 +83,18 @@ namespace DataAccesLayer.Repository
 
         public async Task TInsertRange(IEnumerable<T> entities)
         {
-            foreach (var entity in entities)
-            {
-                if (entity is BaseEntity baseEntity)
-                {
-                    baseEntity.UpdatedDate = DateTime.Now;
-                    baseEntity.CreatedDate = DateTime.Now;
-                }
-            }
             await _dbSet.AddRangeAsync(entities);
             await _context.SaveChangesAsync();
         }
 
         public async Task TUpdate(T entity)
         {
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.UpdatedDate = DateTime.Now;
-            }
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }
 
         public async Task TUpdateRange(IEnumerable<T> entities)
         {
-            foreach (var entity in entities)
-            {
-                if (entity is BaseEntity baseEntity)
-                {
-                    baseEntity.UpdatedDate = DateTime.Now;
-                }
-            }
             _dbSet.UpdateRange(entities);
             await _context.SaveChangesAsync();
         }

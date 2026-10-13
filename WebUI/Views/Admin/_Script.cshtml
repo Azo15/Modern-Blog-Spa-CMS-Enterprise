@@ -1,3 +1,4 @@
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService NotificationAuthorization
 <script src="~/admin/vendor/libs/jquery/jquery.js"></script>
 <script src="~/admin/vendor/libs/popper/popper.js"></script>
 <script src="~/admin/vendor/js/bootstrap.js"></script>
@@ -19,6 +20,8 @@
 
 <script src="~/admin/js/site-sortable.js" asp-append-version="true"></script>
 
+@if ((await NotificationAuthorization.AuthorizeAsync(User, null, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
+{
 <!-- 📌 SignalR Real-Time Notification Client -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
 <script>
@@ -32,6 +35,7 @@
             if (typeof toastr !== "undefined") {
                 toastr.options = {
                     "closeButton": true,
+                    "escapeHtml": true,
                     "progressBar": true,
                     "positionClass": "toast-top-right",
                     "timeOut": "8000"
@@ -52,3 +56,4 @@
         });
     });
 </script>
+}

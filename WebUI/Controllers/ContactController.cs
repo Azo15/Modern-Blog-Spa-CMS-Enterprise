@@ -76,7 +76,7 @@ namespace WebUI.Controllers
                 await _contactFormService.AddAsync(model.ContactForm);
 
                 // 📌 SignalR Canlı Bildirim (WebSocket)
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", 
+                await _hubContext.Clients.Group(NotificationHub.ModerationGroup).SendAsync("ReceiveNotification", 
                     "Yeni İletişim Mesajı!", 
                     $"{model.ContactForm.FullName} isimli ziyaretçiden yeni mesaj geldi: \"{model.ContactForm.Subject}\"", 
                     "info");
