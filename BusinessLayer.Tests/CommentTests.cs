@@ -9,6 +9,19 @@ namespace BusinessLayer.Tests;
 public class CommentTests
 {
     [Fact]
+    public async Task PendingQueueRetainsCommentsWhenTheirBlogIsUnpublished()
+    {
+        using var fixture = new Stage2Fixture();
+        fixture.As(AppRoles.RegisteredUser);
+        var id = await fixture.Sender.Send(new CreateCommentCommand(1, "Pending comment"));
+        fixture.As(AppRoles.ContentManager, 5);
+        await fixture.Sender.Send(new ChangeBlogStatusCommand(1, PublishStatus.Draft));
+        fixture.As(AppRoles.Moderator, 3);
+        Assert.Equal(id, Assert.Single((await fixture.Sender.Send(new GetPendingCommentsQuery())).Items).Id);
+        await Assert.ThrowsAsync<ValidationException>(() => fixture.Sender.Send(new ApproveCommentCommand(id)));
+        Assert.True(await fixture.Sender.Send(new DeleteCommentCommand(id)));
+    }
+    [Fact]
     public async Task MemberCreatesPendingCommentAndModeratorApprovalMakesItPublic()
     {
         using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
