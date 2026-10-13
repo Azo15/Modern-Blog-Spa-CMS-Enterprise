@@ -1,0 +1,30 @@
+@model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.ModerationAccountDto>
+@using BusinessLayer
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Text
+@{ Layout = "_AdminLayout"; ViewData["Title"] = Text["AccountModeration"]; }
+<div class="container-fluid py-4">
+    <h1 class="h3">@Text["AccountModeration"]</h1>
+    @if (TempData["AccountSuccess"] is string success) { <div class="alert alert-success">@success</div> }
+    @if (TempData["AccountError"] is string error) { <div class="alert alert-danger">@error</div> }
+    <form method="get" class="d-flex gap-2 mb-3"><input type="search" name="search" value="@ViewBag.Search" maxlength="200" class="form-control" aria-label="@Text["Search"]" /><button class="btn btn-primary">@Text["Search"]</button></form>
+    <div class="table-responsive"><table class="table table-striped align-middle">
+        <thead><tr><th>@Text["Name"]</th><th>@Text["Email"]</th><th>@Text["Status"]</th><th>@Text["LockUntil"]</th><th>@Text["Actions"]</th></tr></thead>
+        <tbody>
+        @foreach (var account in Model.Items)
+        {
+            <tr><td>@account.FullName</td><td>@account.Email</td><td>@(account.IsLockedOut ? Text["Locked"] : Text["Active"])</td><td>@account.LockoutEnd?.ToString("g")</td><td>
+            @if (account.CanManage)
+            {
+                <form asp-action="SetLockout" method="post" class="d-flex gap-2">
+                    <input type="hidden" name="id" value="@account.Id" /><input type="hidden" name="isLocked" value="@(account.IsLockedOut ? "false" : "true")" />
+                    @if (!account.IsLockedOut) { <input type="number" name="days" value="30" min="1" max="3650" class="form-control form-control-sm" style="max-width:90px" aria-label="@Text["LockDays"]" /> }
+                    <button type="submit" class="btn btn-sm @(account.IsLockedOut ? "btn-success" : "btn-warning")">@(account.IsLockedOut ? Text["Unlock"] : Text["Lock"])</button>
+                </form>
+            }
+            </td></tr>
+        }
+        </tbody>
+    </table></div>
+    @if (Model.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-search="@ViewBag.Search" class="btn btn-outline-secondary">@Text["Previous"]</a> }
+    @if (Model.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-search="@ViewBag.Search" class="btn btn-outline-secondary">@Text["Next"]</a> }
+</div>

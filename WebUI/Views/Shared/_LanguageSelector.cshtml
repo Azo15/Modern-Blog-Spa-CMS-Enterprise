@@ -1,0 +1,10 @@
+@inject Microsoft.Extensions.Localization.IStringLocalizer<BusinessLayer.SharedResource> L
+<form asp-controller="Home" asp-action="SetLanguage" method="post" class="d-inline-flex align-items-center gap-2">
+    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+    <label class="visually-hidden" for="ui-culture">@L["Language"]</label>
+    <select name="culture" id="ui-culture" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="tr-TR" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "tr-TR")">Türkçe</option>
+        <option value="en-US" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US")">English</option>
+    </select>
+    <noscript><button type="submit">@L["Save"]</button></noscript>
+</form>

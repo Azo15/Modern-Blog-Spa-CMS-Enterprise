@@ -22,6 +22,8 @@ public static class AccessPolicies
     public const string Visitor = "Visitor";
     public const string CommentModerator = "RequireCommentModerator";
     public const string Member = "RequireMember";
+    public const string ActiveMember = "RequireActiveMember";
+    public const string AccountModerator = "RequireAccountModerator";
 
     // Called by Program.cs; tests use the same policy definitions.
     public static void Configure(AuthorizationOptions options)
@@ -33,6 +35,8 @@ public static class AccessPolicies
         options.AddPolicy(BlogResource, p => p.RequireAuthenticatedUser().AddRequirements(new BlogOwnerRequirement()));
         options.AddPolicy(CommentModerator, p => p.RequireAuthenticatedUser().RequireRole(AppRoles.Admin, AppRoles.Moderator));
         options.AddPolicy(Member, p => p.RequireAuthenticatedUser().RequireRole(AppRoles.All));
+        options.AddPolicy(ActiveMember, p => p.RequireAuthenticatedUser().RequireRole(AppRoles.All).AddRequirements(new ActiveMemberRequirement()));
+        options.AddPolicy(AccountModerator, p => p.RequireAuthenticatedUser().RequireRole(AppRoles.Admin, AppRoles.Moderator).AddRequirements(new ActiveMemberRequirement()));
         // Public access includes anonymous visitors and signed-in readers. No Visitor account/role.
         options.AddPolicy(Visitor, p => p.RequireAssertion(_ => true));
     }

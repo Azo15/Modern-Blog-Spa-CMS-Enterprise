@@ -1,169 +1,65 @@
-﻿using BusinessLayer.Abstract;
+using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
-using System.Web;
+using System.Net;
 
-namespace BusinessLayer.Concrete
+namespace BusinessLayer.Concrete;
+
+public sealed class MailService(ISiteTableService siteTableService, IConfiguration configuration) : IMailService
 {
-    public class MailService : IMailService
+    public async Task SendContactMailAsync(ContactForm model, string? messageId = null,
+        CancellationToken cancellationToken = default)
     {
-        private readonly ISiteTableService _siteTableService;
+        var settings = await siteTableService.GetQueryable().AsNoTracking()
+            .OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(cancellationToken);
+        // Environment variables / User Secrets override the existing dashboard configuration.
+        var host = configuration["Smtp:Host"] ?? settings?.Host;
+        var portText = configuration["Smtp:Port"] ?? settings?.Port;
+        var user = configuration["Smtp:Username"] ?? settings?.Mail;
+        var password = configuration["Smtp:Password"] ?? settings?.Password;
+        var sender = configuration["Smtp:SenderEmail"] ?? settings?.Mail;
+        var recipient = configuration["Smtp:RecipientEmail"] ?? sender;
+        if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(sender) ||
+            string.IsNullOrWhiteSpace(recipient) || string.IsNullOrWhiteSpace(user) ||
+            string.IsNullOrWhiteSpace(password) || !int.TryParse(portText, out var port) || port is < 1 or > 65535)
+            throw new InvalidOperationException("SMTP ayarları eksik veya geçersiz.");
 
-        public MailService(ISiteTableService siteTableService)
+        var message = new MimeMessage { Subject = $"İletişim Formu: {model.Subject}" };
+        if (!string.IsNullOrWhiteSpace(messageId)) message.MessageId = messageId;
+        message.From.Add(new MailboxAddress("Modern Blog İletişim", sender));
+        message.To.Add(MailboxAddress.Parse(recipient));
+        if (MailboxAddress.TryParse(model.Email, out var replyTo))
+            message.ReplyTo.Add(new MailboxAddress(model.FullName, replyTo.Address));
+        string Encode(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
+        var content = Encode(model.Message).Replace("\r\n", "<br>").Replace("\n", "<br>");
+        var html = $"""
+            <!doctype html><html lang="tr"><head><meta charset="utf-8"></head>
+            <body style="font-family:Arial,sans-serif;color:#24324a">
+            <h2>İletişim Mesajı</h2>
+            <table style="border-collapse:collapse;width:100%;max-width:720px">
+            <tr><th style="text-align:left">Ad Soyad</th><td>{Encode(model.FullName)}</td></tr>
+            <tr><th style="text-align:left">E-posta</th><td>{Encode(model.Email)}</td></tr>
+            <tr><th style="text-align:left">Telefon</th><td>{Encode(model.Phone)}</td></tr>
+            <tr><th style="text-align:left">Konu</th><td>{Encode(model.Subject)}</td></tr>
+            <tr><th style="text-align:left">Mesaj</th><td>{content}</td></tr>
+            </table></body></html>
+            """;
+        message.Body = new BodyBuilder
         {
-            _siteTableService = siteTableService;
-        }
-
-        public async Task SendContactMailAsync(ContactForm model)
-        {
-            var smtpInfo = await _siteTableService.GetQueryable().OrderByDescending(m=>m.CreatedDate).FirstOrDefaultAsync();
-
-            // Null veya eksik kontrolü
-            if (smtpInfo == null || string.IsNullOrEmpty(smtpInfo.Host) ||
-                string.IsNullOrEmpty(smtpInfo.Mail) || string.IsNullOrEmpty(smtpInfo.Password) ||
-                string.IsNullOrEmpty(smtpInfo.Port))
-            {
-                throw new InvalidOperationException("SMTP ayarları eksik veya tanımlı değil.");
-            }
-
-            if (!int.TryParse(smtpInfo.Port, out int port))
-            {
-                throw new InvalidOperationException("SMTP port bilgisi geçersiz.");
-            }
-
-            var emailMessage = new MimeMessage();
-
-            // Gönderen
-            emailMessage.From.Add(new MailboxAddress("XSpa İletişim", smtpInfo.Mail));
-
-            // Alıcı
-            emailMessage.To.Add(MailboxAddress.Parse(smtpInfo.Mail));
-
-            // Cevaplanacak kişi
-            emailMessage.ReplyTo.Add(new MailboxAddress(model.FullName, model.Email));
-
-            emailMessage.Subject = $"İletişim Formu: {model.Subject}";
-
-            // HTML içeriği
-            string body = $@"
-                <!DOCTYPE html>
-                <html lang=""tr"">
-                <head>
-                    <meta charset=""UTF-8"">
-                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                    <title>İletişim Mesajı</title>
-                    <style>
-                        body {{
-                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                            background-color: #f9f9f9;
-                            margin: 0;
-                            padding: 0
-                        }}
-                        .email-wrapper {{
-                            max-width: 600px;
-                            margin: 20px auto;
-                            background-color: #ffffff;
-                            border-radius: 8px;
-                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-                            overflow: hidden
-                        }}
-                        .email-header {{
-                            background: linear-gradient(135deg, rgba(3, 77, 151, 0.7), rgba(95, 115, 147, 0.7));
-                            padding: 20px;
-                            text-align: center
-                        }}
-                        .email-header img {{
-                            max-width: 150px
-                        }}
-                        .email-body {{
-                            padding: 30px;
-                            color: #333
-                        }}
-                        .email-body h2 {{
-                            margin-top: 0;
-                            font-size: 22px;
-                            color: #004080;
-                            text-align: center
-                        }}
-                        .email-body table {{
-                            width: 100%;
-                            margin-top: 20px;
-                            font-size: 16px;
-                            border-collapse: collapse
-                        }}
-                        .email-body td {{
-                            padding: 10px 5px;
-                            vertical-align: top
-                        }}
-                        .email-body td.label {{
-                            font-weight: bold;
-                            width: 120px;
-                            color: #666
-                        }}
-                        .email-body td.message-content {{
-                            background: linear-gradient(135deg, rgba(3, 77, 151, 0.2), rgba(95, 115, 147, 0.2));
-                            backdrop-filter: blur(8px);
-                            -webkit-backdrop-filter: blur(8px);
-                            border-radius: 10px;
-                            padding: 15px;
-                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                            color: #222;
-                            white-space: pre-wrap;
-                        }}
-                        .email-footer {{
-                            background-color: #f1f1f1;
-                            padding: 15px;
-                            text-align: center;
-                            font-size: 13px;
-                            color: #999;
-                        }}
-                        @media screen and (max-width: 600px) {{
-                            .email-body {{
-                                padding: 20px;
-                            }}
-                        }}
-                    </style>
-                </head>
-                <body>
-                    <div class=""email-wrapper"">
-                        <div class=""email-header"">
-                            <img src=""https://drive.google.com/drive/u/0/home/logo.png"" alt=""Logo"">
-                        </div>
-                        <div class=""email-body"">
-                            <h2>Rezervasyon Mesajı</h2>
-                            <table>
-                                <tr><td class=""label"">Ad Soyad:</td><td>{HttpUtility.HtmlEncode(model.FullName)}</td></tr>
-                                <tr><td class=""label"">E-posta:</td><td><a href=""mailto:{model.Email}"" style=""color: #004080;"">{HttpUtility.HtmlEncode(model.Email)}</a></td></tr>
-                                <tr><td class=""label"">Telefon:</td><td>{HttpUtility.HtmlEncode(model.Phone ?? "Belirtilmemiş")}</td></tr>
-                                <tr><td class=""label"">Konu:</td><td>{HttpUtility.HtmlEncode(model.Subject)}</td></tr>
-                                <tr><td class=""label"" style=""vertical-align: top;"">Mesaj:</td><td class=""message-content"">{HttpUtility.HtmlEncode(model.Message).Replace(Environment.NewLine, "<br />")}</td></tr>
-                            </table>
-                        </div>
-                        <div class=""email-footer"">
-                            Bu e-posta, *** rezervasyon formu aracılığıyla gönderilmiştir.<br />
-                            &copy; {DateTime.Now.Year} ***. Tüm hakları saklıdır.
-                        </div>
-                    </div>
-                </body>
-                </html>";
-
-            emailMessage.Body = new TextPart("html") { Text = body };
-
-            try
-            {
-                using var client = new SmtpClient();
-                await client.ConnectAsync(smtpInfo.Host, port, MailKit.Security.SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(smtpInfo.Mail, smtpInfo.Password);
-                await client.SendAsync(emailMessage);
-                await client.DisconnectAsync(true);
-            }
-            catch (Exception ex)
-            {
-                // Gelişmiş loglama varsa burada logla
-                throw new InvalidOperationException("E-posta gönderimi sırasında hata oluştu.", ex);
-            }
-        }
+            TextBody = $"Ad Soyad: {model.FullName}\nE-posta: {model.Email}\nKonu: {model.Subject}\n\n{model.Message}",
+            HtmlBody = html
+        }.ToMessageBody();
+        using var client = new SmtpClient { Timeout = 30000 };
+        var secureSocketOptions = port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
+        await client.ConnectAsync(host, port, secureSocketOptions, cancellationToken);
+        await client.AuthenticateAsync(user, password, cancellationToken);
+        await client.SendAsync(message, cancellationToken);
+        await client.DisconnectAsync(true, cancellationToken);
+        // Sent marking belongs to ContactEmailJob. SMTP delivery cannot provide an atomic DB transaction;
+        // a crash after server acceptance can still duplicate mail. Stable Message-Id supports deduplication.
     }
 }

@@ -1,0 +1,468 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Blog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="Gallery" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>My profile</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="QuickLinks" xml:space="preserve">
+    <value>Quick links</value>
+  </data>
+  <data name="ContactInfo" xml:space="preserve">
+    <value>Contact details</value>
+  </data>
+  <data name="FooterDescription" xml:space="preserve">
+    <value>Your place for peace, beauty and wellbeing. Our team offers a relaxing spa experience.</value>
+  </data>
+  <data name="AllRightsReserved" xml:space="preserve">
+    <value>All rights reserved.</value>
+  </data>
+  <data name="SystemManagement" xml:space="preserve">
+    <value>System management</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Role management</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Site settings</value>
+  </data>
+  <data name="BlogManagement" xml:space="preserve">
+    <value>Blog management</value>
+  </data>
+  <data name="Blogs" xml:space="preserve">
+    <value>Blogs</value>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Trash</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="AboutCards" xml:space="preserve">
+    <value>About cards</value>
+  </data>
+  <data name="Slider" xml:space="preserve">
+    <value>Slider</value>
+  </data>
+  <data name="PendingComments" xml:space="preserve">
+    <value>Pending comments</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Contact messages</value>
+  </data>
+  <data name="AccountModeration" xml:space="preserve">
+    <value>Account moderation</value>
+  </data>
+  <data name="Jobs" xml:space="preserve">
+    <value>Background jobs</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Updated</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="SubmitReview" xml:space="preserve">
+    <value>Submit for review</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="Reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="MoveDraft" xml:space="preserve">
+    <value>Move to draft</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ExportExcel" xml:space="preserve">
+    <value>Download Excel</value>
+  </data>
+  <data name="ExportPdf" xml:space="preserve">
+    <value>Download PDF</value>
+  </data>
+  <data name="Draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="PendingReview" xml:space="preserve">
+    <value>Pending review</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>My favorites</value>
+  </data>
+  <data name="NoFavorites" xml:space="preserve">
+    <value>No favorites yet.</value>
+  </data>
+  <data name="Avatar" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="Favorite" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="RemoveFavorite" xml:space="preserve">
+    <value>Remove favorite</value>
+  </data>
+  <data name="Like" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="Heart" xml:space="preserve">
+    <value>Heart</value>
+  </data>
+  <data name="Clap" xml:space="preserve">
+    <value>Clap</value>
+  </data>
+  <data name="LoginToInteract" xml:space="preserve">
+    <value>Sign in to interact.</value>
+  </data>
+  <data name="Interaction" xml:space="preserve">
+    <value>Interaction</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Locked</value>
+  </data>
+  <data name="LockUntil" xml:space="preserve">
+    <value>Locked until</value>
+  </data>
+  <data name="LockDays" xml:space="preserve">
+    <value>Lock duration (days)</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Lock</value>
+  </data>
+  <data name="Unlock" xml:space="preserve">
+    <value>Unlock</value>
+  </data>
+  <data name="ProfileUpdated" xml:space="preserve">
+    <value>Your profile was updated.</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Your password was changed.</value>
+  </data>
+  <data name="InteractionUpdated" xml:space="preserve">
+    <value>Interaction updated.</value>
+  </data>
+  <data name="AccountUpdated" xml:space="preserve">
+    <value>Account status updated.</value>
+  </data>
+  <data name="AccountDisabled" xml:space="preserve">
+    <value>Your account is locked. You cannot perform this action.</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="RootComments" xml:space="preserve">
+    <value>root comments</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="YourReply" xml:space="preserve">
+    <value>Your reply</value>
+  </data>
+  <data name="SendReply" xml:space="preserve">
+    <value>Send reply</value>
+  </data>
+  <data name="AddComment" xml:space="preserve">
+    <value>Add comment</value>
+  </data>
+  <data name="CommentGuidance" xml:space="preserve">
+    <value>Comments appear after moderator approval. Replies can be added to root comments.</value>
+  </data>
+  <data name="YourComment" xml:space="preserve">
+    <value>Your comment</value>
+  </data>
+  <data name="SendApproval" xml:space="preserve">
+    <value>Submit for approval</value>
+  </data>
+  <data name="MyRecentComments" xml:space="preserve">
+    <value>My recent comments</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="PendingApproval" xml:space="preserve">
+    <value>Pending approval</value>
+  </data>
+  <data name="UpdateApproval" xml:space="preserve">
+    <value>Update and resubmit</value>
+  </data>
+  <data name="LoginComment" xml:space="preserve">
+    <value>Sign in to comment</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="RejectDelete" xml:space="preserve">
+    <value>Reject / Delete</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="DateUtc" xml:space="preserve">
+    <value>Date (UTC)</value>
+  </data>
+  <data name="BlogList" xml:space="preserve">
+    <value>Blog list</value>
+  </data>
+  <data name="CreateBlog" xml:space="preserve">
+    <value>Create blog</value>
+  </data>
+  <data name="EditBlog" xml:space="preserve">
+    <value>Edit blog</value>
+  </data>
+  <data name="RelatedPosts" xml:space="preserve">
+    <value>Related posts</value>
+  </data>
+  <data name="AllPosts" xml:space="preserve">
+    <value>All blog posts</value>
+  </data>
+  <data name="ReadingMinutes" xml:space="preserve">
+    <value>min read</value>
+  </data>
+  <data name="LatestPosts" xml:space="preserve">
+    <value>Latest blog posts</value>
+  </data>
+  <data name="BlogSubtitle" xml:space="preserve">
+    <value>Helpful articles about health, beauty and wellness</value>
+  </data>
+  <data name="ChooseCategory" xml:space="preserve">
+    <value>Choose a category</value>
+  </data>
+  <data name="ExistingImage" xml:space="preserve">
+    <value>If you do not upload a new image, the current image will be kept.</value>
+  </data>
+  <data name="TrashGuidance" xml:space="preserve">
+    <value>Restored blogs return to draft. Existing images are preserved.</value>
+  </data>
+  <data name="DeletedDateUtc" xml:space="preserve">
+    <value>Deleted at (UTC)</value>
+  </data>
+  <data name="DeletedBy" xml:space="preserve">
+    <value>Deleted by user ID</value>
+  </data>
+  <data name="MoveTrash" xml:space="preserve">
+    <value>Move to trash</value>
+  </data>
+  <data name="ImageTooLarge" xml:space="preserve">
+    <value>The image must not exceed 5 MB.</value>
+  </data>
+  <data name="ImageInvalidFormat" xml:space="preserve">
+    <value>Upload a valid JPEG, PNG, GIF or WebP image; file format and MIME must match.</value>
+  </data>
+  <data name="ImageTooManyPixels" xml:space="preserve">
+    <value>The image dimensions exceed the safe limit.</value>
+  </data>
+  <data name="InvalidImage" xml:space="preserve">
+    <value>The image file is invalid.</value>
+  </data>
+  <data name="InvalidReportFilter" xml:space="preserve">
+    <value>The report filters are invalid.</value>
+  </data>
+  <data name="ReportTooLarge" xml:space="preserve">
+    <value>The report is too large; narrow the date range.</value>
+  </data>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Validation failed.</value>
+  </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>An unexpected server error occurred.</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>This field is required.</value>
+  </data>
+  <data name="PositiveId" xml:space="preserve">
+    <value>Select a valid record.</value>
+  </data>
+  <data name="InvalidPage" xml:space="preserve">
+    <value>Enter a valid page number.</value>
+  </data>
+  <data name="InvalidPageSize" xml:space="preserve">
+    <value>Page size must be between 1 and {0}.</value>
+  </data>
+  <data name="MaxLength" xml:space="preserve">
+    <value>Enter at most {0} characters.</value>
+  </data>
+  <data name="LengthBetween" xml:space="preserve">
+    <value>Enter between {0} and {1} characters.</value>
+  </data>
+  <data name="MinLength" xml:space="preserve">
+    <value>Enter at least {0} characters.</value>
+  </data>
+  <data name="InvalidStatus" xml:space="preserve">
+    <value>Select a valid status.</value>
+  </data>
+  <data name="CategoryNotFound" xml:space="preserve">
+    <value>Category not found.</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>The {0} field is required.</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>The {0} field is not a valid e-mail address.</value>
+  </data>
+  <data name="Başlık" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Alt Başlık" xml:space="preserve">
+    <value>Subtitle</value>
+  </data>
+  <data name="İçerik" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Görsel" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Kategori Adı" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Yayınlandı" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Adınız Soyadınız" xml:space="preserve">
+    <value>Your name</value>
+  </data>
+  <data name="E-posta Adresiniz" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Telefon Numaranız" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Mesaj Konusu" xml:space="preserve">
+    <value>Subject</value>
+  </data>
+  <data name="Mesajınız" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Ad" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="Soyad" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="Şifre" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="E-posta" xml:space="preserve">
+    <value>Email</value>
+  </data>
+</root>

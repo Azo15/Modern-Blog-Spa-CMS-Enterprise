@@ -17,7 +17,8 @@ public sealed class ContactEmailRecoveryJob(AppDbContext db, IContactEmailQueue 
         var now = DateTime.UtcNow;
         var retryCutoff = now.AddHours(-1);
         var ids = await db.Set<ContactEmailDelivery>().AsNoTracking()
-            .Where(x => x.SentAtUtc == null && (x.LeaseExpiresAtUtc == null || x.LeaseExpiresAtUtc < now) &&
+            // Initial attempt + three Hangfire retries. Exhausted deliveries remain visible for admin retry.
+            .Where(x => x.SentAtUtc == null && x.AttemptCount < 4 && (x.LeaseExpiresAtUtc == null || x.LeaseExpiresAtUtc < now) &&
                 (x.LastEnqueuedAtUtc == null || x.LastEnqueuedAtUtc < retryCutoff))
             .OrderBy(x => x.Id).Select(x => x.Id).Take(100).ToListAsync(cancellationToken);
         foreach (var id in ids)

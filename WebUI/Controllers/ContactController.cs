@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using WebUI.Hubs;
 using WebUI.Models;
+using WebUI.Services;
+using BusinessLayer;
+using Microsoft.Extensions.Localization;
 
 namespace WebUI.Controllers
 {
@@ -13,19 +16,21 @@ namespace WebUI.Controllers
     [Route("iletisim")]
     public class ContactController : BaseController
     {
-        private readonly IContactFormService _contactFormService;
+        private readonly IContactSubmissionService _submissionService;
         private readonly IContactService _contactService;
-        private readonly IMailService _mailService;
+        private readonly IReCaptchaVerifier _captcha;
+        private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly ILogger<ContactController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _cache;
         private readonly IHubContext<NotificationHub> _hubContext;
 
-        public ContactController(IContactFormService contactFormService, IContactService contactService, IMailService mailService, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache, IHubContext<NotificationHub> hubContext)
+        public ContactController(IContactSubmissionService submissionService, IContactService contactService, IReCaptchaVerifier captcha, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache, IHubContext<NotificationHub> hubContext, IStringLocalizer<SharedResource> localizer)
         {
-            _contactFormService = contactFormService;
+            _submissionService = submissionService;
             _contactService = contactService;
-            _mailService = mailService;
+            _captcha = captcha;
+            _localizer = localizer;
             _logger = logger;
             _configuration = configuration;
             _cache = cache;
@@ -42,9 +47,9 @@ namespace WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendMessage(ContactPageViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || model.ContactForm == null)
             {
-                SetSweetAlertMessage("Hata", "Lütfen tüm alanları doldurun.", "error");
+                SetSweetAlertMessage(_localizer["Contact.ErrorTitle"], _localizer["Contact.ValidationRequired"], "error");
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
                 return View("Index", vm);
@@ -55,16 +60,16 @@ namespace WebUI.Controllers
             if (IsIpOnCooldown(ip))
             {
                 _logger.LogWarning("Spam engellendi - IP: {IP}", ip);
-                SetSweetAlertMessage("Uyarı", "Çok sık mesaj gönderiyorsunuz. Lütfen birkaç dakika sonra tekrar deneyin.", "warning");
+                SetSweetAlertMessage(_localizer["Contact.RateLimitTitle"], _localizer["Contact.RateLimit"], "warning");
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
                 return View("Index", vm);
             }
 
             var recaptchaToken = Request.Form["g-recaptcha-response"];
-            if (!await IsReCaptchaValid(recaptchaToken))
+            if (!await _captcha.VerifyAsync(recaptchaToken, ip, HttpContext.RequestAborted))
             {
-                SetSweetAlertMessage("Bilgi", "Lütfen robot olmadığınızı doğrulayın.", "info");
+                SetSweetAlertMessage(_localizer["Contact.CaptchaTitle"], _localizer["Contact.CaptchaRequired"], "info");
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
                 return View("Index", vm);
@@ -72,23 +77,28 @@ namespace WebUI.Controllers
 
             try
             {
-                await _mailService.SendContactMailAsync(model.ContactForm);
-                await _contactFormService.AddAsync(model.ContactForm);
+                await _submissionService.SubmitAsync(model.ContactForm, HttpContext.RequestAborted);
+                SetIpCooldown(ip, TimeSpan.FromSeconds(60));
 
                 // 📌 SignalR Canlı Bildirim (WebSocket)
-                await _hubContext.Clients.Group(NotificationHub.ModerationGroup).SendAsync("ReceiveNotification", 
-                    "Yeni İletişim Mesajı!", 
-                    $"{model.ContactForm.FullName} isimli ziyaretçiden yeni mesaj geldi: \"{model.ContactForm.Subject}\"", 
-                    "info");
-
-                SetIpCooldown(ip, TimeSpan.FromSeconds(60));
-                _logger.LogInformation("Mesaj başarıyla gönderildi: {Email}", model.ContactForm.Email);
-                SetSweetAlertMessage("Başarılı!", "Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.", "success");
+                try
+                {
+                    await _hubContext.Clients.Group(NotificationHub.ModerationGroup).SendAsync("ReceiveNotification",
+                        "Yeni İletişim Mesajı!",
+                        $"{model.ContactForm.FullName} isimli ziyaretçiden yeni mesaj geldi: \"{model.ContactForm.Subject}\"",
+                        "info", HttpContext.RequestAborted);
+                }
+                catch (Exception notificationError)
+                {
+                    _logger.LogWarning(notificationError, "Contact saved; live manager notification was unavailable.");
+                }
+                _logger.LogInformation("Contact message persisted for background email delivery.");
+                SetSweetAlertMessage(_localizer["Contact.SuccessTitle"], _localizer["Contact.Success"], "success");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Mail gönderme sırasında hata oluştu.");
-                SetSweetAlertMessage("Hata", "Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "error");
+                _logger.LogError(ex, "İletişim mesajı kaydedilirken hata oluştu.");
+                SetSweetAlertMessage(_localizer["Contact.ErrorTitle"], _localizer["Contact.SaveFailed"], "error");
             }
 
             return RedirectToAction("Index");
@@ -124,19 +134,5 @@ namespace WebUI.Controllers
             _cache.Set($"ip-blocked:{ip}", true, duration);
         }
 
-        private async Task<bool> IsReCaptchaValid(string token)
-        {
-            if (string.IsNullOrEmpty(token)) return false;
-
-            var secretKey = _configuration["GoogleReCaptcha:SecretKey"];
-            using var client = new HttpClient();
-            var response = await client.PostAsync(
-                $"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={token}",
-                null);
-
-            var json = await response.Content.ReadAsStringAsync();
-            using var doc = System.Text.Json.JsonDocument.Parse(json);
-            return doc.RootElement.GetProperty("success").GetBoolean();
-        }
     }
 }

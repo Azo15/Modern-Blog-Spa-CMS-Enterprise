@@ -3,6 +3,8 @@ using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using BusinessLayer.ValidationRules;
+using FluentValidation;
 
 namespace BusinessLayer.Concrete;
 
@@ -11,6 +13,7 @@ public sealed class ContactSubmissionService(AppDbContext db, IContactEmailQueue
 {
     public async Task<ContactSubmissionResult> SubmitAsync(ContactForm form, CancellationToken cancellationToken = default)
     {
+        new ContactFormValidators().ValidateAndThrow(form);
         // Never accept audit, moderation or identity fields from the anonymous form.
         var message = new ContactForm
         {

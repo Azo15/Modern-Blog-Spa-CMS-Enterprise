@@ -1,0 +1,468 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
+    <value>Ana Sayfa</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Hakkımızda</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Hizmetlerimiz</value>
+  </data>
+  <data name="Blog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="Gallery" xml:space="preserve">
+    <value>Galeri</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>İletişim</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profilim</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="QuickLinks" xml:space="preserve">
+    <value>Hızlı Linkler</value>
+  </data>
+  <data name="ContactInfo" xml:space="preserve">
+    <value>İletişim Bilgileri</value>
+  </data>
+  <data name="FooterDescription" xml:space="preserve">
+    <value>Huzur, güzellik ve sağlığın buluştuğu özel mekanınız. Uzman ekibimizle size en iyi spa deneyimini sunuyoruz.</value>
+  </data>
+  <data name="AllRightsReserved" xml:space="preserve">
+    <value>Tüm hakları saklıdır.</value>
+  </data>
+  <data name="SystemManagement" xml:space="preserve">
+    <value>Sistem Yönetimi</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Kullanıcılar</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Rol Yönetimi</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Site Ayarları</value>
+  </data>
+  <data name="BlogManagement" xml:space="preserve">
+    <value>Blog Yönetimi</value>
+  </data>
+  <data name="Blogs" xml:space="preserve">
+    <value>Bloglar</value>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Çöp Kutusu</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Kategoriler</value>
+  </data>
+  <data name="AboutCards" xml:space="preserve">
+    <value>Hakkımızda Kartları</value>
+  </data>
+  <data name="Slider" xml:space="preserve">
+    <value>Slider</value>
+  </data>
+  <data name="PendingComments" xml:space="preserve">
+    <value>Bekleyen Yorumlar</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Gelen Mesajlar</value>
+  </data>
+  <data name="AccountModeration" xml:space="preserve">
+    <value>Hesap Engelleme</value>
+  </data>
+  <data name="Jobs" xml:space="preserve">
+    <value>Arka Plan İşleri</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Raporlar</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Başlık</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>İçerik</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Görsel</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Güncelleme</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Yeni ekle</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Geri dön</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Geri yükle</value>
+  </data>
+  <data name="SubmitReview" xml:space="preserve">
+    <value>İncelemeye gönder</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>Yayımla</value>
+  </data>
+  <data name="Reject" xml:space="preserve">
+    <value>Reddet</value>
+  </data>
+  <data name="MoveDraft" xml:space="preserve">
+    <value>Taslağa al</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Önceki</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Sonraki</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Sayfa</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>İşlemler</value>
+  </data>
+  <data name="ExportExcel" xml:space="preserve">
+    <value>Excel İndir</value>
+  </data>
+  <data name="ExportPdf" xml:space="preserve">
+    <value>PDF İndir</value>
+  </data>
+  <data name="Draft" xml:space="preserve">
+    <value>Taslak</value>
+  </data>
+  <data name="PendingReview" xml:space="preserve">
+    <value>İnceleme bekliyor</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>Yayında</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>Reddedildi</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Soyad</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Ad Soyad</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Mevcut şifre</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Yeni şifre</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Şifre tekrarı</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Şifre değiştir</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Favorilerim</value>
+  </data>
+  <data name="NoFavorites" xml:space="preserve">
+    <value>Henüz favoriniz yok.</value>
+  </data>
+  <data name="Avatar" xml:space="preserve">
+    <value>Profil fotoğrafı</value>
+  </data>
+  <data name="Favorite" xml:space="preserve">
+    <value>Favoriye ekle</value>
+  </data>
+  <data name="RemoveFavorite" xml:space="preserve">
+    <value>Favoriden çıkar</value>
+  </data>
+  <data name="Like" xml:space="preserve">
+    <value>Beğeni</value>
+  </data>
+  <data name="Heart" xml:space="preserve">
+    <value>Kalp</value>
+  </data>
+  <data name="Clap" xml:space="preserve">
+    <value>Alkış</value>
+  </data>
+  <data name="LoginToInteract" xml:space="preserve">
+    <value>Etkileşim için giriş yapın.</value>
+  </data>
+  <data name="Interaction" xml:space="preserve">
+    <value>Etkileşim</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Durum</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Engelli</value>
+  </data>
+  <data name="LockUntil" xml:space="preserve">
+    <value>Engel bitişi</value>
+  </data>
+  <data name="LockDays" xml:space="preserve">
+    <value>Engel süresi (gün)</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Engelle</value>
+  </data>
+  <data name="Unlock" xml:space="preserve">
+    <value>Engeli kaldır</value>
+  </data>
+  <data name="ProfileUpdated" xml:space="preserve">
+    <value>Profiliniz güncellendi.</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Şifreniz değiştirildi.</value>
+  </data>
+  <data name="InteractionUpdated" xml:space="preserve">
+    <value>Etkileşim güncellendi.</value>
+  </data>
+  <data name="AccountUpdated" xml:space="preserve">
+    <value>Hesap durumu güncellendi.</value>
+  </data>
+  <data name="AccountDisabled" xml:space="preserve">
+    <value>Hesabınız engellendi. Bu işlem için erişiminiz yok.</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Yorumlar</value>
+  </data>
+  <data name="RootComments" xml:space="preserve">
+    <value>ana yorum</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Yanıtla</value>
+  </data>
+  <data name="YourReply" xml:space="preserve">
+    <value>Yanıtınız</value>
+  </data>
+  <data name="SendReply" xml:space="preserve">
+    <value>Yanıtı gönder</value>
+  </data>
+  <data name="AddComment" xml:space="preserve">
+    <value>Yorum ekle</value>
+  </data>
+  <data name="CommentGuidance" xml:space="preserve">
+    <value>Yorumlar moderatör onayından sonra görünür. Yanıtlar ana yorumun altına eklenir.</value>
+  </data>
+  <data name="YourComment" xml:space="preserve">
+    <value>Yorumunuz</value>
+  </data>
+  <data name="SendApproval" xml:space="preserve">
+    <value>Onaya gönder</value>
+  </data>
+  <data name="MyRecentComments" xml:space="preserve">
+    <value>Son yorumlarım</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Onaylı</value>
+  </data>
+  <data name="PendingApproval" xml:space="preserve">
+    <value>Onay bekliyor</value>
+  </data>
+  <data name="UpdateApproval" xml:space="preserve">
+    <value>Güncelle ve yeniden onaya gönder</value>
+  </data>
+  <data name="LoginComment" xml:space="preserve">
+    <value>Yorum yapmak için giriş yapın</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Onayla</value>
+  </data>
+  <data name="RejectDelete" xml:space="preserve">
+    <value>Reddet / Sil</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Yazar</value>
+  </data>
+  <data name="DateUtc" xml:space="preserve">
+    <value>Tarih (UTC)</value>
+  </data>
+  <data name="BlogList" xml:space="preserve">
+    <value>Blog Listesi</value>
+  </data>
+  <data name="CreateBlog" xml:space="preserve">
+    <value>Blog Oluşturma</value>
+  </data>
+  <data name="EditBlog" xml:space="preserve">
+    <value>Blog Güncelleme</value>
+  </data>
+  <data name="RelatedPosts" xml:space="preserve">
+    <value>İlgili Yazılar</value>
+  </data>
+  <data name="AllPosts" xml:space="preserve">
+    <value>Tüm Blog Yazıları</value>
+  </data>
+  <data name="ReadingMinutes" xml:space="preserve">
+    <value>dk okuma</value>
+  </data>
+  <data name="LatestPosts" xml:space="preserve">
+    <value>Son Blog Yazıları</value>
+  </data>
+  <data name="BlogSubtitle" xml:space="preserve">
+    <value>Sağlık, güzellik ve wellness hakkında faydalı bilgiler</value>
+  </data>
+  <data name="ChooseCategory" xml:space="preserve">
+    <value>Kategori seçiniz</value>
+  </data>
+  <data name="ExistingImage" xml:space="preserve">
+    <value>Yeni görsel yüklemezseniz mevcut görsel kullanılacaktır.</value>
+  </data>
+  <data name="TrashGuidance" xml:space="preserve">
+    <value>Geri yüklenen bloglar taslak olarak kaydedilir. Mevcut görseller korunur.</value>
+  </data>
+  <data name="DeletedDateUtc" xml:space="preserve">
+    <value>Silinme zamanı (UTC)</value>
+  </data>
+  <data name="DeletedBy" xml:space="preserve">
+    <value>Silen kullanıcı ID</value>
+  </data>
+  <data name="MoveTrash" xml:space="preserve">
+    <value>Çöp Kutusuna Taşı</value>
+  </data>
+  <data name="ImageTooLarge" xml:space="preserve">
+    <value>Görsel en fazla 5 MB olabilir.</value>
+  </data>
+  <data name="ImageInvalidFormat" xml:space="preserve">
+    <value>Geçerli JPEG, PNG, GIF veya WebP görseli yükleyin; dosya türü ve MIME eşleşmelidir.</value>
+  </data>
+  <data name="ImageTooManyPixels" xml:space="preserve">
+    <value>Görsel boyutları güvenli sınırı aşıyor.</value>
+  </data>
+  <data name="InvalidImage" xml:space="preserve">
+    <value>Görsel dosyası geçersiz.</value>
+  </data>
+  <data name="InvalidReportFilter" xml:space="preserve">
+    <value>Rapor filtreleri geçersiz.</value>
+  </data>
+  <data name="ReportTooLarge" xml:space="preserve">
+    <value>Rapor çok büyük; tarih aralığını daraltın.</value>
+  </data>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Doğrulama başarısız.</value>
+  </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>Sunucu tarafında beklenmeyen bir hata oluştu.</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Bu alan zorunludur.</value>
+  </data>
+  <data name="PositiveId" xml:space="preserve">
+    <value>Geçerli bir kayıt seçin.</value>
+  </data>
+  <data name="InvalidPage" xml:space="preserve">
+    <value>Geçerli bir sayfa numarası girin.</value>
+  </data>
+  <data name="InvalidPageSize" xml:space="preserve">
+    <value>Sayfa boyutu 1 ile {0} arasında olmalıdır.</value>
+  </data>
+  <data name="MaxLength" xml:space="preserve">
+    <value>En fazla {0} karakter girin.</value>
+  </data>
+  <data name="LengthBetween" xml:space="preserve">
+    <value>{0} ile {1} karakter arasında girin.</value>
+  </data>
+  <data name="MinLength" xml:space="preserve">
+    <value>En az {0} karakter girin.</value>
+  </data>
+  <data name="InvalidStatus" xml:space="preserve">
+    <value>Geçerli bir durum seçin.</value>
+  </data>
+  <data name="CategoryNotFound" xml:space="preserve">
+    <value>Kategori bulunamadı.</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>{0} alanı zorunludur.</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>{0} geçerli bir e-posta adresi değildir.</value>
+  </data>
+  <data name="Başlık" xml:space="preserve">
+    <value>Başlık</value>
+  </data>
+  <data name="Alt Başlık" xml:space="preserve">
+    <value>Alt Başlık</value>
+  </data>
+  <data name="İçerik" xml:space="preserve">
+    <value>İçerik</value>
+  </data>
+  <data name="Görsel" xml:space="preserve">
+    <value>Görsel</value>
+  </data>
+  <data name="Kategori Adı" xml:space="preserve">
+    <value>Kategori Adı</value>
+  </data>
+  <data name="Yayınlandı" xml:space="preserve">
+    <value>Yayınlandı</value>
+  </data>
+  <data name="Adınız Soyadınız" xml:space="preserve">
+    <value>Adınız Soyadınız</value>
+  </data>
+  <data name="E-posta Adresiniz" xml:space="preserve">
+    <value>E-posta Adresiniz</value>
+  </data>
+  <data name="Telefon Numaranız" xml:space="preserve">
+    <value>Telefon Numaranız</value>
+  </data>
+  <data name="Mesaj Konusu" xml:space="preserve">
+    <value>Mesaj Konusu</value>
+  </data>
+  <data name="Mesajınız" xml:space="preserve">
+    <value>Mesajınız</value>
+  </data>
+  <data name="Ad" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Soyad" xml:space="preserve">
+    <value>Soyad</value>
+  </data>
+  <data name="Şifre" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="E-posta" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+</root>

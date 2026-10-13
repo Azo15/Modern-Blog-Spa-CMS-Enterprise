@@ -1,0 +1,41 @@
+@model ProfileViewModel
+@using BusinessLayer
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Text
+@{ ViewData["Title"] = Text["Profile"]; }
+<div class="container py-5">
+    <h1>@Text["Profile"]</h1>
+    <p class="text-muted">@Model.Email</p>
+    @if (TempData["ProfileSuccess"] is string success) { <div class="alert alert-success" role="status">@success</div> }
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <form asp-action="Update" method="post" enctype="multipart/form-data" class="border rounded p-4">
+                @if (!string.IsNullOrEmpty(Model.Avatar)) { <img src="~/uploads/avatars/@Model.Avatar" alt="@Text["Avatar"]" class="rounded-circle mb-3" width="96" height="96" style="object-fit:cover" /> }
+                <div class="mb-3"><label for="firstName">@Text["FirstName"]</label><input id="firstName" name="FirstName" value="@Model.Profile.FirstName" maxlength="100" required class="form-control" autocomplete="given-name" /></div>
+                <div class="mb-3"><label for="lastName">@Text["LastName"]</label><input id="lastName" name="LastName" value="@Model.Profile.LastName" maxlength="100" required class="form-control" autocomplete="family-name" /></div>
+                <div class="mb-3"><label for="avatar">@Text["Avatar"] (5 MB)</label><input id="avatar" name="Avatar" type="file" accept="image/jpeg,image/png,image/webp" class="form-control" /></div>
+                <button class="btn btn-primary" type="submit">@Text["Save"]</button>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form asp-action="ChangePassword" method="post" class="border rounded p-4">
+                <h2 class="h4">@Text["ChangePassword"]</h2>
+                <div class="mb-3"><label for="currentPassword">@Text["CurrentPassword"]</label><input id="currentPassword" name="CurrentPassword" type="password" required class="form-control" autocomplete="current-password" /></div>
+                <div class="mb-3"><label for="newPassword">@Text["NewPassword"]</label><input id="newPassword" name="NewPassword" type="password" minlength="8" maxlength="128" required class="form-control" autocomplete="new-password" /></div>
+                <div class="mb-3"><label for="confirmPassword">@Text["ConfirmPassword"]</label><input id="confirmPassword" name="ConfirmPassword" type="password" required class="form-control" autocomplete="new-password" /></div>
+                <button class="btn btn-primary" type="submit">@Text["ChangePassword"]</button>
+            </form>
+        </div>
+    </div>
+    <h2 class="mt-5">@Text["Favorites"]</h2>
+    @if (Model.Favorites.Items.Count == 0) { <p>@Text["NoFavorites"]</p> }
+    else
+    {
+        <ul class="list-group mb-3">
+        @foreach (var blog in Model.Favorites.Items)
+        { <li class="list-group-item d-flex justify-content-between align-items-center"><a asp-controller="Blog" asp-action="Post" asp-route-slug="@blog.Slug">@blog.Title</a><form asp-controller="BlogInteraction" asp-action="Favorite" method="post"><input type="hidden" name="blogId" value="@blog.BlogId" /><input type="hidden" name="slug" value="@blog.Slug" /><button class="btn btn-sm btn-outline-secondary" type="submit">@Text["RemoveFavorite"]</button></form></li> }
+        </ul>
+    }
+    @if (Model.Favorites.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.Favorites.PageIndex - 1)" class="btn btn-outline-secondary">@Text["Previous"]</a> }
+    @if (Model.Favorites.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.Favorites.PageIndex + 1)" class="btn btn-outline-secondary">@Text["Next"]</a> }
+</div>

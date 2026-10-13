@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Models;
+using MediatR;
+using BusinessLayer.CQRS.Commands;
+using FluentValidation;
 
 namespace WebUI.Controllers
 {
@@ -12,11 +15,13 @@ namespace WebUI.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly ISender _sender;
 
-        public AdminUserRoleController(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager)
+        public AdminUserRoleController(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager, ISender sender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _sender = sender;
         }
 
         [HttpGet]
@@ -127,15 +132,14 @@ namespace WebUI.Controllers
             }
 
             var isLocked = await _userManager.IsLockedOutAsync(user);
-            if (isLocked)
+            try
             {
-                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
-                SetToastMessage("Kullanıcı kilidi başarıyla kaldırıldı.", "success");
+                if (!await _sender.Send(new SetAccountLockoutCommand(id, !isLocked, 3650))) return NotFound();
+                SetToastMessage(isLocked ? "Kullanıcı kilidi başarıyla kaldırıldı." : "Kullanıcı hesabı kilitlendi.", isLocked ? "success" : "warning");
             }
-            else
+            catch (ValidationException ex)
             {
-                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
-                SetToastMessage("Kullanıcı hesabı kilitlendi.", "warning");
+                SetToastMessage(ex.Message, "warning");
             }
 
             return RedirectToAction(nameof(Index));

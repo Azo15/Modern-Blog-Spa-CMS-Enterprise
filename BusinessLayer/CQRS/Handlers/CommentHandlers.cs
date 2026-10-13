@@ -14,11 +14,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 namespace BusinessLayer.CQRS.Handlers;
 
-public sealed class CommentCommandHandlers(AppDbContext db, ICurrentUserService user, IAuthorizationService auth, IProfanityFilterService profanity, IManagerNotifier notifier)
+public sealed class CommentCommandHandlers(AppDbContext db, ICurrentUserService user, IAuthorizationService auth, IProfanityFilterService profanity, IManagerNotifier notifier, IActiveMemberService members)
     : IRequestHandler<CreateCommentCommand, int>, IRequestHandler<UpdateCommentCommand, bool>, IRequestHandler<DeleteCommentCommand, bool>, IRequestHandler<ApproveCommentCommand, bool>
 {
     private async Task<int> MemberId()
     {
+        await members.RequireAsync();
         if (!(await auth.AuthorizeAsync(user.User, AccessPolicies.Member)).Succeeded || !int.TryParse(user.UserId, out var id)) throw new UnauthorizedAccessException();
         return id;
     }
@@ -33,7 +34,7 @@ public sealed class CommentCommandHandlers(AppDbContext db, ICurrentUserService 
     private async Task RequirePublished(int blogId, CancellationToken ct)
     { if (!await db.Blogs.AnyAsync(b => b.Id == blogId && b.PublishStatus == PublishStatus.Published, ct)) throw Invalid("Blog yayında değil veya bulunamadı."); }
     private async Task RequireModerator()
-    { if (!(await auth.AuthorizeAsync(user.User, AccessPolicies.CommentModerator)).Succeeded) throw new UnauthorizedAccessException(); }
+    { await members.RequireAsync(); if (!(await auth.AuthorizeAsync(user.User, AccessPolicies.CommentModerator)).Succeeded) throw new UnauthorizedAccessException(); }
 
     public async Task<int> Handle(CreateCommentCommand r, CancellationToken ct)
     {
