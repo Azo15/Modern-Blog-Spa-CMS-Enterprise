@@ -15,7 +15,7 @@
                                 <div class="col-lg-8 mx-auto">
                                     <div class="hero-content" data-aos="fade-up">
                                         <h1 class="hero-title font-playfair">@item.Title</h1>
-                                        <p class="hero-subtitle">@Html.Raw(item.Content)</p>
+                                        <p class="hero-subtitle">@Html.Raw(SafeHtml.Sanitize(item.Content))</p>
                                         <div class="mt-4">
                                             <a class="btn btn-primary-custom me-3" asp-controller="Service" asp-action="Index">Hizmetlerimizi Keşfedin</a>
                                             <a class="btn btn-outline-custom" asp-controller="Contact" asp-action="Index">Bize Ulaş</a>

@@ -16,7 +16,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title text-center">@Model.Title</h5>
-                <p class="card-text">@Html.Raw(Model.Content)</p>
+                <p class="card-text">@Html.Raw(SafeHtml.Sanitize(Model.Content))</p>
             </div>
         </div>
     </div>

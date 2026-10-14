@@ -34,7 +34,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="about-hero-desc" data-aos="fade-up">
-                    @Html.Raw(Model.Content)
+                    @Html.Raw(SafeHtml.Sanitize(Model.Content))
                 </div>
             </div>
         </div>

@@ -191,6 +191,41 @@ public sealed class ApiEndpointTests
     }
 
     [Fact]
+    public async Task ContactPreviewHandlesShortAddressesAndEncodesUntrustedMarkup()
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
+        await Login(client, "admin@acceptance.test");
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Contacts.Add(new EntityLayer.Concrete.Contact { Adres = "<img src=x onerror=unsafe-address()>" + new string('a', 60), Mail = "admin@example.test" });
+            await db.SaveChangesAsync();
+        }
+        var page = await client.GetAsync("/AdminContact");
+        Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+        var html = await page.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("<img src=x onerror=unsafe-address()>", html);
+        Assert.Contains("&lt;img", html);
+    }
+
+    [Fact]
+    public async Task FreshDeploymentHomeWorksWithoutDemoDataAndLegacyRichTextIsSanitized()
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/")).StatusCode);
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Sliders.Add(new EntityLayer.Concrete.Slider { Title = "Security canary", Content = "<strong>Welcome</strong><script>unsafe-canary()</script><img src=x onerror='unsafe-image()'>" });
+            await db.SaveChangesAsync();
+        }
+        var home = await client.GetStringAsync("/");
+        Assert.Contains("Welcome", home);
+        Assert.DoesNotContain("unsafe-canary", home);
+        Assert.DoesNotContain("unsafe-image", home);
+    }
+
+    [Fact]
     public async Task SwaggerListsApiXmlDocsAndBearerDefinition()
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);

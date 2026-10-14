@@ -49,9 +49,9 @@
                     </td>
 
                     <td class="td-m-0">
-                        @Html.Raw(item.Content != null && item.Content.Length > 50
+                        @Html.Raw(SafeHtml.Sanitize(item.Content != null && item.Content.Length > 50
                                                 ? item.Content.Substring(0, 50) + "..."
-                                                : item.Content)
+                                                : item.Content))
                     </td>
 
                     <td>

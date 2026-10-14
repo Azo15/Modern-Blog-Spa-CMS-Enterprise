@@ -5,6 +5,7 @@
 @using BusinessLayer
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<SharedResource> L
+@inject BusinessLayer.Abstract.IHtmlContentSanitizer SafeHtml
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 

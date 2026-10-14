@@ -8,14 +8,14 @@
 flowchart LR
     Reader[Visitor / Mobil / SPA] --> API[WebUI: MVC + REST API v1]
     Editor[Admin / Editor / Author / Moderator / User] --> API
-    API --> Auth[Identity Cookie veya JWT\nPolicy + kaynak sahipliği + hesap durumu]
+    API --> Auth["Identity Cookie veya JWT<br/>Policy + kaynak sahipliği + hesap durumu"]
     Auth --> Sender[MediatR ISender]
     Sender --> Validation[FluentValidation pipeline]
     Validation --> Handlers[BusinessLayer: CQRS handler ve iş kuralları]
-    Handlers --> EF[DataAccesLayer: EF Core\nUTC audit + soft-delete filtreleri]
+    Handlers --> EF["DataAccesLayer: EF Core<br/>UTC audit + soft-delete filtreleri"]
     EF --> SQL[(SQL Server 2022)]
-    Handlers --> Cache[Redis distributed cache\nkesintide süreç içi fallback]
-    Handlers --> Images[SkiaSharp\nMIME / imza / boyut kontrolü\n1200px WebP75]
+    Handlers --> Cache["Redis distributed cache<br/>kesintide süreç içi fallback"]
+    Handlers --> Images["SkiaSharp<br/>MIME / imza / boyut kontrolü<br/>1200px WebP75"]
     Handlers --> Group[SignalR Managers grubu]
     EF --> Outbox[İletişim + kalıcı teslimat niyeti]
     Outbox --> Jobs[Hangfire SQL queue / retry / recovery]
@@ -24,7 +24,7 @@ flowchart LR
     Handlers --> Export[ClosedXML Excel + gömülü fontlu PDF]
 ```
 
-EntityLayer entity/enum'ları tanımlar. DataAccesLayer veritabanı ilişkileri, indeksler, audit ve global filtreleri uygular. BusinessLayer yetki, sahiplik, yaşam döngüsü, yorum moderasyonu, etkileşimler ve CQRS kurallarını yürütür. WebUI controller'ları bu katmana ISender üzerinden ulaşır; API aynı iş kurallarını kullanır.
+EntityLayer entity/enum'ları tanımlar. DataAccesLayer veritabanı ilişkileri, indeksler, audit ve global filtreleri uygular. BusinessLayer yetki, sahiplik, yaşam döngüsü, yorum moderasyonu, etkileşimler ve CQRS kurallarını yürütür. Blog ve API controller'ları bu katmana ISender üzerinden ulaşır; API aynı iş kurallarını kullanır. Eski site/kategori yönetim ekranları mevcut servis arayüzlerini kullanmaya devam eder.
 
 Halihazırda yayımlanmamış veya silinmiş bloglar halka açık liste/detay/cache sonuçlarına girmez. Public API entity yerine salt-okunur DTO döndürür. Redis kesildiğinde uygulama local cache ile çalışabilir; yayın değişiklikleri DB fingerprint ve cache invalidation ile doğrulanır. Çok replica için ortak Redis, SQL, görsel depolaması ve Data Protection anahtarları kullanılır. Built-in rate limit süreç başınadır; çok instance genel kota için reverse proxy/gateway sınırı da gerekir.
 

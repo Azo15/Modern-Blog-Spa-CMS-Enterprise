@@ -50,8 +50,8 @@
                     </td>
 
                     <td class="td-m-0">
-                        @Html.Raw(item.Adres != null && item.Adres.Length > 50
-                                                ? item.Adres.Substring(0, 250) + "..."
+                        @(item.Adres != null && item.Adres.Length > 50
+                                                ? item.Adres.Substring(0, 50) + "..."
                                                 : item.Adres)
                     </td>
 

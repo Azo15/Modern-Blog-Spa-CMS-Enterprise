@@ -14,7 +14,7 @@
             </div>
             <div class="service-card-body">
                 <h3 class="service-title">@item.Title</h3>
-                <p class="service-description">@Html.Raw(details)</p>
+                <p class="service-description">@Html.Raw(SafeHtml.Sanitize(details))</p>
                 <div class="service-footer">
                     <span class="service-price">@item.Content</span>
                     @* <a asp-controller="Service" asp-action="Detail" asp-route-id="@item.Id" class="service-link">
