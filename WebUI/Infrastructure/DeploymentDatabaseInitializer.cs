@@ -69,6 +69,14 @@ public static class DeploymentDatabaseInitializer
                 + QUOTENAME(@ApplicationPassword, '''') + N', CHECK_POLICY = ON;';
             EXEC sys.sp_executesql @sql;
 
+            """;
+        command.Parameters.AddWithValue("@MigratorPassword", migratorPassword);
+        command.Parameters.AddWithValue("@ApplicationPassword", applicationPassword);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+
+        // Compile this batch only after CREATE DATABASE has completed.
+        command.Parameters.Clear();
+        command.CommandText = """
             USE [xspa_db];
             IF DATABASE_PRINCIPAL_ID(N'modern_blog_migrator') IS NULL
                 CREATE USER [modern_blog_migrator] FOR LOGIN [modern_blog_migrator];
@@ -82,8 +90,6 @@ public static class DeploymentDatabaseInitializer
             ALTER ROLE [db_datareader] ADD MEMBER [modern_blog_app];
             ALTER ROLE [db_datawriter] ADD MEMBER [modern_blog_app];
             """;
-        command.Parameters.AddWithValue("@MigratorPassword", migratorPassword);
-        command.Parameters.AddWithValue("@ApplicationPassword", applicationPassword);
         await command.ExecuteNonQueryAsync(cancellationToken);
         // Closing this connection releases the session-owned bootstrap lock.
     }
@@ -116,10 +122,12 @@ public static class DeploymentDatabaseInitializer
         if (await manager.FindByEmailAsync(email) is not null)
             throw new InvalidOperationException("Bootstrap admin must use an unused account email; existing accounts are never promoted automatically.");
 
+        await using var transaction = await services.GetRequiredService<AppDbContext>().Database.BeginTransactionAsync();
         var admin = new AppUser { UserName = email, Email = email, EmailConfirmed = true,
             FirstName = "System", LastName = "Administrator", LockoutEnabled = true };
         Ensure(await manager.CreateAsync(admin, password));
         Ensure(await manager.AddToRoleAsync(admin, AppRoles.Admin));
+        await transaction.CommitAsync();
     }
 
     private static void Ensure(IdentityResult result)
