@@ -53,7 +53,7 @@ Komutlar: `ToggleBlogFavoriteCommand`, `SetBlogReactionCommand`, `SetAccountLock
 WebUI dosyaları:
 
 - `Controllers/ProfileController.cs`, `Models/ProfileViewModels.cs`, `Views/Profile/Index.cshtml`: `/Profile`, ad/soyad, şifre değişimi, optimize avatar ve favoriler.
-- `Controllers/BlogInteractionController.cs`, `ViewComponents/BlogInteractionViewComponent.cs`, `Models/BlogInteractionViewModel.cs`, `Views/Shared/Components/BlogInteraction/Default.cshtml`: blog detayındaki favori/Like/Heart/Clap formları.
+- `Controllers/BlogInteractionController.cs`, `ViewComponents/BlogInteractionViewComponent.cs`, `Models/ProfileViewModels.cs` içindeki `BlogInteractionViewModel`, `Views/Shared/Components/BlogInteraction/Default.cshtml`: blog detayındaki favori/Like/Heart/Clap formları.
 - `Controllers/AdminAccountController.cs`, `Views/AdminAccount/Index.cshtml`: arama, sayfalama, kilitle/kilit aç.
 - `Controllers/AdminUserRoleController.cs`: eski kilit aksiyonu da güvenli komuta yönlendirilir.
 - `Controllers/AdminUserListController.cs`: görünmeyen/soft-delete yorumlar ve favori/tepki geçmişi olan hesabın silinmesi önceden engellenir; geçmiş/avatar korunur.

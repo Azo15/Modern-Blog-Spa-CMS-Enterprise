@@ -900,4 +900,7 @@
   <data name="Tüm hakları saklıdır." xml:space="preserve">
     <value>All rights reserved.</value>
   </data>
+  <data name="DeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this record?</value>
+  </data>
 </root>
