@@ -25,18 +25,32 @@ namespace WebUI.Middleware
             }
             catch (FluentValidation.ValidationException exception)
             {
+                if (WebUI.Infrastructure.ApiProblemResponses.IsApi(context))
+                {
+                    await WebUI.Infrastructure.ApiProblemResponses.WriteAsync(context, StatusCodes.Status400BadRequest,
+                        errors: exception.Errors.GroupBy(e => e.PropertyName).ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).Distinct().ToArray()));
+                    return;
+                }
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await context.Response.WriteAsJsonAsync(new { message = _text?["ValidationFailed"].Value ?? "Doğrulama başarısız.", errors = exception.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }) });
             }
             catch (UnauthorizedAccessException)
             {
+                if (WebUI.Infrastructure.ApiProblemResponses.IsApi(context))
+                { await WebUI.Infrastructure.ApiProblemResponses.WriteAsync(context, StatusCodes.Status403Forbidden); return; }
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
             }
             catch (BusinessLayer.Exceptions.InteractionConflictException)
             {
+                if (WebUI.Infrastructure.ApiProblemResponses.IsApi(context))
+                { await WebUI.Infrastructure.ApiProblemResponses.WriteAsync(context, StatusCodes.Status409Conflict); return; }
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
                 await context.Response.WriteAsJsonAsync(new { message = _text?["InteractionConflict"].Value ?? "The action conflicted with another request. Please try again." });
             }
+            catch (BadHttpRequestException exception) when (WebUI.Infrastructure.ApiProblemResponses.IsApi(context))
+            { await WebUI.Infrastructure.ApiProblemResponses.WriteAsync(context, exception.StatusCode); }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            { /* The client disconnected. There is no response stream to write or server failure to log. */ }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Beklenmeyen bir sunucu hatası meydana geldi! Path: {Path}, Method: {Method}",
@@ -48,6 +62,8 @@ namespace WebUI.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            if (WebUI.Infrastructure.ApiProblemResponses.IsApi(context))
+            { await WebUI.Infrastructure.ApiProblemResponses.WriteAsync(context, StatusCodes.Status500InternalServerError); return; }
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var isAjaxOrApi = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||

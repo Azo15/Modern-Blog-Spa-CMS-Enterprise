@@ -73,7 +73,7 @@ public static class ApiServiceRegistration
                 Title = "Modern Spa & Blog Platform API v1",
                 Version = "v1",
                 Description = "Published blog queries and Identity protected author/member commands. Successes use ApiResponse<T>; errors use RFC 7807 Problem Details. Cookie commands require antiforgery validation.",
-                License = new OpenApiLicense { Name = "Project license: see repository LICENSE or deployment agreement" }
+                License = new OpenApiLicense { Name = configuration["Swagger:LicenseName"] ?? "License not specified; contact project owner" }
             });
             options.DocInclusionPredicate((document, description) => document == "v1" &&
                 description.RelativePath?.StartsWith("api/v1/", StringComparison.OrdinalIgnoreCase) == true);

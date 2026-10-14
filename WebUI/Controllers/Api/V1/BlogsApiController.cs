@@ -40,6 +40,7 @@ public sealed class BlogsApiController(ISender sender) : ControllerBase
     /// <summary>Creates a draft owned by the authenticated author. Publication is a separate review action.</summary>
     [HttpPost(Name = "ApiV1CreateBlog")]
     [Authorize(Policy = AccessPolicies.BlogAuthor)]
+    [Authorize(Policy = AccessPolicies.ActiveMember)]
     [ApiCookieAntiforgery]
     [ProducesResponseType(typeof(ApiResponse<CreatedResourceDto>), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] BlogWriteRequest request, CancellationToken cancellationToken)
@@ -51,6 +52,7 @@ public sealed class BlogsApiController(ISender sender) : ControllerBase
     /// <summary>Updates an owned blog or a blog managed by an editor/admin, preserving its original author.</summary>
     [HttpPut("{id:int}", Name = "ApiV1UpdateBlog")]
     [Authorize(Policy = AccessPolicies.BlogAuthor)]
+    [Authorize(Policy = AccessPolicies.ActiveMember)]
     [ApiCookieAntiforgery]
     [ProducesResponseType(typeof(ApiResponse<ResourceChangedDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(int id, [FromBody] BlogWriteRequest request, CancellationToken cancellationToken)
@@ -61,6 +63,7 @@ public sealed class BlogsApiController(ISender sender) : ControllerBase
     /// <summary>Moves an owned or managed blog into the trash while retaining its image.</summary>
     [HttpDelete("{id:int}", Name = "ApiV1DeleteBlog")]
     [Authorize(Policy = AccessPolicies.BlogAuthor)]
+    [Authorize(Policy = AccessPolicies.ActiveMember)]
     [ApiCookieAntiforgery]
     [ProducesResponseType(typeof(ApiResponse<ResourceChangedDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

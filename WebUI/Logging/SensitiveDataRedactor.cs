@@ -10,7 +10,7 @@ public static class SensitiveDataRedactor
     public const string Mask = "[REDACTED]";
     private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(100);
     private static readonly Regex SensitiveName = Pattern(@"(?:password|passwd|pwd|secret|token|authorization|cookie|credential|email|mailaddress|cardnumber|creditcard|cvv|cvc|apikey|connectionstring)");
-    private static readonly Regex Credentials = Pattern("(?<key>\\b(?:password|passwd|pwd|secret|access[_-]?token|refresh[_-]?token|id[_-]?token|api[_-]?key|client[_-]?secret|authorization|cookie|cvv|cvc)\\b[\\\"']?\\s*[:=]\\s*)(?:[\\\"'][^\\\"'\\r\\n]*[\\\"']|[^\\s,;}&\\r\\n]+)");
+    private static readonly Regex Credentials = Pattern("(?<key>\\b(?:password|passwd|pwd|secret|token|access[_-]?token|refresh[_-]?token|id[_-]?token|api[_-]?key|client[_-]?secret|authorization|cookie|cvv|cvc)\\b[\\\"']?\\s*[:=]\\s*)(?:[\\\"'][^\\\"'\\r\\n]*[\\\"']|[^,;}&\\r\\n]+)");
     private static readonly Regex Bearer = Pattern(@"\b(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+");
     private static readonly Regex Jwt = Pattern(@"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b");
     private static readonly Regex Email = Pattern(@"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9.-]*[A-Z0-9])?\.[A-Z]{2,}");
@@ -28,6 +28,9 @@ public static class SensitiveDataRedactor
     {
         try
         {
+            // Framework request URLs and exception strings may contain percent-encoded personal data.
+            // Decode twice to detect common double-encoding, then apply the same fail-closed patterns.
+            for (var pass = 0; pass < 2 && value.Contains('%'); pass++) value = Uri.UnescapeDataString(value);
             value = Bearer.Replace(value, "Bearer " + Mask);
             value = Jwt.Replace(value, Mask);
             value = Credentials.Replace(value, m => m.Groups["key"].Value + Mask);
@@ -35,7 +38,8 @@ public static class SensitiveDataRedactor
             value = Card.Replace(value, Mask);
             return UrlUserInfo.Replace(value, m => m.Groups["scheme"].Value + Mask + "@");
         }
-        catch (RegexMatchTimeoutException) { return "[REDACTED: oversized sensitive message]"; }
+        catch (Exception ex) when (ex is RegexMatchTimeoutException or UriFormatException)
+        { return "[REDACTED: sensitive message could not be parsed]"; }
     }
 
     public static LogEventPropertyValue RedactValue(LogEventPropertyValue value)

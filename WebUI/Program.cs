@@ -22,6 +22,11 @@ using System.Globalization;
 using WebUI.Models;
 using WebUI.Security;
 using static WebUI.Helpers.GlobalHelper;
+using WebUI.Api;
+using WebUI.Infrastructure;
+using WebUI.Logging;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,11 +52,12 @@ builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
 builder.Services.AddHttpClient<IReCaptchaVerifier, ReCaptchaVerifier>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+var logDestination = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File(Path.Combine(builder.Environment.ContentRootPath, "logs", "log-.txt"), rollingInterval: RollingInterval.Day)
     .CreateLogger();
+Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+    .WriteTo.Sink(new SensitiveDataRedactingSink(logDestination)).CreateLogger();
 
 builder.Host.UseSerilog();
 
@@ -66,19 +72,25 @@ builder.Services.AddSingleton<IAuthorizationHandler, BlogOwnerAuthorizationHandl
 builder.Services.ContainerDependencies();
 
 // 3. DbContext'i DI sistemine ekle ve SQL Server bağlantısını ayarla
-var connection = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("ConnectionStrings__DefaultConnection ortam değişkenini veya User Secrets ayarını tanımlayın.");
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connection));
-
-builder.Services.AddHangfire(config => config
+var testing = builder.Environment.IsEnvironment("Testing");
+var localHttp = builder.Configuration.GetValue<bool>("Deployment:LocalHttp");
+var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!testing)
+{
+    if (string.IsNullOrWhiteSpace(connection)) throw new InvalidOperationException("Configure ConnectionStrings__DefaultConnection through secrets/environment.");
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
+    builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("Hangfire") ?? connection,
-        new SqlServerStorageOptions { QueuePollInterval = TimeSpan.Zero, SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5) }));
-builder.Services.AddHangfireServer(options => options.WorkerCount = Math.Max(1, Math.Min(Environment.ProcessorCount, 4)));
+        new SqlServerStorageOptions
+        {
+            QueuePollInterval = TimeSpan.Zero, SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+            PrepareSchemaIfNecessary = builder.Environment.IsDevelopment() || args.Contains("--initialize-database", StringComparer.Ordinal)
+        }));
+    builder.Services.AddHangfireServer(options => options.WorkerCount = Math.Max(1, Math.Min(Environment.ProcessorCount, 4)));
+}
 
 
 // 4. Identity sistemini `int` tipiyle yapılandır (IdentityUser<int>, IdentityRole<int>)
@@ -101,6 +113,21 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<AppDbContext>() // EF Core kullanımı
 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
 .AddDefaultTokenProviders(); // Şifre yenileme vb. için gerekli token sağlayıcılar
+builder.Services.AddPlatformApi(builder.Configuration);
+builder.Services.AddPlatformRateLimiting(builder.Configuration);
+
+var keysPath = builder.Configuration["DataProtection:KeysPath"];
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("ModernBlogPlatform");
+if (!string.IsNullOrWhiteSpace(keysPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(keysPath)));
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    var proxies = builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [];
+    if (proxies.Length == 0) return;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = 1;
+    options.KnownNetworks.Clear(); options.KnownProxies.Clear();
+    foreach (var proxy in proxies) options.KnownProxies.Add(System.Net.IPAddress.Parse(proxy));
+});
 
 // 5. Razor runtime compilation ve FluentValidation
 builder.Services.AddControllersWithViews()
@@ -134,17 +161,29 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/hata/403";
     options.Events.OnRedirectToAccessDenied = context =>
     {
+        if (ApiProblemResponses.IsApi(context.HttpContext)) return ApiProblemResponses.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden);
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (ApiProblemResponses.IsApi(context.HttpContext)) return ApiProblemResponses.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized);
+        context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };
     options.SlidingExpiration = true;
     options.Cookie.Name = ".SpaMerkezi.Auth";
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() || localHttp
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;
 });
 
 var app = builder.Build();
+if (args.Contains("--initialize-database", StringComparer.Ordinal))
+{
+    await DeploymentDatabaseInitializer.InitializeAsync(app.Services, app.Configuration);
+    return;
+}
 
 // Business exceptions are mapped below, inside the environment exception handler.
 
@@ -157,10 +196,11 @@ if (app.Environment.IsDevelopment())
 }
 
 // Roles are safe to provision in all environments; demo users/content are development-only.
-await DataSeeder.SeedRolesAsync(app.Services);
+if (!testing) await DataSeeder.SeedRolesAsync(app.Services);
 if (app.Environment.IsDevelopment())
     await DataSeeder.SeedAsync(app.Services);
 
+if (!testing)
 using (var scope = app.Services.CreateScope())
 {
     var jobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
@@ -172,6 +212,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // 9. Geliştirme ve üretim ortamlarına göre hata sayfası
+app.UseForwardedHeaders();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -185,9 +226,11 @@ else
 // Map validation/authorization exceptions before DeveloperExceptionPage can turn them into 500.
 app.UseRequestLocalization();
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<ApiBoundaryMiddleware>();
+app.UsePlatformSwagger();
 
 // 10. HTTP ve statik dosya ayarları
-if (!app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment() && !testing && !localHttp)
 {
     app.UseHttpsRedirection();
 }
@@ -196,7 +239,9 @@ app.UseStaticFiles();
 // 11. Routing ve kimlik doğrulama
 app.UseRouting();
 app.UseAuthentication(); // [Authorize] için gerekli
+app.UseRateLimiter();
 app.UseAuthorization();
+if (!testing)
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = [new HangfireCustomAuthorizationFilter()],
@@ -205,6 +250,10 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 });
 
 // 12. Route ayarları
+app.MapControllers();
+app.Map("/api/v1/{**unmatched}", context => ApiProblemResponses.WriteAsync(context, StatusCodes.Status404NotFound));
+app.MapGet("/health/ready", async (AppDbContext db, CancellationToken ct) =>
+    await db.Database.CanConnectAsync(ct) ? Results.Ok(new { status = "ready" }) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable));
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Default}/{action=Index}/{id?}");
@@ -220,3 +269,4 @@ app.MapHub<NotificationHub>("/notificationHub");
 
 // 13. Uygulamayı çalıştır
 app.Run();
+public partial class Program { }

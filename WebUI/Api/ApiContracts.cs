@@ -19,7 +19,10 @@ public sealed record CommentWriteRequest(
 /// <summary>Identity credentials for API clients. This endpoint does not issue a cookie.</summary>
 public sealed record ApiLoginRequest(
     [property: Required, EmailAddress, StringLength(256)] string Email,
-    [property: Required, StringLength(1024)] string Password);
+    [property: Required, StringLength(1024)] string Password)
+{
+    public override string ToString() => "ApiLoginRequest { Credentials = [REDACTED] }";
+}
 
 /// <summary>The identifier returned after a command creates a resource.</summary>
 public sealed record CreatedResourceDto(int Id);

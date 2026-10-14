@@ -68,11 +68,10 @@ public sealed class ImageOptimizationService(IWebHostEnvironment environment,
         using var webp = resultImage.Encode(SKEncodedImageFormat.Webp, 75);
         if (webp is null) throw new ValidationException(text["ImageInvalidFormat"]);
 
-        var uploadsRoot = Path.GetFullPath(Path.Combine(environment.WebRootPath, "uploads"));
-        var targetFolder = Path.GetFullPath(Path.Combine(uploadsRoot, folder));
-        if (!targetFolder.StartsWith(uploadsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Image path escapes uploads storage.");
+        var targetFolder = ImageStoragePathGuard.ResolveFolder(environment.WebRootPath, folder);
         Directory.CreateDirectory(targetFolder);
+        // Recheck newly created paths before opening a file, including links installed concurrently.
+        ImageStoragePathGuard.ResolveFolder(environment.WebRootPath, folder);
         var name = $"{Guid.NewGuid():N}.webp";
         var path = Path.Combine(targetFolder, name);
         // Keep old files so soft-deleted content can be restored with its image.

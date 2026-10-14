@@ -28,6 +28,9 @@ public sealed class LogPrivacyTests
     [InlineData("token=opaque-credential-123", "opaque-credential-123")]
     [InlineData("card 4111 1111 1111 1111", "4111")]
     [InlineData("redis://user:server-secret@localhost:6379", "server-secret")]
+    [InlineData("GET /?email=user%40example.com", "user")]
+    [InlineData("GET /?token=opaque%20credential&safe=ok", "credential")]
+    [InlineData("GET /?email=user%2540example.com", "user")]
     public void UnstructuredSecretsAreRedacted(string input, string secret)
     {
         var result = SensitiveDataRedactor.Redact(input);
