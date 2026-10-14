@@ -1,35 +1,112 @@
-version: '3.8'
+name: modern-blog
 
 services:
-  webui:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:-Developer}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}
+    volumes:
+      - sql_data:/var/opt/mssql
+    ports:
+      - "127.0.0.1:${MSSQL_HOST_PORT:-1433}:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "SQLCMDPASSWORD=\"$$MSSQL_SA_PASSWORD\" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -b -Q 'SELECT 1' -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # Short-lived DDL/SA credentials never reach the long-running webui container.
+  migrate:
+    image: modern-blog-webui:local
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: modern_blog_webui
-    ports:
-      - "5157:80"
+    command: ["--initialize-database"]
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=xspa_db;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD};TrustServerCertificate=True;
-      - ConnectionStrings__Redis=redis:6379
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__BootstrapConnection: "Server=mssql,1433;Database=master;User Id=sa;Password=\"${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}\";Encrypt=True;TrustServerCertificate=True"
+      ConnectionStrings__DefaultConnection: "Server=mssql,1433;Database=xspa_db;User Id=modern_blog_migrator;Password=\"${MSSQL_MIGRATOR_PASSWORD:?Set MSSQL_MIGRATOR_PASSWORD in .env}\";Encrypt=True;TrustServerCertificate=True"
+      DatabaseBootstrap__MigratorPassword: ${MSSQL_MIGRATOR_PASSWORD:?Set MSSQL_MIGRATOR_PASSWORD in .env}
+      DatabaseBootstrap__ApplicationPassword: ${MSSQL_APP_PASSWORD:?Set MSSQL_APP_PASSWORD in .env}
+      BootstrapAdmin__Email: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BootstrapAdmin__Password: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      Jwt__Issuer: ${JWT_ISSUER:-modern-blog-platform}
+      Jwt__Audience: ${JWT_AUDIENCE:-modern-blog-clients}
     depends_on:
-      - sqlserver
-      - redis
-    restart: always
+      mssql:
+        condition: service_healthy
+    restart: "no"
 
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: modern_blog_sqlserver
+  webui:
+    image: modern-blog-webui:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:${WEBUI_HOST_PORT:-5158}:8080"
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD}
-    ports:
-      - "1433:1433"
-    restart: always
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Server=mssql,1433;Database=xspa_db;User Id=modern_blog_app;Password=\"${MSSQL_APP_PASSWORD:?Set MSSQL_APP_PASSWORD in .env}\";Encrypt=True;TrustServerCertificate=True"
+      ConnectionStrings__Redis: redis:6379,abortConnect=false
+      DataProtection__KeysPath: /app/data-protection-keys
+      # Local HTTP demo. HTTPS production settings are described in docs/DEPLOYMENT.md.
+      Deployment__LocalHttp: ${LOCAL_HTTP:-true}
+      Swagger__Enabled: ${SWAGGER_ENABLED:-false}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      Jwt__Issuer: ${JWT_ISSUER:-modern-blog-platform}
+      Jwt__Audience: ${JWT_AUDIENCE:-modern-blog-clients}
+      Jwt__AccessTokenMinutes: ${JWT_ACCESS_TOKEN_MINUTES:-30}
+      Smtp__Host: ${SMTP_HOST:-}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__Username: ${SMTP_USERNAME:-}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      Smtp__SenderEmail: ${SMTP_SENDER_EMAIL:-}
+      Smtp__RecipientEmail: ${SMTP_RECIPIENT_EMAIL:-}
+      GoogleReCaptcha__SiteKey: ${RECAPTCHA_SITE_KEY:-}
+      GoogleReCaptcha__SecretKey: ${RECAPTCHA_SECRET_KEY:-}
+      GoogleReCaptcha__ExpectedHostname: ${RECAPTCHA_HOSTNAME:-}
+    volumes:
+      - app_logs:/app/logs
+      - app_uploads:/app/wwwroot/uploads
+      - data_protection_keys:/app/data-protection-keys
+    depends_on:
+      mssql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
-  redis:
-    image: redis:alpine
-    container_name: modern_blog_redis
-    ports:
-      - "6379:6379"
-    restart: always
+volumes:
+  sql_data:
+  redis_data:
+  app_logs:
+  app_uploads:
+  data_protection_keys:

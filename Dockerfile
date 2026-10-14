@@ -1,29 +1,38 @@
-# 📌 1. Aşama: Build & Publish
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim AS build
 WORKDIR /src
 
-# Proje dosyalarını kopyala ve restore et
-COPY ["WebUI/WebUI.csproj", "WebUI/"]
-COPY ["BusinessLayer/BusinessLayer.csproj", "BusinessLayer/"]
-COPY ["DataAccesLayer/DataAccesLayer.csproj", "DataAccesLayer/"]
-COPY ["EntityLayer/EntityLayer.csproj", "EntityLayer/"]
+# Restore project dependencies before copying frequently changing source files.
+COPY EntityLayer/EntityLayer.csproj EntityLayer/
+COPY DataAccesLayer/DataAccesLayer.csproj DataAccesLayer/
+COPY BusinessLayer/BusinessLayer.csproj BusinessLayer/
+COPY WebUI/WebUI.csproj WebUI/
+RUN dotnet restore WebUI/WebUI.csproj --runtime linux-x64
 
-RUN dotnet restore "WebUI/WebUI.csproj"
+COPY EntityLayer/ EntityLayer/
+COPY DataAccesLayer/ DataAccesLayer/
+COPY BusinessLayer/ BusinessLayer/
+COPY WebUI/ WebUI/
+RUN dotnet publish WebUI/WebUI.csproj --configuration Release --runtime linux-x64 \
+    --self-contained false --no-restore --output /app/publish /p:UseAppHost=false
 
-# Tüm kaynak kodları kopyala ve derle
-COPY . .
-WORKDIR "/src/WebUI"
-RUN dotnet build "WebUI.csproj" -c Release -o /app/build
-RUN dotnet publish "WebUI.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-# 📌 2. Aşama: Runtime Environment
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
 
-ENV ASPNETCORE_URLS=http://+:80
-ENV ASPNETCORE_ENVIRONMENT=Production
+# NativeAssets.Linux.NoDependencies provides libSkiaSharp; Linux font discovery
+# uses libfontconfig and curl is used only by the container healthcheck.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends libfontconfig1 fonts-dejavu-core curl \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=build --chown=app:app /app/publish/ ./
+RUN test -f /app/libSkiaSharp.so \
+    && mkdir -p /app/logs /app/wwwroot/uploads /app/data-protection-keys \
+    && chown -R app:app /app/logs /app/wwwroot/uploads /app/data-protection-keys
 
-EXPOSE 80
-
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_HTTP_PORTS=8080 \
+    DataProtection__KeysPath=/app/data-protection-keys \
+    DOTNET_EnableDiagnostics=0
+EXPOSE 8080
+USER app
 ENTRYPOINT ["dotnet", "WebUI.dll"]
