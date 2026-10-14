@@ -1,18 +1,7 @@
-﻿@model IEnumerable<Service>
-
-<section class="section section-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="section-title font-playfair" data-aos="fade-up">Öne Çıkan Hizmetlerimiz</h2>
-                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
-                    Uzman ekibimizle size en iyi spa deneyimini sunuyoruz
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-3">
-            @await Html.PartialAsync("~/Views/Service/_ServiceCardPartial.cshtml", Model)
-        </div>
-    </div>
-</section>
+@model IEnumerable<Service>
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; var source=(Model??Enumerable.Empty<Service>()).ToList(); var keys=new[]{"sveç","derin","hamam","maske","refleks","sauna"}; var selected=keys.Select(k=>source.FirstOrDefault(s=>(s.Title??"").ToLowerInvariant().Contains(k))).Where(s=>s!=null).Select(s=>s!).ToList();var i=0;}
+<section class="luxe-section luxe-section-light" id="rituals"><div class="container">
+    <div class="luxe-section-heading" data-aos="fade-up"><div><span class="luxe-eyebrow">@(en ? "OUR SIGNATURE RITUALS" : "İMZA RİTÜELLERİMİZ")</span><h2>@(en ? "Care for the body." : "Bedeninize bir dokunuş.")<br /><em>@(en ? "Space for the soul." : "Ruhunuza bir nefes.")</em></h2></div><div class="luxe-section-intro"><p>@(en ? "A considered collection of experiences, shaped around how you want to feel." : "Nasıl hissetmek istediğinizden ilham alan, özenle seçilmiş bir deneyim koleksiyonu.")</p><a class="luxe-text-link" asp-controller="Service" asp-action="Index">@(en ? "Explore all rituals" : "Tüm ritüelleri keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
+    <div class="luxe-service-grid">@await Html.PartialAsync("/Views/Service/_ServiceCardPartial.cshtml", selected.Count>0 ? selected.Take(6) : source.Take(6))</div>
+    @if(source.Count==0){<div class="luxe-empty">@(en ? "Tell us how you would like to unwind. We will help you find your ritual." : "Nasıl dinlenmek istediğinizi bize anlatın. Size uygun ritüeli birlikte seçelim.") <a class="luxe-text-link" href="https://wa.me/905388787000">@(en ? "Let's talk" : "Birlikte planlayalım")</a></div>}
+</div></section>

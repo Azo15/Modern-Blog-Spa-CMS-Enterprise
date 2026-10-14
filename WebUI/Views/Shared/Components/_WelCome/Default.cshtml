@@ -1,39 +1,20 @@
-﻿@model List<Slider>
-
-@if (Model != null && Model.Any())
-{
-    <section class="hero-section">
-        <div class="swiper hero-swiper">
-            <div class="swiper-wrapper">
-                @foreach (var item in Model)
-                {
-                    var imageUrl = Url.Content($"/{item.Image}");
-                    <div class="swiper-slide hero-slide"
-                         style="background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('@imageUrl');">
-                        <div class="container my-auto">
-                            <div class="row">
-                                <div class="col-lg-8 mx-auto">
-                                    <div class="hero-content" data-aos="fade-up">
-                                        <h1 class="hero-title font-playfair">@item.Title</h1>
-                                        <p class="hero-subtitle">@Html.Raw(SafeHtml.Sanitize(item.Content))</p>
-                                        <div class="mt-4">
-                                            <a class="btn btn-primary-custom me-3" asp-controller="Service" asp-action="Index">Hizmetlerimizi Keşfedin</a>
-                                            <a class="btn btn-outline-custom" asp-controller="Contact" asp-action="Index">Bize Ulaş</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            @if (Model.Count > 1)
-            {
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            }
+@model List<Slider>
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";var slides = new[] { (en ? "Pause the world." : "Hayatın ritmine", en ? "Come back to you." : "küçük bir mola.", en ? "Touch, warmth and a space to unwind. Discover your own ritual of wellbeing." : "Özenli dokunuşlar, sıcaklık ve dinginlik. Kendinize ait iyi yaşam ritüelini keşfedin."), (en ? "A timeless ritual." : "Zamansız ritüeller,", en ? "A new beginning." : "yeni başlangıçlar.", en ? "From traditional hammam to contemporary care, make room for an unhurried moment." : "Geleneksel hamamdan çağdaş bakımlara, acele etmeden yaşanan özel bir deneyim."), (en ? "Breathe a little deeper." : "Derin bir nefes.", en ? "Feel a little lighter." : "Yeni bir denge.", en ? "Water, nature and stillness. Let the everyday gently fall away." : "Suyun, doğanın ve sessizliğin buluştuğu bir an. Günün telaşını geride bırakın.") };}
+<section class="luxe-hero" aria-label="@(en ? "Welcome to XSPA" : "XSPA'ya hoş geldiniz")">
+    <div class="swiper hero-swiper"><div class="swiper-wrapper">
+    @for(var i=0;i<3;i++){
+        var item = Model?.ElementAtOrDefault(i); var slide=slides[i];
+        <div class="swiper-slide luxe-hero-slide">
+            <img class="luxe-hero-image" src="@Media.Image(item?.Image, $"img/hero-{i+1}.webp")" alt="@(en ? "An atmosphere of spa and wellbeing" : "Spa ve iyi yaşam atmosferi")" width="2200" height="1467" fetchpriority="@(i==0 ? "high" : "low")" loading="@(i==0 ? "eager" : "lazy")" />
+            <div class="container luxe-hero-content"><div class="luxe-hero-inner">
+                <span class="luxe-eyebrow">@(en ? "THE ART OF SLOW LIVING" : "İYİ YAŞAMIN ZARİF SANATI")</span>
+                @if(i==0){<h1 class="luxe-hero-title">@slide.Item1<br /><em>@slide.Item2</em></h1>}else{<h2 class="luxe-hero-title">@slide.Item1<br /><em>@slide.Item2</em></h2>}
+                <div class="luxe-hero-copy">@Html.Raw(SafeHtml.Sanitize(string.IsNullOrWhiteSpace(item?.Content) ? slide.Item3 : item.Content))</div>
+                <div class="luxe-hero-actions"><a class="luxe-button luxe-button-gold" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer">@(en ? "Discover your ritual" : "Ritüelinizi keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="luxe-hero-call" href="tel:+905388787000"><i class="fa-solid fa-phone" aria-hidden="true"></i><span><small>@(en ? "A PERSONAL INVITATION" : "SİZE ÖZEL BİR DAVET")</small>+90 538 878 70 00</span></a></div>
+            </div></div>
         </div>
-    </section>
-}
+    }
+    </div></div>
+    <div class="luxe-hero-bottom"><div class="container"><a class="luxe-scroll" href="#rituals">@(en ? "EXPLORE BELOW" : "KEŞFETMEYE DEVAM EDİN")</a><span class="luxe-hero-note">KIRKLARELİ · SPA &amp; WELLNESS</span><div class="luxe-hero-controls"><button class="luxe-slide-prev" type="button" aria-label="@(en ? "Previous slide" : "Önceki görsel")"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button><div class="swiper-pagination"></div><button class="luxe-slide-next" type="button" aria-label="@(en ? "Next slide" : "Sonraki görsel")"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button><button class="luxe-pause" type="button" aria-label="@(en ? "Pause slideshow" : "Slaytları duraklat")" aria-pressed="false"><i class="fa-solid fa-pause" aria-hidden="true"></i></button></div></div></div>
+</section>
+<div class="luxe-ritual-strip"><div class="container"><span><i class="fa-solid fa-spa" aria-hidden="true"></i> @(en ? "THOUGHTFUL RITUALS" : "ÖZENLİ RİTÜELLER")</span><span><i class="fa-solid fa-leaf" aria-hidden="true"></i> @(en ? "INSPIRED BY NATURE" : "DOĞADAN İLHAMLA")</span><span><i class="fa-regular fa-gem" aria-hidden="true"></i> @(en ? "PERSONAL CARE" : "SİZE ÖZEL BAKIM")</span><span><i class="fa-solid fa-wind" aria-hidden="true"></i> @(en ? "ROOM TO BREATHE" : "NEFES ALDIĞINIZ BİR ALAN")</span></div></div>

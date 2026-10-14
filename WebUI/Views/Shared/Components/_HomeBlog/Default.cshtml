@@ -1,18 +1,7 @@
-@model IReadOnlyList<BusinessLayer.Dtos.BlogListDto>
-
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="section-title font-playfair text-white" data-aos="fade-up">Son Blog Yazıları</h2>
-                <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
-                    Sağlık ve güzellik hakkında faydalı bilgiler
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-3">
-            @await Html.PartialAsync("~/Views/Blog/_BlogCardPartial.cshtml", Model)
-        </div>
-    </div>
-</section>
+@model IEnumerable<BusinessLayer.Dtos.BlogListDto>
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
+<section class="luxe-section luxe-section-dark"><div class="container">
+    <div class="luxe-section-heading" data-aos="fade-up"><div><span class="luxe-eyebrow">@(en ? "THE WELLBEING JOURNAL" : "İYİ YAŞAM GÜNLÜĞÜ")</span><h2>@(en ? "Small rituals." : "Küçük ritüeller.")<br /><em>@(en ? "Meaningful moments." : "Güzel değişimler.")</em></h2></div><div class="luxe-section-intro"><p>@(en ? "A little inspiration for bringing care, balance and mindfulness into your everyday." : "Bakımı, dengeyi ve farkındalığı günlük hayatınıza taşımak için bir tutam ilham.")</p><a class="luxe-text-link" asp-controller="Blog" asp-action="Index">@(en ? "Read the journal" : "Günlüğü keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
+    <div class="luxe-blog-grid">@await Html.PartialAsync("/Views/Blog/_BlogCardPartial.cshtml", Model.Take(3))</div>
+    @if(!Model.Any()){<p>@(en ? "Our next wellbeing story is being prepared." : "Bir sonraki iyi yaşam hikâyemiz hazırlanıyor.")</p>}
+</div></section>

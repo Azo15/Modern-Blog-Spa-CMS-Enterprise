@@ -1,23 +1,7 @@
-@model List<Galary>
-
-
-<section class="section section-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="section-title font-playfair" data-aos="fade-up">@L["Galeri"]</h2>
-                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
-                    Spa merkezimizden görüntüler
-                </p>
-            </div>
-        </div>
-
-        @await Html.PartialAsync("~/Views/Galary/_GalleryCardPartial.cshtml", Model)
-
-        <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="200">
-            <a class="btn btn-primary-custom" asp-controller="Galary" asp-action="Index">
-                Tüm Galeriyi Görüntüle
-            </a>
-        </div>
-    </div>
-</section>
+@model IEnumerable<Galary>
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
+<section class="luxe-section"><div class="container">
+    <div class="luxe-section-heading" data-aos="fade-up"><div><span class="luxe-eyebrow">@(en ? "AN ATMOSPHERE OF CALM" : "DİNGİNLİĞİN ATMOSFERİ")</span><h2>@(en ? "Let the everyday" : "Günün telaşı,")<br /><em>@(en ? "gently fall away." : "kapının dışında kalsın.")</em></h2></div><div class="luxe-section-intro"><p>@(en ? "Natural textures, gentle light and thoughtful details. A glimpse of the spa world." : "Doğal dokular, yumuşak ışıklar ve özenle düşünülmüş detaylar. Spa dünyasına bir bakış.")</p><a class="luxe-text-link" asp-controller="Galary" asp-action="Index">@(en ? "View the gallery" : "Galeriye göz atın") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
+    @await Html.PartialAsync("/Views/Galary/_GalleryCardPartial.cshtml", Model.Take(8))
+    <p class="luxe-gallery-caption">@(en ? "Curated spa imagery · a visual invitation" : "Özenle seçilmiş spa görselleri · görsel bir davet")</p>
+</div></section>

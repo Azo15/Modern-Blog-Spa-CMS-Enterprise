@@ -17,7 +17,7 @@ namespace WebUI.ViewComponents.Default
             var data = await _serviceService.GetListAsync(
                 filter: x => x.IsPublish == true,
                 orderBy: q => q.OrderByDescending(x => x.CreatedDate),
-                take: 8
+                take: 50
             );
             return View(data);
         }
