@@ -104,6 +104,23 @@ namespace WebUI.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost("bulten"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> NewsletterInterest(string? email)
+        {
+            var vm = await BuildViewModel();
+            if (string.IsNullOrWhiteSpace(email) || email.Length > 256 || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email))
+            {
+                ModelState.AddModelError("ContactForm.Email", _localizer["Contact.ValidationRequired"]);
+                return View("Index", vm);
+            }
+            var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+            vm.ContactForm!.Email = email.Trim();
+            vm.ContactForm.Subject = en ? "Wellbeing newsletter request" : "İyi yaşam bülteni talebi";
+            vm.ContactForm.Message = en ? "I would like information about your wellbeing newsletter. Please contact me about available updates." : "İyi yaşam bülteniniz hakkında bilgi almak istiyorum. Uygun güncellemeler için benimle iletişime geçebilirsiniz.";
+            ViewData["NewsletterNotice"] = en ? "Your email is ready. Complete the contact form to confirm your request." : "E-posta adresiniz hazır. Talebinizi onaylamak için iletişim formunu tamamlayın.";
+            return View("Index", vm);
+        }
+
         // ViewModel'i her seferinde hazırla
         private async Task<ContactPageViewModel> BuildViewModel()
         {

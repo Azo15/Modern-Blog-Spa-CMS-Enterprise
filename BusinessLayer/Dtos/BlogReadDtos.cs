@@ -4,7 +4,8 @@ namespace BusinessLayer.Dtos;
 
 // Public DTOs deliberately contain no Identity entity, email, hash or security stamp.
 public sealed record BlogListDto(int Id, string? Title, string? SubTitle, string? Slug, string? Image,
-    int? CatagoryId, string? CategoryTitle, string? AuthorName, DateTime CreatedDate);
+    int? CatagoryId, string? CategoryTitle, string? AuthorName, DateTime CreatedDate,
+    int ReadingMinutes = 0, int LikeCount = 0, int HeartCount = 0);
 public sealed record BlogDetailDto(int Id, string? Title, string? SubTitle, string? Slug, string? Image,
     int? CatagoryId, string? CategoryTitle, string? AuthorName, DateTime CreatedDate, string? Content);
 public sealed record BlogAdminDto(int Id, string? Title, string? SubTitle, string? Slug, string? Image,

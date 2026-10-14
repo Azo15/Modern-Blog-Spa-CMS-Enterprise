@@ -1,24 +1,17 @@
+@{var home = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Default", StringComparison.OrdinalIgnoreCase); var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
 <!DOCTYPE html>
-
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
-
 <head>
     @await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
     @await RenderSectionAsync("Styles", required: false)
 </head>
-
-<body>
-
-    <div class="animated-bg"></div>
-
+<body class="luxe-body @(home ? "is-home" : "is-inner")">
+    <a class="luxe-skip" href="#main-content">@(en ? "Skip to content" : "İçeriğe geç")</a>
     @await Component.InvokeAsync("_Navbar")
-
-    @RenderBody()
-
+    <main id="main-content">@RenderBody()</main>
     @await Component.InvokeAsync("_Footer")
-
+    <a class="luxe-whatsapp" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer" aria-label="@(en ? "Book on WhatsApp" : "Hızlı WhatsApp iletişim")"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>@(en ? "Let's talk" : "Bir mesaj uzağınızdayız")</span></a>
     @await Html.PartialAsync("/Views/LayoutPartial/_Script.cshtml")
-
-    @RenderSection("Scripts", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -12,9 +12,11 @@ namespace WebUI.Controllers;
 public sealed class BlogController(ISender sender, IAuthorizationService authorization) : Controller
 {
     [HttpGet("")]
-    public async Task<IActionResult> Index(int page = 1, int? categoryId = null, CancellationToken ct = default)
+    public async Task<IActionResult> Index(int page = 1, int? categoryId = null, string? search = null, CancellationToken ct = default)
     {
-        var result = await sender.Send(new GetPublicBlogsQuery(page, 20, categoryId), ct);
+        var result = await sender.Send(new GetPublicBlogsQuery(page, 12, categoryId, Search: search), ct);
+        ViewBag.PublicCategories = await sender.Send(new GetPublicCategoriesQuery(), ct);
+        ViewBag.Search = search;
         ViewBag.TotalBlogs = result.TotalCount;
         ViewBag.CategoryId = categoryId;
         return View(result);

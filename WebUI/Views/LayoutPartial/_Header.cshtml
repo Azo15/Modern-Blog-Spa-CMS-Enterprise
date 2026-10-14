@@ -1,41 +1,15 @@
-﻿<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<!-- SEO -->
-<title>XSpa Merkezi</title>
-<meta name="description" content="Kırklareli Masaj Salonu ve Spa Merkezi, Kırklareli'nin merkezinde yer alan kapsamlı hizmetleriyle misafirlerine eşsiz bir rahatlama deneyimi sunmaktadır. Kırklareli hamam, sauna, masaj ve buhar odası gibi hizmetlerimizle hem bedensel hem de zihinsel sağlığınızı destekliyoruz.">
-<meta name="keywords" content="Kırklareli Masaj Salonu, Kırklareli Spa Merkezi, Kırklareli Hamam, Kırklareli Masaj, Kırklareli Sauna, Kırklareli Buhar Odası, Kırklareli VIP Masaj, Kırklareli Wellness">
-<meta name="author" content="xSpa Merkezi">
-<link rel="canonical" href="https://www.xspamerkezi.com/" />
-
-<!-- Open Graph -->
-<meta property="og:title" content="xSpa Merkezi" />
-<meta property="og:description" content="Kırklareli'nin merkezinde yer alan spa merkezimizde hamam, sauna, masaj ve buhar odası hizmetleri sunulmaktadır." />
-<meta property="og:url" content="https://www.xspamerkezi.com/" />
-<meta property="og:type" content="website" />
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="xSpa Merkezi" />
-<meta name="twitter:description" content="Kırklareli'nin merkezinde yer alan spa merkezimizde hamam, sauna, masaj ve buhar odası hizmetleri sunulmaktadır." />
-
-<script>
-    (function () {
-        const theme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-    })();
-</script>
-
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-<!-- Kütüphaneler -->
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="~/lib/fontawesome/css/all.min.css" rel="stylesheet" />
-<link href="~/lib/aos/aos.css" rel="stylesheet" />
-<link href="~/lib/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
-<link href="~/lib/swipper/swiper-bundle.min.css" rel="stylesheet" />
-<link href="~/lib/fancybox/css/fancybox.min.css" rel="stylesheet" />
-<link href="~/css/site.css" rel="stylesheet" />
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#081C15" />
+<title>@ViewData["Title"] · XSPA — Spa &amp; Wellness</title>
+<meta name="description" content="@(en ? "An unhurried spa experience. Discover massage, traditional hammam and wellbeing in Kırklareli." : "Kırklareli'de dingin bir spa deneyimi. Masaj, geleneksel hamam ve kendinize ayırdığınız özel anları keşfedin.")" />
+<link rel="icon" href="~/img/brand-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="~/fonts/fonts.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/lib/aos/aos.css" />
+<link rel="stylesheet" href="~/lib/swipper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="~/lib/fancybox/css/fancybox.min.css" />
+<link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />

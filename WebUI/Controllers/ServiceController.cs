@@ -25,7 +25,7 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 20;
-            var query = _serviceService.GetQueryable();
+            var query = _serviceService.GetQueryable().Where(s => s.IsPublish);
 
             int totalItems = await query.CountAsync();
 
@@ -46,6 +46,14 @@ namespace WebUI.Controllers
                 Action = "Index"
             };
             return View(data);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> ServiceDetails(int id)
+        {
+            if (id <= 0) return NotFound();
+            var service = await _serviceService.GetQueryable().AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsPublish);
+            return service is null ? NotFound() : View(service);
         }
 
         //[HttpGet("hizmet-detayı")]

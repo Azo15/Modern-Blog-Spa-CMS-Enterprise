@@ -19,7 +19,8 @@ namespace BusinessLayer.CQRS.Handlers;
 internal static class BlogProjection
 {
     internal static readonly Expression<Func<Blog, BlogAdminDto>> Admin = b => new BlogAdminDto(b.Id, b.Title, b.SubTitle, b.Slug, b.Image, b.CatagoryId, b.AppUserId, b.Content, b.PublishStatus, b.CreatedDate, b.UpdatedDate, b.DeletedDate, b.DeletedBy);
-    internal static readonly Expression<Func<Blog, BlogListDto>> Public = b => new BlogListDto(b.Id, b.Title, b.SubTitle, b.Slug, b.Image, b.CatagoryId, b.Catagory == null ? null : b.Catagory.Title, b.AppUser == null ? null : b.AppUser.FirstName + " " + b.AppUser.LastName, b.CreatedDate);
+    internal static readonly Expression<Func<Blog, BlogListDto>> Public = b => new BlogListDto(b.Id, b.Title, b.SubTitle, b.Slug, b.Image, b.CatagoryId, b.Catagory == null ? null : b.Catagory.Title, b.AppUser == null ? null : b.AppUser.FirstName + " " + b.AppUser.LastName, b.CreatedDate,
+        b.Content == null || b.Content.Length == 0 ? 0 : (b.Content.Length + 999) / 1000, 0, 0);
     internal static async Task Require(IAuthorizationService auth, ICurrentUserService user, string policy, Blog? resource = null)
     { if (!(await auth.AuthorizeAsync(user.User, resource, policy)).Succeeded) throw new UnauthorizedAccessException(); }
     internal static async Task<PaginatedList<T>> Page<T>(IQueryable<T> query, int page, int size, CancellationToken ct)
@@ -71,11 +72,26 @@ public sealed class GetPublicBlogsQueryHandler(AppDbContext db, ICacheService ca
         var searchKey = string.IsNullOrEmpty(search) ? "none" : Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(search)));
         var key = $"{prefix}:p{request.PageIndex}:s{request.PageSize}:exclude{request.ExcludeId}:search{searchKey}:n{stamp?.Count ?? 0}:v{stamp?.Last.Ticks ?? 0}:id{stamp?.Id ?? 0}";
         var cached = await cache.GetAsync<PaginatedList<BlogListDto>>(key);
-        if (cached is not null) return cached;
+        if (cached is not null) return await WithCurrentReactions(cached, ct);
         var items = await query.OrderByDescending(b => b.CreatedDate).ThenByDescending(b => b.Id).Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).Select(BlogProjection.Public).ToListAsync(ct);
         var result = new PaginatedList<BlogListDto>(items, stamp?.Count ?? 0, request.PageIndex, request.PageSize);
         await cache.SetAsync(key, result, TimeSpan.FromMinutes(10));
-        return result;
+        return await WithCurrentReactions(result, ct);
+    }
+
+    private async Task<PaginatedList<BlogListDto>> WithCurrentReactions(PaginatedList<BlogListDto> page, CancellationToken ct)
+    {
+        if (page.Items.Count == 0) return page;
+        var ids = page.Items.Select(b => b.Id).ToArray();
+        // Interaction totals remain current even when article metadata comes from cache.
+        var counts = await db.BlogReactions.AsNoTracking().Where(r => ids.Contains(r.BlogId))
+            .GroupBy(r => new { r.BlogId, r.ReactionType })
+            .Select(g => new { g.Key.BlogId, g.Key.ReactionType, Count = g.Count() }).ToListAsync(ct);
+        var items = page.Items.Select(b => b with {
+            LikeCount = counts.Where(c => c.BlogId == b.Id && c.ReactionType == ReactionType.Like).Sum(c => c.Count),
+            HeartCount = counts.Where(c => c.BlogId == b.Id && c.ReactionType == ReactionType.Heart).Sum(c => c.Count)
+        }).ToList();
+        return new(items, page.TotalCount, page.PageIndex, page.PageSize);
     }
 }
 

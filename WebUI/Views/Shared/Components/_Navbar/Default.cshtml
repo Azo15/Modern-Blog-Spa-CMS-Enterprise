@@ -1,69 +1,34 @@
 @model SiteTable
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService NavigationAuthorization
-<nav class="navbar navbar-expand-xl sticky-top">
-    <div class="container">
-        <!-- Logo -->
-        <a class="navbar-brand" asp-controller="Default" asp-action="Index">
-            <div class="logo">
-                <img src="@(!string.IsNullOrEmpty(Model?.SiteLogo) ? Model.SiteLogo : "/img/logo.jpg")" alt="Logo" />
-            </div>
-        </a>
-
-        <!-- Mobil Menü Butonu -->
-        <button class="menu-btn d-xl-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Menüyü Aç/Kapat">
-            <span class="bar top"></span>
-            <span class="bar middle"></span>
-            <span class="bar bottom"></span>
-        </button>
-
-        <!-- Menü Öğeleri -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <!-- Default controller ve Index action'ı aktifse 'active' klasını ekler -->
-                    <a class="nav-link @Html.IsActive("Default", "Index")" asp-controller="Default" asp-action="Index">@L["Home"]</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("About", "Index")" asp-controller="About" asp-action="Index">@L["About"]</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Service", "Index")" asp-controller="Service" asp-action="Index">@L["Services"]</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Blog")" asp-controller="Blog" asp-action="Index">@L["Blog"]</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Galary", "Index")" asp-controller="Galary" asp-action="Index">@L["Gallery"]</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @Html.IsActive("Contact", "Index")" asp-controller="Contact" asp-action="Index">@L["Contact"]</a>
-                </li>
-            </ul>
-
-            <div class="navbar-button-area">
-                @await Html.PartialAsync("_LanguageSelector")
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <i class="fas fa-sun"></i>
-                </button>
-
-                @if (User?.Identity?.IsAuthenticated == true)
-                {
-                    <!-- Admin panelinin aktifliğini de kontrol edebilirsiniz -->
-                    <a class="theme-toggle adminButton ms-2 @Html.IsActive("AdminUserList", "UserList")"
-                       asp-controller="Profile" asp-action="Index" title="@L["Profile"]">
-                        <i class="fa fa-user-circle" aria-hidden="true"></i>
-                    </a>
-                    @if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded)
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
+<header class="luxe-header" id="site-header">
+    <div class="luxe-topbar"><div class="container"><span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Kırklareli <span class="luxe-topbar-divider">/</span> @(en ? "A moment, just for you." : "Kendinize ayırdığınız bir an.")</span><a href="tel:+905388787000"><i class="fa-solid fa-phone" aria-hidden="true"></i> +90 538 878 70 00</a></div></div>
+    <nav class="navbar navbar-expand-xl luxe-nav" aria-label="@(en ? "Main navigation" : "Ana menü")">
+        <div class="container">
+            <a class="luxe-brand" asp-controller="Default" asp-action="Index" aria-label="XSPA — @L["Home"]"><img src="~/img/brand-mark.svg" width="50" height="50" alt="" /><span>XSPA<small>SPA &amp; WELLNESS</small></span></a>
+            <button class="luxe-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="@(en ? "Toggle menu" : "Menüyü aç veya kapat")"><span></span><span></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("Default", "Index")" asp-controller="Default" asp-action="Index">@L["Home"]</a></li>
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("About", "Index")" asp-controller="About" asp-action="Index">@L["About"]</a></li>
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("Service", "Index")" asp-controller="Service" asp-action="Index">@L["Services"]</a></li>
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("Blog")" asp-controller="Blog" asp-action="Index">@L["Blog"]</a></li>
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("Galary", "Index")" asp-controller="Galary" asp-action="Index">@L["Gallery"]</a></li>
+                    <li class="nav-item"><a class="nav-link @Html.IsActive("Contact", "Index")" asp-controller="Contact" asp-action="Index">@L["Contact"]</a></li>
+                </ul>
+                <div class="luxe-nav-actions">
+                    @await Html.PartialAsync("_LanguageSelector")
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <a asp-controller="AdminBlog" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2">@L["AdminPanel"]</a>
+                        <a class="luxe-account" asp-controller="Profile" asp-action="Index" aria-label="@L["Profile"]"><i class="fa-regular fa-user" aria-hidden="true"></i></a>
+                        @if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded){<a class="luxe-admin-link" asp-controller="AdminBlog" asp-action="Index">@L["AdminPanel"]</a>}
+                        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded){<a class="luxe-admin-link" asp-controller="AdminComment" asp-action="Index">@L["AdminPanel"]</a>}
                     }
-                    else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
-                    {
-                        <a asp-controller="AdminMessage" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2">@L["AdminPanel"]</a>
-                    }
-                }
+                    else {<a class="luxe-account" asp-controller="Dashboard" asp-action="SignIn" aria-label="@(en ? "Sign in" : "Üye girişi")"><i class="fa-regular fa-user" aria-hidden="true"></i></a>}
+                    <a class="luxe-button luxe-button-gold luxe-nav-book" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer">@(en ? "Book a ritual" : "VIP Randevu")<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
+</header>

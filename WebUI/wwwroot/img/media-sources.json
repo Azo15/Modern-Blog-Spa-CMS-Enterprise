@@ -1,0 +1,308 @@
+{
+  "date": "2026-10-14",
+  "license": "https://www.pexels.com/license/",
+  "note": "Licensed illustrative stock photography; images do not document this business or identify actual staff. Resized and converted to WebP.",
+  "assets": [
+    {
+      "file": "img/about-retreat.webp",
+      "photoId": 6667423,
+      "source": "https://www.pexels.com/photo/6667423/",
+      "download": "https://images.pexels.com/photos/6667423/pexels-photo-6667423.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 868,
+      "height": 1300,
+      "bytes": 48686
+    },
+    {
+      "file": "img/blog-bakim.webp",
+      "photoId": 3737586,
+      "source": "https://www.pexels.com/photo/3737586/",
+      "download": "https://images.pexels.com/photos/3737586/pexels-photo-3737586.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 22514
+    },
+    {
+      "file": "img/blog-cilt.webp",
+      "photoId": 3757952,
+      "source": "https://www.pexels.com/photo/3757952/",
+      "download": "https://images.pexels.com/photos/3757952/pexels-photo-3757952.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 34298
+    },
+    {
+      "file": "img/blog-derindoku.webp",
+      "photoId": 6663378,
+      "source": "https://www.pexels.com/photo/6663378/",
+      "download": "https://images.pexels.com/photos/6663378/pexels-photo-6663378.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 868,
+      "height": 1300,
+      "bytes": 41976
+    },
+    {
+      "file": "img/blog-detoks.webp",
+      "photoId": 1640777,
+      "source": "https://www.pexels.com/photo/1640777/",
+      "download": "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 170934
+    },
+    {
+      "file": "img/blog-lavanta.webp",
+      "photoId": 9898737,
+      "source": "https://www.pexels.com/photo/9898737/",
+      "download": "https://images.pexels.com/photos/9898737/pexels-photo-9898737.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1040,
+      "height": 1300,
+      "bytes": 59270
+    },
+    {
+      "file": "img/blog-nefes.webp",
+      "photoId": 3822622,
+      "source": "https://www.pexels.com/photo/3822622/",
+      "download": "https://images.pexels.com/photos/3822622/pexels-photo-3822622.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 51358
+    },
+    {
+      "file": "img/blog-sauna.webp",
+      "photoId": 7587477,
+      "source": "https://www.pexels.com/photo/7587477/",
+      "download": "https://images.pexels.com/photos/7587477/pexels-photo-7587477.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 819,
+      "bytes": 68558
+    },
+    {
+      "file": "img/blog-su.webp",
+      "photoId": 416528,
+      "source": "https://www.pexels.com/photo/416528/",
+      "download": "https://images.pexels.com/photos/416528/pexels-photo-416528.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 857,
+      "bytes": 51540
+    },
+    {
+      "file": "img/blog-vitamin.webp",
+      "photoId": 5938242,
+      "source": "https://www.pexels.com/photo/5938242/",
+      "download": "https://images.pexels.com/photos/5938242/pexels-photo-5938242.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 42664
+    },
+    {
+      "file": "img/blog-yoga.webp",
+      "photoId": 4056723,
+      "source": "https://www.pexels.com/photo/4056723/",
+      "download": "https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 801,
+      "bytes": 69532
+    },
+    {
+      "file": "img/gallery-1.webp",
+      "photoId": 6628658,
+      "source": "https://www.pexels.com/photo/6628658/",
+      "download": "https://images.pexels.com/photos/6628658/pexels-photo-6628658.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 36646
+    },
+    {
+      "file": "img/gallery-2.webp",
+      "photoId": 13286770,
+      "source": "https://www.pexels.com/photo/13286770/",
+      "download": "https://images.pexels.com/photos/13286770/pexels-photo-13286770.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 99754
+    },
+    {
+      "file": "img/gallery-3.webp",
+      "photoId": 6634885,
+      "source": "https://www.pexels.com/photo/6634885/",
+      "download": "https://images.pexels.com/photos/6634885/pexels-photo-6634885.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 36356
+    },
+    {
+      "file": "img/gallery-4.webp",
+      "photoId": 230477,
+      "source": "https://www.pexels.com/photo/230477/",
+      "download": "https://images.pexels.com/photos/230477/pexels-photo-230477.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 45824
+    },
+    {
+      "file": "img/gallery-5.webp",
+      "photoId": 6667423,
+      "source": "https://www.pexels.com/photo/6667423/",
+      "download": "https://images.pexels.com/photos/6667423/pexels-photo-6667423.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 868,
+      "height": 1300,
+      "bytes": 48686
+    },
+    {
+      "file": "img/gallery-6.webp",
+      "photoId": 6620704,
+      "source": "https://www.pexels.com/photo/6620704/",
+      "download": "https://images.pexels.com/photos/6620704/pexels-photo-6620704.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 150380
+    },
+    {
+      "file": "img/gallery-7.webp",
+      "photoId": 19695976,
+      "source": "https://www.pexels.com/photo/19695976/",
+      "download": "https://images.pexels.com/photos/19695976/pexels-photo-19695976.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 102098
+    },
+    {
+      "file": "img/gallery-8.webp",
+      "photoId": 7222166,
+      "source": "https://www.pexels.com/photo/7222166/",
+      "download": "https://images.pexels.com/photos/7222166/pexels-photo-7222166.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 96566
+    },
+    {
+      "file": "img/hero-1.webp",
+      "photoId": 19695976,
+      "source": "https://www.pexels.com/photo/19695976/",
+      "download": "https://images.pexels.com/photos/19695976/pexels-photo-19695976.jpeg?auto=compress&cs=tinysrgb&w=2200",
+      "license": "https://www.pexels.com/license/",
+      "width": 2200,
+      "height": 1467,
+      "bytes": 250588
+    },
+    {
+      "file": "img/hero-2.webp",
+      "photoId": 6620704,
+      "source": "https://www.pexels.com/photo/6620704/",
+      "download": "https://images.pexels.com/photos/6620704/pexels-photo-6620704.jpeg?auto=compress&cs=tinysrgb&w=2200",
+      "license": "https://www.pexels.com/license/",
+      "width": 2200,
+      "height": 1467,
+      "bytes": 400868
+    },
+    {
+      "file": "img/hero-3.webp",
+      "photoId": 33136238,
+      "source": "https://www.pexels.com/photo/33136238/",
+      "download": "https://images.pexels.com/photos/33136238/pexels-photo-33136238.jpeg?auto=compress&cs=tinysrgb&w=2200",
+      "license": "https://www.pexels.com/license/",
+      "width": 844,
+      "height": 1500,
+      "bytes": 232290
+    },
+    {
+      "file": "img/portrait-author.webp",
+      "photoId": 415829,
+      "source": "https://www.pexels.com/photo/415829/",
+      "download": "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 1057,
+      "bytes": 51154
+    },
+    {
+      "file": "img/portrait-therapist.webp",
+      "photoId": 6663362,
+      "source": "https://www.pexels.com/photo/6663362/",
+      "download": "https://images.pexels.com/photos/6663362/pexels-photo-6663362.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 868,
+      "height": 1300,
+      "bytes": 43076
+    },
+    {
+      "file": "img/service-altinmaske.webp",
+      "photoId": 9775356,
+      "source": "https://www.pexels.com/photo/9775356/",
+      "download": "https://images.pexels.com/photos/9775356/pexels-photo-9775356.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 800,
+      "bytes": 64646
+    },
+    {
+      "file": "img/service-derindoku.webp",
+      "photoId": 6628658,
+      "source": "https://www.pexels.com/photo/6628658/",
+      "download": "https://images.pexels.com/photos/6628658/pexels-photo-6628658.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 36646
+    },
+    {
+      "file": "img/service-hamam.webp",
+      "photoId": 15528970,
+      "source": "https://www.pexels.com/photo/15528970/",
+      "download": "https://images.pexels.com/photos/15528970/pexels-photo-15528970.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 1200,
+      "bytes": 138332
+    },
+    {
+      "file": "img/service-isvec.webp",
+      "photoId": 3230236,
+      "source": "https://www.pexels.com/photo/3230236/",
+      "download": "https://images.pexels.com/photos/3230236/pexels-photo-3230236.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 867,
+      "height": 1300,
+      "bytes": 41224
+    },
+    {
+      "file": "img/service-refleksoloji.webp",
+      "photoId": 6663566,
+      "source": "https://www.pexels.com/photo/6663566/",
+      "download": "https://images.pexels.com/photos/6663566/pexels-photo-6663566.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 801,
+      "bytes": 37118
+    },
+    {
+      "file": "img/service-sauna.webp",
+      "photoId": 7598370,
+      "source": "https://www.pexels.com/photo/7598370/",
+      "download": "https://images.pexels.com/photos/7598370/pexels-photo-7598370.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "license": "https://www.pexels.com/license/",
+      "width": 1200,
+      "height": 801,
+      "bytes": 234120
+    }
+  ],
+  "errors": []
+}

@@ -48,6 +48,7 @@ else builder.Services.AddStackExchangeRedisCache(options =>
 });
 builder.Services.AddScoped<IBlogImageStorage, BlogImageStorage>();
 builder.Services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
+builder.Services.AddSingleton<PublicMediaService>();
 builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
 builder.Services.AddHttpClient<IReCaptchaVerifier, ReCaptchaVerifier>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
