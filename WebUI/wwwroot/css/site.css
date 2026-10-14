@@ -26,3 +26,5 @@
 .luxe-topbar a i{animation:phone-ring 5s ease-in-out infinite}@keyframes phone-ring{0%,75%,100%{transform:rotate(0)}80%,90%{transform:rotate(10deg)}85%,95%{transform:rotate(-10deg)}}
 @media(max-width:767px){.luxe-hero-bottom{bottom:83px}.luxe-hero-copy{max-width:345px}.luxe-map-preview h2{font-size:28px}}
 @media(prefers-reduced-motion:reduce){.luxe-topbar a i{animation:none}}
+
+.luxe-hour-range{display:block;font-family:var(--serif);font-size:34px;line-height:1.5;color:#91713B;font-weight:400;letter-spacing:-.03em;margin:8px 0 13px}

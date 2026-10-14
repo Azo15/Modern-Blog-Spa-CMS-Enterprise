@@ -238,12 +238,14 @@ public sealed class ApiEndpointTests
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Sliders.Add(new EntityLayer.Concrete.Slider { Title = "Security canary", Content = "<strong>Welcome</strong><script>unsafe-canary()</script><img src=x onerror='unsafe-image()'>" });
+            db.Galaries.Add(new EntityLayer.Concrete.Galary { Title = "<img src=x onerror=gallery-attack()>", Image = "missing-demo.webp" });
             await db.SaveChangesAsync();
         }
         var home = await client.GetStringAsync("/");
         Assert.Contains("Welcome", home);
         Assert.DoesNotContain("unsafe-canary", home);
         Assert.DoesNotContain("unsafe-image", home);
+        Assert.Contains("&amp;lt;img", home);
     }
 
     [Fact]

@@ -270,3 +270,5 @@ body{font-family:'Outfit',Arial,sans-serif;background:linear-gradient(110deg,rgb
 .luxe-auth-panel input[type=email],.luxe-auth-panel input[type=password],.luxe-auth-panel input[type=date],.luxe-auth-panel input[type=text]{background:#F7F4EB;border:1px solid rgba(197,168,128,.4);border-radius:0;min-height:49px;font-size:14px}.luxe-auth-panel input:focus{border-color:#C5A880;box-shadow:0 0 0 3px rgba(197,168,128,.15)}
 .luxe-auth-panel button{background:#081C15;border-radius:0;color:#FDFBF7;min-height:49px;font-size:13px;letter-spacing:.03em}.luxe-auth-panel button:hover{background:#1B4332;box-shadow:none}.luxe-auth-panel a:not(.luxe-auth-brand){color:#91713B}.luxe-auth-panel label,.luxe-auth-panel .form-footer{font-size:13px}.luxe-auth-panel .form-check-input{accent-color:#1B4332}.luxe-auth-panel i{color:#91713B}
 @media(max-width:575px){body{padding:25px 18px}.luxe-auth-panel{padding:26px 22px}.luxe-auth-panel h3{font-size:31px}}
+
+.luxe-auth-panel .btn-primary{border-color:#081C15;--bs-btn-focus-shadow-rgb:197,168,128}
