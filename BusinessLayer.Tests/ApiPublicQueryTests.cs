@@ -11,6 +11,25 @@ namespace BusinessLayer.Tests;
 public class ApiPublicQueryTests
 {
     [Fact]
+    public async Task ReactionTotalsRemainCurrentWhenArticleMetadataIsCached()
+    {
+        using var f = new Stage2Fixture();
+        f.As(null);
+        var initial = await f.Sender.Send(new GetPublicBlogsQuery());
+        Assert.Equal(0, Assert.Single(initial.Items).LikeCount);
+        f.Db.BlogReactions.AddRange(
+            new BlogReaction { BlogId = 1, AppUserId = 2, ReactionType = ReactionType.Like },
+            new BlogReaction { BlogId = 1, AppUserId = 3, ReactionType = ReactionType.Heart });
+        await f.Db.SaveChangesAsync();
+        var afterReaction = Assert.Single((await f.Sender.Send(new GetPublicBlogsQuery())).Items);
+        Assert.Equal(1, afterReaction.LikeCount);
+        Assert.Equal(1, afterReaction.HeartCount);
+        f.Db.BlogReactions.Remove(await f.Db.BlogReactions.SingleAsync(r => r.AppUserId == 2));
+        await f.Db.SaveChangesAsync();
+        Assert.Equal(0, Assert.Single((await f.Sender.Send(new GetPublicBlogsQuery())).Items).LikeCount);
+    }
+
+    [Fact]
     public async Task SearchAndCategoryFiltersApplyBeforePaginationAndExcludePrivateContent()
     {
         using var f = new Stage2Fixture();

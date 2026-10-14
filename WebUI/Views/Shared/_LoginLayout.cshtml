@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - xSpa</title>
-    <link href="~/css/login.css" rel="stylesheet" />
+    <link href="~/fonts/fonts.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
 </head>
 <body>
 
-    <div class="container">
+    <div class="container luxe-auth-panel">
+        <a class="luxe-auth-brand" asp-controller="Default" asp-action="Index"><img src="~/img/brand-mark.svg" alt="" width="45" height="45" /><span>XSPA<small>SPA &amp; WELLNESS</small></span></a>
         <div class="text-end p-3">@await Html.PartialAsync("_LanguageSelector")</div>
         @RenderBody()
     </div>
