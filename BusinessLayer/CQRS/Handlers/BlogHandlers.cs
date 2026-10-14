@@ -70,7 +70,7 @@ public sealed class GetPublicBlogsQueryHandler(AppDbContext db, ICacheService ca
         var stamp = await query.GroupBy(b => 1).Select(g => new { Count = g.Count(), Last = g.Max(b => b.UpdatedDate ?? b.CreatedDate), Id = g.Max(b => b.Id) }).SingleOrDefaultAsync(ct);
         var prefix = request.CategoryId.HasValue ? $"blogs_cat_{request.CategoryId}" : "blogs_all";
         var searchKey = string.IsNullOrEmpty(search) ? "none" : Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(search)));
-        var key = $"{prefix}:p{request.PageIndex}:s{request.PageSize}:exclude{request.ExcludeId}:search{searchKey}:n{stamp?.Count ?? 0}:v{stamp?.Last.Ticks ?? 0}:id{stamp?.Id ?? 0}";
+        var key = $"{prefix}:ui2:p{request.PageIndex}:s{request.PageSize}:exclude{request.ExcludeId}:search{searchKey}:n{stamp?.Count ?? 0}:v{stamp?.Last.Ticks ?? 0}:id{stamp?.Id ?? 0}";
         var cached = await cache.GetAsync<PaginatedList<BlogListDto>>(key);
         if (cached is not null) return await WithCurrentReactions(cached, ct);
         var items = await query.OrderByDescending(b => b.CreatedDate).ThenByDescending(b => b.Id).Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).Select(BlogProjection.Public).ToListAsync(ct);
