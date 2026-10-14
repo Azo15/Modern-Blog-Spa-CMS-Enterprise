@@ -2,7 +2,7 @@
 @using BusinessLayer
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Text
 @{ ViewData["Title"] = Text["Profile"]; }
-<div class="container py-5">
+<div class="container luxe-profile">
     <h1>@Text["Profile"]</h1>
     <p class="text-muted">@Model.Email</p>
     @if (TempData["ProfileSuccess"] is string success) { <div class="alert alert-success" role="status">@success</div> }

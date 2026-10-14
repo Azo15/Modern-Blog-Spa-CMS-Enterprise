@@ -2,26 +2,26 @@
 @using BusinessLayer.Security
 @inject Microsoft.AspNetCore.Authorization.IAuthorizationService CommentAuthorization
 @{var canComment=(await CommentAuthorization.AuthorizeAsync(User,null,AccessPolicies.ActiveMember)).Succeeded;}
-<section id="comments" class="container py-4">
+<section id="comments" class="luxe-comments">
 <h2>@L["Comments"] (@Model.Comments.TotalCount @L["RootComments"])</h2>
 @if(TempData["CommentError"] is string error){<p class="text-danger">@error</p>}
 @if(TempData["CommentSuccess"] is string success){<p class="text-success">@success</p>}
 @foreach(var thread in Model.Comments.Items)
 {
-<article class="border-bottom py-3">
-<strong>@thread.Comment.AuthorName</strong> <time>@thread.Comment.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time>
+<article class="luxe-comment-thread">
+<div class="luxe-comment-head"><strong>@thread.Comment.AuthorName</strong> <time>@thread.Comment.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time></div>
 <p style="white-space:pre-wrap">@thread.Comment.Content</p>
 @foreach(var reply in thread.Children)
 {
-<div class="ms-4 border-start ps-3"><strong>@reply.AuthorName</strong><time> @reply.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time><p style="white-space:pre-wrap">@reply.Content</p></div>
+<div class="luxe-comment-reply"><strong>@reply.AuthorName</strong><time> @reply.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time><p style="white-space:pre-wrap">@reply.Content</p></div>
 }
 @if(canComment)
 {
 <details><summary>@L["Reply"]</summary>
-<form asp-controller="Comment" asp-action="Create" method="post">
+<form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
 <input type="hidden" name="blogId" value="@Model.Blog.Id"/><input type="hidden" name="parentCommentId" value="@thread.Comment.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
 <label for="reply-@thread.Comment.Id">@L["YourReply"]</label><textarea id="reply-@thread.Comment.Id" name="content" required maxlength="1000" class="form-control"></textarea>
-<button class="btn btn-primary mt-2">@L["SendReply"]</button></form></details>
+<button class="luxe-button luxe-button-dark">@L["SendReply"]</button></form></details>
 }
 </article>
 }
@@ -32,21 +32,21 @@
 @if(canComment)
 {
 <h3>@L["AddComment"]</h3><p>@L["CommentGuidance"]</p>
-<form asp-controller="Comment" asp-action="Create" method="post">
+<form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
 <input type="hidden" name="blogId" value="@Model.Blog.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
 <label for="new-comment">@L["YourComment"]</label><textarea id="new-comment" name="content" required maxlength="1000" class="form-control"></textarea>
-<button class="btn btn-primary mt-2">@L["SendApproval"]</button></form>
+<button class="luxe-button luxe-button-dark">@L["SendApproval"]</button></form>
 @if(Model.OwnComments.Any())
 {
 <h3 class="mt-4">@L["MyRecentComments"]</h3>
 @foreach(var own in Model.OwnComments)
 {
 <details class="my-2"><summary>Yorum #@own.Id — @L[own.IsApproved ? "Approved" : "PendingApproval"]</summary>
-<form asp-controller="Comment" asp-action="Update" method="post">
+<form class="luxe-comment-form" asp-controller="Comment" asp-action="Update" method="post">
 <input type="hidden" name="id" value="@own.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
 <label for="edit-comment-@own.Id">@L["Content"]</label><textarea id="edit-comment-@own.Id" name="content" required maxlength="1000" class="form-control">@own.Content</textarea>
-<button class="btn btn-secondary mt-2">@L["UpdateApproval"]</button></form>
-<form asp-controller="Comment" asp-action="Delete" method="post"><input type="hidden" name="id" value="@own.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/><button class="btn btn-outline-danger mt-2">@L["Delete"]</button></form>
+<button class="luxe-button luxe-button-dark">@L["UpdateApproval"]</button></form>
+<form class="luxe-comment-form" asp-controller="Comment" asp-action="Delete" method="post"><input type="hidden" name="id" value="@own.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/><button class="btn btn-outline-danger mt-2">@L["Delete"]</button></form>
 </details>
 }
 }

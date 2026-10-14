@@ -22,6 +22,7 @@ public class DevelopmentSeederTests
         environment.SetupGet(e => e.EnvironmentName).Returns("Development");
         var services = new ServiceCollection().AddLogging();
         services.AddSingleton(environment.Object);
+        services.AddSingleton<WebUI.Services.PublicMediaService>();
         services.AddDataProtection();
         services.AddDbContext<AppDbContext>(o => o.UseSqlite(connection));
         services.AddIdentityCore<AppUser>().AddRoles<IdentityRole<int>>()

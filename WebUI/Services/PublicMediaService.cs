@@ -9,7 +9,7 @@ public sealed class PublicMediaService(IWebHostEnvironment environment)
         if (!string.IsNullOrWhiteSpace(candidate) && !candidate.Contains(':') && !candidate.Contains('?') &&
             !candidate.Contains('#') && candidate.Split('/').All(p => p is not (".." or ".") && p.Length > 0))
         {
-            var root = environment.WebRootPath ?? Path.Combine(environment.ContentRootPath, "wwwroot");
+            var root = environment.WebRootPath ?? Path.Combine(environment.ContentRootPath ?? AppContext.BaseDirectory, "wwwroot");
             var path = Path.Combine(root, candidate.Replace('/', Path.DirectorySeparatorChar));
             if (File.Exists(path)) return "/" + candidate;
         }
