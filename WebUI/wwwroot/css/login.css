@@ -1,4 +1,4 @@
-﻿body {
+body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -260,3 +260,13 @@ button {
         border-width: 4px;
     }
 }
+
+/* Public account pages share the XSPA editorial palette. */
+body{font-family:'Outfit',Arial,sans-serif;background:linear-gradient(110deg,rgba(8,28,21,.92),rgba(8,28,21,.6)),url('/img/hero-3.webp') center/cover fixed;color:#18392D;padding:35px 20px;min-height:100svh}
+.luxe-auth-panel{max-width:470px;background:#FDFBF7;border:1px solid rgba(197,168,128,.5);border-radius:0;padding:30px 32px;box-shadow:0 25px 80px rgba(0,0,0,.2)}
+.luxe-auth-panel .card{background:transparent;border:0;border-radius:0!important;box-shadow:none!important;padding:10px 0!important}.luxe-auth-panel .min-vh-100{min-height:0!important}.luxe-auth-panel .form-select{font-size:12px;border:1px solid #C5A880;background:#F7F4EB;border-radius:0;width:auto;margin-left:auto}
+.luxe-auth-brand{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;color:#081C15;margin-bottom:12px}.luxe-auth-brand>span{font-family:'Playfair Display',Georgia,serif;font-size:31px;letter-spacing:.16em;line-height:1.2}.luxe-auth-brand small{display:block;font-family:'Outfit',Arial,sans-serif;letter-spacing:.18em;font-size:8px;color:#91713B}
+.luxe-auth-panel h2,.luxe-auth-panel h3{font-family:'Playfair Display',Georgia,serif;color:#081C15;font-weight:400;font-size:35px}
+.luxe-auth-panel input[type=email],.luxe-auth-panel input[type=password],.luxe-auth-panel input[type=date],.luxe-auth-panel input[type=text]{background:#F7F4EB;border:1px solid rgba(197,168,128,.4);border-radius:0;min-height:49px;font-size:14px}.luxe-auth-panel input:focus{border-color:#C5A880;box-shadow:0 0 0 3px rgba(197,168,128,.15)}
+.luxe-auth-panel button{background:#081C15;border-radius:0;color:#FDFBF7;min-height:49px;font-size:13px;letter-spacing:.03em}.luxe-auth-panel button:hover{background:#1B4332;box-shadow:none}.luxe-auth-panel a:not(.luxe-auth-brand){color:#91713B}.luxe-auth-panel label,.luxe-auth-panel .form-footer{font-size:13px}.luxe-auth-panel .form-check-input{accent-color:#1B4332}.luxe-auth-panel i{color:#91713B}
+@media(max-width:575px){body{padding:25px 18px}.luxe-auth-panel{padding:26px 22px}.luxe-auth-panel h3{font-size:31px}}

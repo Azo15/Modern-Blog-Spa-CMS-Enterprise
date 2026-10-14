@@ -209,6 +209,27 @@ public sealed class ApiEndpointTests
     }
 
     [Fact]
+    public async Task NewsletterInterestRequiresCsrfAndPrefillsConfirmationWithoutSendingMail()
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+            { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false, HandleCookies = true });
+        var denied = await client.PostAsync("/iletisim/bulten", new FormUrlEncodedContent(new Dictionary<string,string> { ["email"]="reader@example.test" }));
+        Assert.Equal(HttpStatusCode.BadRequest, denied.StatusCode);
+        var home = await client.GetStringAsync("/");
+        var token = System.Net.WebUtility.HtmlDecode(System.Text.RegularExpressions.Regex.Match(home, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"").Groups[1].Value);
+        Assert.NotEmpty(token);
+        var response = await client.PostAsync("/iletisim/bulten", new FormUrlEncodedContent(new Dictionary<string,string>
+            { ["email"]="reader@example.test", ["__RequestVerificationToken"]=token }));
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Contains("reader@example.test", html);
+        Assert.Contains("ContactForm.Subject", html);
+        using var scope = factory.Services.CreateScope();
+        Assert.Empty(await scope.ServiceProvider.GetRequiredService<AppDbContext>().ContactForms.ToListAsync());
+    }
+
+    [Fact]
     public async Task FreshDeploymentHomeWorksWithoutDemoDataAndLegacyRichTextIsSanitized()
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);

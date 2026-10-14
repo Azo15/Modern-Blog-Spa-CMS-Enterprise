@@ -31,10 +31,23 @@ public class DevelopmentSeederTests
         using (var scope = provider.CreateScope())
             await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreatedAsync();
         await DataSeeder.SeedAsync(provider);
+        using (var seeded = provider.CreateScope())
+        {
+            var db = seeded.ServiceProvider.GetRequiredService<AppDbContext>();
+            var contact = await db.Contacts.SingleAsync();
+            contact.Adres = "Preserve this business address";
+            contact.Mail = "preserved@example.test";
+            contact.Phone = "old-number";
+            await db.SaveChangesAsync();
+        }
         await DataSeeder.SeedAsync(provider);
         using var verification = provider.CreateScope();
         var users = verification.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var roles = verification.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        var persistedContact = await verification.ServiceProvider.GetRequiredService<AppDbContext>().Contacts.SingleAsync();
+        Assert.Equal("+90 538 878 70 00", persistedContact.Phone);
+        Assert.Equal("Preserve this business address", persistedContact.Adres);
+        Assert.Equal("preserved@example.test", persistedContact.Mail);
         Assert.Equal(5, await users.Users.CountAsync());
         Assert.Equal(5, await roles.Roles.CountAsync());
         Assert.False(await roles.RoleExistsAsync("Visitor"));
