@@ -25,7 +25,7 @@ public static class DeploymentDatabaseInitializer
 
         // Hangfire schema preparation uses the short-lived migrator db_owner login.
         // The normal web host sets PrepareSchemaIfNecessary=false.
-        using var storage = new SqlServerStorage(
+        var storage = new SqlServerStorage(
             configuration.GetConnectionString("Hangfire") ?? configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Migration database connection is required."),
             new SqlServerStorageOptions { PrepareSchemaIfNecessary = true });

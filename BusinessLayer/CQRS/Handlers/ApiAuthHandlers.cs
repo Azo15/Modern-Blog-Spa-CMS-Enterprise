@@ -1,10 +1,8 @@
-using System.Security.Claims;
 using BusinessLayer.Abstract;
 using BusinessLayer.CQRS.Commands;
 using BusinessLayer.CQRS.Queries;
 using BusinessLayer.Dtos;
 using BusinessLayer.Security;
-using DataAccesLayer.Abstract;
 using EntityLayer.Concrete;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +25,7 @@ public sealed class ApiLoginCommandHandler(UserManager<AppUser> users, SignInMan
     }
 }
 
-public sealed class GetApiIdentityQueryHandler(ICurrentUserService current, IActiveMemberService members, UserManager<AppUser> users)
+public sealed class GetApiIdentityQueryHandler(IActiveMemberService members, UserManager<AppUser> users)
     : IRequestHandler<GetApiIdentityQuery, ApiIdentityDto>
 {
     public async Task<ApiIdentityDto> Handle(GetApiIdentityQuery request, CancellationToken ct)

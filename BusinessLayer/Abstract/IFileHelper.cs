@@ -6,7 +6,7 @@ namespace BusinessLayer.Abstract
     public interface IFileHelper
     {
         Task<string?> UploadAsync(IFormFile file, string root);
-        void Delete(string fullFilePath);
-        Task<string> UpdateAsync(IFormFile file, string root, string? existingFilePath);
+        void Delete(string relativeFilePath);
+        Task<string?> UpdateAsync(IFormFile file, string root, string? existingFilePath);
     }
 }

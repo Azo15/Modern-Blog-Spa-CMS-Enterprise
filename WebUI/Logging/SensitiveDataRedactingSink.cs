@@ -14,7 +14,7 @@ public sealed class SensitiveDataRedactingSink(Serilog.ILogger destination) : IL
         var safe = new LogEvent(logEvent.Timestamp, logEvent.Level, safeException,
             Parser.Parse(SensitiveDataRedactor.Redact(logEvent.MessageTemplate.Text)),
             logEvent.Properties.Select(pair => SensitiveDataRedactor.RedactProperty(new LogEventProperty(pair.Key, pair.Value))),
-            logEvent.TraceId, logEvent.SpanId);
+            logEvent.TraceId ?? default, logEvent.SpanId ?? default);
         destination.Write(safe);
     }
 
