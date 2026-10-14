@@ -68,6 +68,8 @@ public sealed class ApiEndpointTests
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
         if (email is not null) await Login(client, email);
+        var aboutCards = await client.GetAsync("/AdminAboutCard");
+        Assert.Equal(role is AppRoles.Admin or AppRoles.ContentManager ? HttpStatusCode.OK : role is null ? HttpStatusCode.Redirect : HttpStatusCode.Forbidden, aboutCards.StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/blogs")).StatusCode);
         using var create = await client.PostAsJsonAsync("/api/v1/blogs", BlogBody);
         if (canCreate)

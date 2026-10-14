@@ -126,7 +126,7 @@ namespace WebUI.Controllers
                 EntityName = "Hakkımda Kartı"
             };
 
-            return View("Views/Shared/Delete.cshtml", vm);
+            return View("/Views/Shared/Delete.cshtml", vm);
         }
 
         [HttpPost]

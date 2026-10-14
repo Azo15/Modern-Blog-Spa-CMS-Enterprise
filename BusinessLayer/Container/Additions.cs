@@ -39,6 +39,8 @@ namespace BusinessLayer.Container
 
             services.AddScoped<IAboutDal, EFAboutDal>();
             services.AddScoped<IAboutService, AboutManager>();
+            services.AddScoped<IAboutCardDal, EFAboutCardDal>();
+            services.AddScoped<IAboutCardService, AboutCardManager>();
 
             services.AddScoped<IContactDal, EFContactDal>();
             services.AddScoped<IContactService, ContactManager>();
