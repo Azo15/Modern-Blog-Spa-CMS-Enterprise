@@ -190,7 +190,7 @@ dotnet test BusinessLayer.Tests/BusinessLayer.Tests.csproj --artifacts-path .art
 
 Ek doğrulamalar:
 
-- **32 gerçek HTTP kontrolü**: public liste, antiforgery, cookie kültürü, güvenli redirect, admin/moderator/member erişimleri, dashboard, dört tür Excel/PDF, no-store, favori/tepki ve hesap kilidi. Test hesabı kilidi açıldı; test etkileşimleri geri çekildi.
+- **38 gerçek HTTP kontrolü**: public liste, antiforgery, cookie kültürü, güvenli redirect, admin/moderator/member erişimleri, dashboard, dört tür Excel/PDF, no-store, favori/tepki, hesap kilidi ve İngilizce yönetim formları/silme onayı. Test hesabı kilidi açıldı; test etkileşimleri geri çekildi.
 - **4 gerçek SQL Server/Hangfire kontrolü**: favori tekil indeksinde SQL 2601/2627, mesaj/niyetin gerçek queue'dan önce kaydı, kapalı loopback SMTP'de Scheduled retry, veri korunması/gönderildi işaretinin yazılmaması. Ayrı, bu teste ait LocalDB veritabanı işlem sonunda kaldırıldı; dışarıya e-posta gönderilmedi.
 - Migration uygulandı ve pending model changes kontrolü geçti.
 - WebUI build hatasız. Önceden kalan nullable uyarıları ayrıca görülüyor.
@@ -201,7 +201,7 @@ Yerel kanıtlar: `.artifacts/test-results/stage3.trx`, `stage3-test.log`, `stage
 
 MailKit **4.18.1** kullanıldı; eski STARTTLS advisory'sini içeren 4.13.0 kaldırıldı. Gelen kriptografi bağımlılığı `System.Security.Cryptography.Pkcs` **10.0.13** ile güncellendi. Çalışan uygulamada kullanılmayan AutoMapper 13.0.1 referansları, DI kaydı ve kullanılmayan MappingProfile kaldırıldı; CQRS DTO projeksiyonları açık eşlemeyi kullanıyor.
 
-Paket taramasında eski geliştirme/scaffolding araçlarının transitif `Microsoft.Build`/`NuGet.Packaging`/`NuGet.Protocol` uyarıları ayrıca değerlendirilmelidir. Bunlar raporda görünür tutulur; bu teslim tüm makinenin SDK/runtime/toolchain güncellemesi veya sıfır uyarı sertifikası değildir. Dağıtım öncesi ortam SDK/runtime güncelliği ve production publish bağımlılıkları ayrıca gözden geçirilmelidir.
+Son paket taramasında eski geliştirme/scaffolding araçlarının transitif `Microsoft.Build` 17.10.4 (High), `NuGet.Packaging` ve `NuGet.Protocol` 6.11.0 (Low) uyarıları sürüyor. Dağıtım öncesi bu araçlar, ortam SDK/runtime güncelliği ve production publish bağımlılıkları ayrıca gözden geçirilmelidir. Tarama kaydı `.artifacts/stage3-package-audit.log` içindedir.
 
 Görsel tasarrufu görüntüye bağlıdır; her yüklemede dosyanın daha küçük olacağı garantisi yoktur. Kaynak ve arşiv/görsellerin saklanması için disk kapasitesi, yedekleme ve saklama politikası gerekir. Raporlar güvenli boyut sınırları içinde senkron istekle üretilir; çok büyük veri için sonraki aşamada ayrı rapor işi/streaming tasarlanabilir.
 
