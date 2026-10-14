@@ -1,22 +1,3 @@
 @model List<Galary>
-@{
-    ViewData["Title"] = L["Galeri"];
-    Layout = "~/Views/Shared/_UILayout.cshtml";
-}
-
-<div id="gallery" >
-    <section class="section section-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="section-title font-playfair" data-aos="fade-up">@L["Galeri"]</h1>
-                    <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
-                        @L["Spa merkezimizden görüntüler ve atmosfer"]
-                    </p>
-                </div>
-            </div>
-
-            @await Html.PartialAsync("_GalleryCardPartial", Model)
-        </div>
-    </section>
-</div>
+@{ViewData["Title"]=L["Gallery"];var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";}
+<section class="luxe-page-hero"><div class="container"><span class="luxe-eyebrow">@(en?"THE ATMOSPHERE":"ATMOSFERİ KEŞFEDİN")</span><h1 class="luxe-title">@(en?"A quieter world,":"Daha sakin bir dünya,")<br /><em>@(en?"in every detail.":"her bir detayda.")</em></h1><p class="luxe-lead">@(en?"A curated glimpse of the spa world. Warmth, texture and moments of calm.":"Spa dünyasından özenle seçilmiş kareler. Sıcaklık, dokular ve dingin anlar.")</p><span class="luxe-page-number">03 / ATMOSPHERE</span></div></section><section class="luxe-section"><div class="container">@await Html.PartialAsync("_GalleryCardPartial",Model)<p class="luxe-gallery-caption">@(en?"Illustrative spa photography. Select an image to explore.":"Spa atmosferini yansıtan görseller. Yakından keşfetmek için bir kare seçin.")</p></div></section>

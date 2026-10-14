@@ -1,32 +1,4 @@
 @model IEnumerable<Service>
-
-@{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_UILayout.cshtml";
-}
-
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <h1 class="section-title font-playfair text-white" data-aos="fade-up">@L["Hizmetlerimiz"]</h1>
-                <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
-                    @L["Size özel tasarlanmış spa ve wellness hizmetleri"]
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-3">
-            @await Html.PartialAsync("_ServiceCardPartial", Model)
-        </div>
-        
-        @if (ViewBag.PaginationInfo != null)
-        {
-            <div class="row mt-4">
-                <div class="col-12">
-                    @await Component.InvokeAsync("Pagination", new { paginationInfo = ViewBag.PaginationInfo })
-                </div>
-            </div>
-        }
-    </div>
-</section>
+@{ViewData["Title"]=L["Services"];var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";}
+<section class="luxe-page-hero"><div class="container"><span class="luxe-eyebrow">@(en?"TAILORED TO YOU":"SİZE ÖZEL DENEYİMLER")</span><h1 class="luxe-title">@(en?"Find your":"Kendinize ait")<br /><em>@(en?"ritual of calm.":"ritüeli bulun.")</em></h1><p class="luxe-lead">@(en?"From a gentle massage to a timeless hammam. Choose a moment that feels right for you.":"Zarif bir masajdan zamansız hamam ritüeline. Size iyi gelen deneyimi seçin.")</p><span class="luxe-page-number">01 / RITUALS</span></div></section>
+<section class="luxe-section"><div class="container"><div class="luxe-service-grid">@await Html.PartialAsync("_ServiceCardPartial",Model)</div>@if(!Model.Any()){<p class="luxe-empty">@(en?"Contact us to plan your ritual.":"Ritüelinizi planlamak için bize ulaşın.")</p>}@if(ViewBag.PaginationInfo!=null){<div class="mt-5">@await Component.InvokeAsync("Pagination",new {paginationInfo=ViewBag.PaginationInfo})</div>}</div></section>

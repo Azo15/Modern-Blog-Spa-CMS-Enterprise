@@ -224,7 +224,7 @@ namespace WebUI.Data
                 context.Contacts.Add(new Contact
                 {
                     Adres = "Atatürk Cad. No:45 Kat:2, Kırklareli Merkez",
-                    Phone = "+90 288 555 0123",
+                    Phone = "+90 538 878 70 00",
                     Mail = "info@wellnessspa.com",
                     InstagramUrl = "https://instagram.com/wellnessspa",
                     FacebookUrl = "https://facebook.com/wellnessspa",
@@ -235,6 +235,23 @@ namespace WebUI.Data
                 });
                 await context.SaveChangesAsync();
             }
+
+            // Repair only missing legacy/demo media; valid user uploads are preserved.
+            var media = scope.ServiceProvider.GetRequiredService<WebUI.Services.PublicMediaService>();
+            foreach (var contact in context.Contacts.Where(c => c.Phone != "+90 538 878 70 00"))
+                contact.Phone = "+90 538 878 70 00";
+            foreach (var blog in context.Blogs)
+                blog.Image = media.BlogImage(blog.Title, blog.Image).TrimStart('/');
+            foreach (var service in context.Services)
+                service.Image = media.ServiceImage(service.Title, service.Image).TrimStart('/');
+            var slideIndex = 0;
+            foreach (var slide in context.Sliders.OrderBy(s => s.Id))
+                slide.Image = media.Image(slide.Image, $"img/hero-{++slideIndex % 3 switch { 1 => 1, 2 => 2, _ => 3 }}.webp").TrimStart('/');
+            foreach (var gallery in context.Galaries)
+                gallery.Image = media.GalleryImage(gallery.Title, gallery.Image).TrimStart('/');
+            foreach (var about in context.Abouts)
+                about.Image = media.Image(about.Image, "img/about-retreat.webp").TrimStart('/');
+            await context.SaveChangesAsync();
         }
     }
 }

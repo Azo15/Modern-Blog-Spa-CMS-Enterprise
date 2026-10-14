@@ -1,35 +1,5 @@
 @model IEnumerable<BusinessLayer.Dtos.BlogListDto>
-@{
-    int index = 0;
-}
-@if (Model != null && Model.Any())
-{
-    foreach (var item in Model)
-    {
-        int delay = 200 + ((index % 4) * 200);
-        var imgPath = string.IsNullOrEmpty(item.Image) ? "img/default-image.jpg" : item.Image;
-
-        <div class="col-6 col-lg-4 col-xl-3 mb-4" data-aos="fade-up" data-aos-delay="@delay">
-            <a class="blog-card-a h-100" asp-controller="Blog" asp-action="Post" asp-route-slug="@item.Slug">
-                <div class="blog-card h-100">
-                    <div class="blog-image">
-                        <img src="~/@imgPath" alt="@item.Title" />
-                        <div class="blog-date">@item.CategoryTitle</div>
-                    </div>
-                    <div class="blog-content">
-                        <h3 class="blog-title">@item.Title</h3>
-                        <p class="blog-excerpt">@item.SubTitle</p>
-                        <div class="blog-meta">
-                            <div class="blog-author">
-                                <i class="fas fa-user-circle"></i>
-                                @item.AuthorName
-                            </div>
-                            <span>@item.CreatedDate.ToString("dd MMM yyyy")</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        index++;
-    }
+@{var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";var index=0;}
+@foreach(var item in Model){index++;var author=string.IsNullOrWhiteSpace(item.AuthorName)?"XSPA":item.AuthorName;var initial=author.Trim()[0];
+<article class="luxe-blog-card" data-aos="fade-up" data-aos-delay="@((index%3)*80)"><a class="luxe-blog-media" style="display:block" asp-controller="Blog" asp-action="Post" asp-route-slug="@item.Slug"><img src="@Media.BlogImage(item.Title,item.Image)" alt="@item.Title" width="1200" height="830" loading="lazy" /><span class="luxe-blog-reading"><i class="fa-regular fa-clock" aria-hidden="true"></i> ~@Math.Max(1,item.ReadingMinutes) @(en?"min read":"dk okuma")</span></a><div class="luxe-blog-body"><span class="luxe-blog-category">@item.CategoryTitle</span><h3><a asp-controller="Blog" asp-action="Post" asp-route-slug="@item.Slug">@item.Title</a></h3><p>@item.SubTitle</p><div class="luxe-blog-meta"><span class="luxe-author"><span class="luxe-author-monogram" aria-hidden="true">@initial</span>@author</span><time datetime="@item.CreatedDate.ToString("yyyy-MM-dd")">@item.CreatedDate.ToString("dd MMM yyyy")</time></div><div class="luxe-blog-reactions"><span aria-label="@L["Like"]: @item.LikeCount"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i> @item.LikeCount</span><span aria-label="@L["Heart"]: @item.HeartCount"><i class="fa-regular fa-heart" aria-hidden="true"></i> @item.HeartCount</span><a class="ms-auto" asp-controller="Blog" asp-action="Post" asp-route-slug="@item.Slug">@(en?"Read story":"Yazıyı okuyun") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></article>
 }

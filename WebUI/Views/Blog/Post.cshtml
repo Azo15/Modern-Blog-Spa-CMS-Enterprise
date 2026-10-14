@@ -1,73 +1,7 @@
-@inject BusinessLayer.Abstract.IHtmlContentSanitizer HtmlSanitizer
 @model WebUI.Models.BlogPostViewModel
-
-@{
-    ViewData["Title"] = "Post";
-    Layout = "~/Views/Shared/_UILayout.cshtml";
-}
-<section class="blog-detail-header" style="background-image: url('@Url.Content("~/" + (Model.Blog.Image ?? "img/default-image.jpg"))')">
-    <div class="container">
-        <div class="blog-detail-category" data-aos="fade-up">
-            Spa & Wellness
-        </div>
-        <h1 class="blog-detail-title font-playfair" data-aos="fade-up" data-aos-delay="100">
-            @Model.Blog.Title
-        </h1>
-        <div class="blog-detail-meta" data-aos="fade-up" data-aos-delay="200">
-            <span>
-                <i class="fas fa-calendar-alt"></i>
-                @Model.Blog.CreatedDate.ToString("dd MMMM yyyy")
-            </span>
-            <span>
-                <i class="fas fa-user"></i>
-                @Model.Blog.AuthorName
-            </span>
-            <span>
-                <i class="fas fa-clock"></i>
-                @ViewBag.ReadingTime @L["ReadingMinutes"]
-            </span>
-        </div>
-    </div>
-</section>
-
-<!-- Blog Content -->
-<section class="blog-content">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <!-- Navigation Buttons -->
-                <div class="blog-navigation" data-aos="fade-up">
-                    <a asp-controller="Blog" asp-action="Index" class="nav-btn back-btn">
-                        <i class="fas fa-arrow-left"></i>
-                        @L["AllPosts"]
-                    </a>
-                </div>
-
-                <div class="blog-content-wrapper" data-aos="fade-up" data-aos-delay="100">
-                    @Html.Raw(HtmlSanitizer.Sanitize(Model.Blog.Content))
-                </div>
-                @await Component.InvokeAsync("BlogInteraction", new { blogId = Model.Blog.Id, slug = Model.Blog.Slug })
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Related Posts -->
-@if (ViewBag.RelatedBlogs != null)
-{
-    var relatedBlogs = (IEnumerable<BusinessLayer.Dtos.BlogListDto>)ViewBag.RelatedBlogs;
-    if (relatedBlogs.Any())
-    {
-        <section class="related-posts">
-            <div class="container">
-                <h2 class="section-title font-playfair" data-aos="fade-up">@L["RelatedPosts"] (@relatedBlogs.First().CategoryTitle)</h2>
-                
-                <div class="row g-3">
-                    @await Html.PartialAsync("_BlogCardPartial", relatedBlogs)
-                </div>
-                
-            </div>
-        </section>
-    }
-}
-@await Html.PartialAsync("_Comments", Model)
+@{ViewData["Title"]=Model.Blog.Title;var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";}
+<header class="luxe-post-header"><div class="container"><span class="luxe-eyebrow">@Model.Blog.CategoryTitle</span><h1>@Model.Blog.Title</h1><div class="luxe-post-meta"><span><i class="fa-regular fa-user" aria-hidden="true"></i>@Model.Blog.AuthorName</span><time datetime="@Model.Blog.CreatedDate.ToString("yyyy-MM-dd")">@Model.Blog.CreatedDate.ToString("dd MMMM yyyy")</time><span><i class="fa-regular fa-clock" aria-hidden="true"></i>@ViewBag.ReadingTime @L["ReadingMinutes"]</span></div></div></header>
+<div class="container"><img class="luxe-post-cover" src="@Media.BlogImage(Model.Blog.Title,Model.Blog.Image)" alt="@Model.Blog.Title" width="1200" height="460" fetchpriority="high" /></div>
+<article class="luxe-article"><a class="luxe-text-link mb-5" asp-action="Index"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>@L["AllPosts"]</a><div class="luxe-prose">@Html.Raw(SafeHtml.Sanitize(Model.Blog.Content))</div>@await Component.InvokeAsync("BlogInteraction",new {blogId=Model.Blog.Id,slug=Model.Blog.Slug})</article>
+@await Html.PartialAsync("_Comments",Model)
+@if(ViewBag.RelatedBlogs is IEnumerable<BusinessLayer.Dtos.BlogListDto> related && related.Any()){<section class="luxe-section luxe-section-light"><div class="container"><div class="luxe-section-heading"><div><span class="luxe-eyebrow">@(en?"CONTINUE YOUR JOURNEY":"KEŞFE DEVAM EDİN")</span><h2>@L["RelatedPosts"]</h2></div></div><div class="luxe-blog-grid">@await Html.PartialAsync("_BlogCardPartial",related.Take(3))</div></div></section>}
