@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Text;
 using BusinessLayer.Abstract;
 using BusinessLayer.CQRS.Commands;
 using BusinessLayer.CQRS.Queries;
@@ -59,10 +61,15 @@ public sealed class GetPublicBlogsQueryHandler(AppDbContext db, ICacheService ca
         var query = db.Blogs.AsNoTracking().Where(b => !b.IsDeleted && b.PublishStatus == PublishStatus.Published);
         if (request.CategoryId.HasValue) query = query.Where(b => b.CatagoryId == request.CategoryId);
         if (request.ExcludeId.HasValue) query = query.Where(b => b.Id != request.ExcludeId);
+        var search = request.Search?.Trim();
+        if (!string.IsNullOrEmpty(search))
+            query = query.Where(b => (b.Title != null && b.Title.Contains(search)) ||
+                (b.SubTitle != null && b.SubTitle.Contains(search)) || (b.Content != null && b.Content.Contains(search)));
         // A lightweight DB fingerprint also protects publication rules across nodes during Redis outages.
         var stamp = await query.GroupBy(b => 1).Select(g => new { Count = g.Count(), Last = g.Max(b => b.UpdatedDate ?? b.CreatedDate), Id = g.Max(b => b.Id) }).SingleOrDefaultAsync(ct);
         var prefix = request.CategoryId.HasValue ? $"blogs_cat_{request.CategoryId}" : "blogs_all";
-        var key = $"{prefix}:p{request.PageIndex}:s{request.PageSize}:exclude{request.ExcludeId}:n{stamp?.Count ?? 0}:v{stamp?.Last.Ticks ?? 0}:id{stamp?.Id ?? 0}";
+        var searchKey = string.IsNullOrEmpty(search) ? "none" : Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(search)));
+        var key = $"{prefix}:p{request.PageIndex}:s{request.PageSize}:exclude{request.ExcludeId}:search{searchKey}:n{stamp?.Count ?? 0}:v{stamp?.Last.Ticks ?? 0}:id{stamp?.Id ?? 0}";
         var cached = await cache.GetAsync<PaginatedList<BlogListDto>>(key);
         if (cached is not null) return cached;
         var items = await query.OrderByDescending(b => b.CreatedDate).ThenByDescending(b => b.Id).Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).Select(BlogProjection.Public).ToListAsync(ct);
@@ -97,6 +104,15 @@ public sealed class GetCategoryOptionsQueryHandler(AppDbContext db, ICurrentUser
         await BlogProjection.Require(auth, user, AccessPolicies.BlogAuthor);
         return await db.Catagories.AsNoTracking().OrderBy(c => c.Title).Select(c => new CategoryOptionDto(c.Id, c.Title)).ToListAsync(ct);
     }
+}
+
+public sealed class GetPublicCategoriesQueryHandler(AppDbContext db) : IRequestHandler<GetPublicCategoriesQuery, IReadOnlyList<PublicCategoryDto>>
+{
+    public async Task<IReadOnlyList<PublicCategoryDto>> Handle(GetPublicCategoriesQuery request, CancellationToken ct)
+        => await db.Catagories.AsNoTracking().OrderBy(c => c.Title).ThenBy(c => c.Id)
+            .Select(c => new PublicCategoryDto(c.Id, c.Title,
+                db.Blogs.Count(b => b.CatagoryId == c.Id && !b.IsDeleted && b.PublishStatus == PublishStatus.Published)))
+            .ToListAsync(ct);
 }
 
 public sealed class CreateBlogCommandHandler(IBlogWorkflowService workflow, IBlogImageStorage images, ICurrentUserService user, IAuthorizationService auth, AppDbContext db) : IRequestHandler<CreateBlogCommand, int>

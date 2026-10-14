@@ -11,3 +11,5 @@ public sealed record BlogAdminDto(int Id, string? Title, string? SubTitle, strin
     int? CatagoryId, int? AppUserId, string? Content, PublishStatus PublishStatus,
     DateTime CreatedDate, DateTime? UpdatedDate, DateTime? DeletedDate, string? DeletedBy);
 public sealed record CategoryOptionDto(int Id, string? Title);
+/// <summary>A public category and the number of currently published, visible blogs it contains.</summary>
+public sealed record PublicCategoryDto(int Id, string? Title, int BlogCount);

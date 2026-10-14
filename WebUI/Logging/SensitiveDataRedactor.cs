@@ -28,9 +28,9 @@ public static class SensitiveDataRedactor
     {
         try
         {
-            value = Credentials.Replace(value, m => m.Groups["key"].Value + Mask);
             value = Bearer.Replace(value, "Bearer " + Mask);
             value = Jwt.Replace(value, Mask);
+            value = Credentials.Replace(value, m => m.Groups["key"].Value + Mask);
             value = Email.Replace(value, Mask);
             value = Card.Replace(value, Mask);
             return UrlUserInfo.Replace(value, m => m.Groups["scheme"].Value + Mask + "@");

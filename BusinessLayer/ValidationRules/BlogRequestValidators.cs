@@ -66,6 +66,8 @@ public sealed class GetPublicBlogsQueryValidator : AbstractValidator<GetPublicBl
         RuleFor(x => x.PageIndex).InclusiveBetween(1, 1000000).Localized(localizer, "InvalidPage");
         RuleFor(x => x.PageSize).InclusiveBetween(1, 100).Localized(localizer, "InvalidPageSize", 100);
         RuleFor(x => x.CategoryId).GreaterThan(0).Localized(localizer, "PositiveId").When(x => x.CategoryId.HasValue);
+        RuleFor(x => x.ExcludeId).GreaterThan(0).Localized(localizer, "PositiveId").When(x => x.ExcludeId.HasValue);
+        RuleFor(x => x.Search).MaximumLength(100).Localized(localizer, "MaxLength", 100);
     }
 }
 public sealed class GetTrashedBlogsQueryValidator : AbstractValidator<GetTrashedBlogsQuery>
