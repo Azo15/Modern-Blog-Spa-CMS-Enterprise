@@ -23,7 +23,8 @@ public static class ApiProblemResponses
         problem.Extensions["traceId"] = Activity.Current?.Id ?? context.TraceIdentifier;
         context.Response.StatusCode = status;
         context.Response.Headers.CacheControl = "no-store";
-        return context.Response.WriteAsJsonAsync(problem, options: null, contentType: "application/problem+json",
-            cancellationToken: context.RequestAborted);
+        return problem is ValidationProblemDetails validation
+            ? context.Response.WriteAsJsonAsync(validation, options: null, contentType: "application/problem+json", cancellationToken: context.RequestAborted)
+            : context.Response.WriteAsJsonAsync(problem, options: null, contentType: "application/problem+json", cancellationToken: context.RequestAborted);
     }
 }

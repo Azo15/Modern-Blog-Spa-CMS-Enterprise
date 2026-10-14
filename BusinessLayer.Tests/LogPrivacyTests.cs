@@ -39,6 +39,19 @@ public sealed class LogPrivacyTests
     }
 
     [Fact]
+    public void NumericCardValuesAndIdentityCredentialsAreMasked()
+    {
+        var captured = new CaptureSink();
+        using var output = new LoggerConfiguration().WriteTo.Sink(captured).CreateLogger();
+        using var logger = new LoggerConfiguration().WriteTo.Sink(new SensitiveDataRedactingSink(output)).CreateLogger();
+        logger.Information("Diagnostic {Value} {SecurityStamp} {SigningKey}", 4111111111111111L, "private-stamp", "private-signing-key");
+        var json = captured.Json();
+        Assert.DoesNotContain("4111111111111111", json);
+        Assert.DoesNotContain("private-stamp", json);
+        Assert.DoesNotContain("private-signing-key", json);
+    }
+
+    [Fact]
     public void NestedStructuredValuesAndExceptionChainsNeverReachTheOutput()
     {
         var captured = new CaptureSink();

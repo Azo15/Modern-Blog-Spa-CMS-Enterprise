@@ -10,7 +10,6 @@ namespace WebUI.Controllers.Api.V1;
 /// <summary>Public category options with counts that include published blogs only.</summary>
 [ApiController]
 [Route("api/v1/categories")]
-[Produces("application/json")]
 public sealed class CategoriesApiController(ISender sender) : ControllerBase
 {
     /// <summary>Gets available categories and their publicly visible blog counts.</summary>

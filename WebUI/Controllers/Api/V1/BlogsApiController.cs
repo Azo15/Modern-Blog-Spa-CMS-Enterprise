@@ -12,7 +12,6 @@ namespace WebUI.Controllers.Api.V1;
 /// <summary>Published content queries and policy protected author commands.</summary>
 [ApiController]
 [Route("api/v1/blogs")]
-[Produces("application/json")]
 public sealed class BlogsApiController(ISender sender) : ControllerBase
 {
     /// <summary>Lists published blogs with optional category and literal text filters.</summary>

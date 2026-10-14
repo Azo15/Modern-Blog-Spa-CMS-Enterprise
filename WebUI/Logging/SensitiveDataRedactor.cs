@@ -9,7 +9,7 @@ public static class SensitiveDataRedactor
 {
     public const string Mask = "[REDACTED]";
     private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(100);
-    private static readonly Regex SensitiveName = Pattern(@"(?:password|passwd|pwd|secret|token|authorization|cookie|credential|email|mailaddress|cardnumber|creditcard|cvv|cvc|apikey|connectionstring)");
+    private static readonly Regex SensitiveName = Pattern(@"(?:password|passwd|pwd|secret|token|authorization|cookie|credential|email|mailaddress|cardnumber|creditcard|cvv|cvc|apikey|connectionstring|signingkey|securitystamp)");
     private static readonly Regex Credentials = Pattern("(?<key>\\b(?:password|passwd|pwd|secret|token|access[_-]?token|refresh[_-]?token|id[_-]?token|api[_-]?key|client[_-]?secret|authorization|cookie|cvv|cvc)\\b[\\\"']?\\s*[:=]\\s*)(?:[\\\"'][^\\\"'\\r\\n]*[\\\"']|[^,;}&\\r\\n]+)");
     private static readonly Regex Bearer = Pattern(@"\b(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+");
     private static readonly Regex Jwt = Pattern(@"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b");
@@ -47,6 +47,7 @@ public static class SensitiveDataRedactor
         {
             ScalarValue { Value: string text } => new ScalarValue(Redact(text)),
             ScalarValue { Value: Exception exception } => new ScalarValue(Redact(exception.ToString())),
+            ScalarValue scalar when scalar.Value is long or ulong or decimal => new ScalarValue(Redact(Convert.ToString(scalar.Value, CultureInfo.InvariantCulture) ?? string.Empty)),
             ScalarValue scalar when scalar.Value is null or bool or byte or short or int or long or float or double or decimal or DateTime or DateTimeOffset or TimeSpan or Guid => scalar,
             ScalarValue scalar => new ScalarValue(Redact(Convert.ToString(scalar.Value, CultureInfo.InvariantCulture) ?? string.Empty)),
             SequenceValue sequence => new SequenceValue(sequence.Elements.Select(RedactValue)),

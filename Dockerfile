@@ -28,6 +28,7 @@ COPY --from=build --chown=app:app /app/publish/ ./
 RUN test -f /app/libSkiaSharp.so \
     && mkdir -p /app/logs /app/wwwroot/uploads /app/data-protection-keys \
     && chown -R app:app /app/logs /app/wwwroot/uploads /app/data-protection-keys
+RUN chmod 700 /app/data-protection-keys
 
 ENV ASPNETCORE_ENVIRONMENT=Production \
     ASPNETCORE_HTTP_PORTS=8080 \

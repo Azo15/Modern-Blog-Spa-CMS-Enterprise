@@ -121,7 +121,8 @@ var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Mo
 if (!string.IsNullOrWhiteSpace(keysPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(keysPath)));
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    var proxies = builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [];
+    var proxies = (builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [])
+        .Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => value.Trim()).ToArray();
     if (proxies.Length == 0) return;
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.ForwardLimit = 1;

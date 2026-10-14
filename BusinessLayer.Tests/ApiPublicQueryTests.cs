@@ -21,6 +21,8 @@ public class ApiPublicQueryTests
             new Blog { Id = 4, Title = "Needle deleted", CatagoryId = 1, AppUserId = 1, PublishStatus = PublishStatus.Published, IsDeleted = true },
             new Blog { Id = 5, Title = "Other published", Content = "A content Needle to find", CatagoryId = 1, AppUserId = 1, PublishStatus = PublishStatus.Published });
         await f.Db.SaveChangesAsync();
+        f.Db.Remove(await f.Db.Blogs.SingleAsync(b => b.Id == 4));
+        await f.Db.SaveChangesAsync();
         f.Db.ChangeTracker.Clear();
         var found = await f.Sender.Send(new GetPublicBlogsQuery(1, 1, 1, Search: " Needle "));
         Assert.Equal(1, found.TotalCount);
@@ -62,6 +64,9 @@ public class ApiPublicQueryTests
             new Blog { Id = 2, CatagoryId = 1, AppUserId = 1, PublishStatus = PublishStatus.Draft },
             new Blog { Id = 3, CatagoryId = 1, AppUserId = 1, PublishStatus = PublishStatus.Published, IsDeleted = true },
             new Blog { Id = 4, CatagoryId = 2, AppUserId = 1, PublishStatus = PublishStatus.Published });
+        await f.Db.SaveChangesAsync();
+        f.Db.Remove(await f.Db.Blogs.SingleAsync(b => b.Id == 3));
+        f.Db.Remove(await f.Db.Catagories.SingleAsync(c => c.Id == 3));
         await f.Db.SaveChangesAsync();
         f.Db.ChangeTracker.Clear();
         var categories = await f.Sender.Send(new GetPublicCategoriesQuery());

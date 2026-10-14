@@ -8,12 +8,13 @@ public static class ApiRateLimitRegistration
 {
     public static IServiceCollection AddPlatformRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
-        var permits = configuration.GetValue("ApiRateLimit:PermitLimit", 60);
-        var windowSeconds = configuration.GetValue("ApiRateLimit:WindowSeconds", 60);
-        if (permits is < 1 or > 10000 || windowSeconds is < 1 or > 3600)
-            throw new InvalidOperationException("API rate limit configuration is outside the supported range.");
         services.AddRateLimiter(options =>
         {
+            // Resolve after the host's complete configuration has been applied.
+            var permits = configuration.GetValue("ApiRateLimit:PermitLimit", 60);
+            var windowSeconds = configuration.GetValue("ApiRateLimit:WindowSeconds", 60);
+            if (permits is < 1 or > 10000 || windowSeconds is < 1 or > 3600)
+                throw new InvalidOperationException("API rate limit configuration is outside the supported range.");
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {

@@ -88,15 +88,15 @@ public class ApiAuthTests
     [InlineData("not-an-email", "valid")]
     [InlineData("member@example.test", "")]
     public void LoginValidationRejectsInvalidInputs(string email, string password)
-        => Assert.False(new ApiLoginCommandValidator().Validate(new(email, password)).IsValid);
+        => Assert.False(new ApiLoginCommandValidator().Validate(new ApiLoginCommand(email, password)).IsValid);
 
     [Fact]
     public void LoginValidationBoundsCredentialLengths()
     {
         var validator = new ApiLoginCommandValidator();
-        Assert.False(validator.Validate(new(new string('a', 257) + "@example.test", "valid")).IsValid);
-        Assert.False(validator.Validate(new("member@example.test", new string('a', 1025))).IsValid);
-        Assert.True(validator.Validate(new("member@example.test", "valid")).IsValid);
+        Assert.False(validator.Validate(new ApiLoginCommand(new string('a', 257) + "@example.test", "valid")).IsValid);
+        Assert.False(validator.Validate(new ApiLoginCommand("member@example.test", new string('a', 1025))).IsValid);
+        Assert.True(validator.Validate(new ApiLoginCommand("member@example.test", "valid")).IsValid);
     }
 
     [Fact]

@@ -75,14 +75,16 @@ public sealed class ImageOptimizationService(IWebHostEnvironment environment,
         var name = $"{Guid.NewGuid():N}.webp";
         var path = Path.Combine(targetFolder, name);
         // Keep old files so soft-deleted content can be restored with its image.
+        var created = false;
         try
         {
             await using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, true);
+            created = true;
             await output.WriteAsync(webp.ToArray(), cancellationToken);
         }
         catch
         {
-            if (File.Exists(path)) File.Delete(path);
+            if (created && File.Exists(path)) File.Delete(path);
             throw;
         }
         return name;

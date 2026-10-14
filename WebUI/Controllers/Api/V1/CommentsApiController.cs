@@ -10,7 +10,6 @@ namespace WebUI.Controllers.Api.V1;
 /// <summary>Member comments and one level of direct replies, submitted for moderation.</summary>
 [ApiController]
 [Route("api/v1/comments")]
-[Produces("application/json")]
 public sealed class CommentsApiController(ISender sender) : ControllerBase
 {
     /// <summary>Creates a pending comment or a pending reply to an approved root comment.</summary>

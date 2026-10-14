@@ -71,6 +71,7 @@ services:
       DataProtection__KeysPath: /app/data-protection-keys
       # Local HTTP demo. HTTPS production settings are described in docs/DEPLOYMENT.md.
       Deployment__LocalHttp: ${LOCAL_HTTP:-true}
+      ReverseProxy__KnownProxies__0: ${TRUSTED_PROXY_IP:-}
       Swagger__Enabled: ${SWAGGER_ENABLED:-false}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
       Jwt__Issuer: ${JWT_ISSUER:-modern-blog-platform}

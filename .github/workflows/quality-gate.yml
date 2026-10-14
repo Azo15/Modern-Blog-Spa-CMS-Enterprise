@@ -1,0 +1,27 @@
+name: Quality and container build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Tests and BusinessLayer coverage gate
+        shell: pwsh
+        run: ./scripts/Test-QualityGate.ps1 -MinimumCoverage 70
+      - name: Linux container build
+        run: docker build --tag modern-blog:ci .
+      - name: Upload test and coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-evidence
+          path: .artifacts/quality/**
+          if-no-files-found: warn

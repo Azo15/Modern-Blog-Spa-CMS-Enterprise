@@ -58,7 +58,6 @@ public sealed class FileHelper(IWebHostEnvironment environment, IImageOptimizati
 
     private static void RejectReparsePoint(string path)
     {
-        if ((File.Exists(path) || Directory.Exists(path)) && (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0)
-            throw new UnauthorizedAccessException("Linked image paths are not allowed.");
+        BusinessLayer.Security.StoragePathSecurity.RejectRedirect(path);
     }
 }

@@ -12,7 +12,6 @@ namespace WebUI.Controllers.Api.V1;
 /// <summary>Identity password verification and short lived API bearer credentials.</summary>
 [ApiController]
 [Route("api/v1/auth")]
-[Produces("application/json")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class AuthApiController(ISender sender) : ControllerBase
 {
