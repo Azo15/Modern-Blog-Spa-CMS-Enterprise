@@ -1,6 +1,6 @@
-﻿@model Catagory
+@model Catagory
 @{
-    ViewData["Title"] = "Blog Kategorisi Güncelleme";
+    ViewData["Title"] = L["Blog Kategorisi Güncelleme"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -28,9 +28,9 @@
 
             <div class="mt-4 d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                    <i class="fas fa-arrow-left me-1"></i> @L["Geri Dön"]
                 </a>
-                <button type="submit" class="btn btn-success">Güncelle</button>
+                <button type="submit" class="btn btn-success">@L["Güncelle"]</button>
             </div>
         </form>
     </div>

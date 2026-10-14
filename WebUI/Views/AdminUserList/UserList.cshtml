@@ -1,6 +1,6 @@
-﻿@model IEnumerable<UserListViewModel>
+@model IEnumerable<UserListViewModel>
 @{
-    ViewData["Title"] = "Admin Listesi";
+    ViewData["Title"] = L["Admin Listesi"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -26,7 +26,7 @@
                         <th>
                             @Html.DisplayNameFor(model => model.Email)
                         </th>
-                        <th>Eylemler</th>
+                        <th>@L["Eylemler"]</th>
                     </tr>
                 </thead>
 
@@ -47,7 +47,7 @@
                                     @Html.AntiForgeryToken()
 
                                     <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fa-solid fa-trash me-1"></i> Sil
+                                        <i class="fa-solid fa-trash me-1"></i> @L["Sil"]
                                     </button>
                                 </form>
                             </td>

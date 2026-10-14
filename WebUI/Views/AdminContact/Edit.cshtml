@@ -1,7 +1,7 @@
-﻿@model Contact
+@model Contact
 
 @{
-    ViewData["Title"] = "İletişim Bilgisi Güncelleme";
+    ViewData["Title"] = L["İletişim Bilgisi Güncelleme"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -51,18 +51,18 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Adres" class="form-label">Adres</label>
+                    <label asp-for="Adres" class="form-label">@L["Adres"]</label>
                     <textarea rows="4" asp-for="Adres" class="form-control" placeholder="Adres giriniz"></textarea>
                 </div>
             </div>
 
             <div class="mt-4 d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                    <i class="fas fa-arrow-left me-1"></i> @L["Geri Dön"]
                 </a>
 
                 <button type="submit" class="btn btn-primary ">
-                    <i class="bi bi-check-circle"></i> Güncelle
+                    <i class="bi bi-check-circle"></i> @L["Güncelle"]
                 </button>
             </div>
 

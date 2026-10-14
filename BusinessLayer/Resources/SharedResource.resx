@@ -657,4 +657,247 @@
   <data name="Identity.UserAlreadyHasPassword" xml:space="preserve">
     <value>Bu hesap için zaten bir şifre tanımlı.</value>
   </data>
+  <data name="Kullanıcı &amp; Rol Yönetimi" xml:space="preserve">
+    <value>Kullanıcı &amp; Rol Yönetimi</value>
+  </data>
+  <data name="Rol Atama" xml:space="preserve">
+    <value>Rol Atama</value>
+  </data>
+  <data name="Rolleri Kaydet" xml:space="preserve">
+    <value>Rolleri Kaydet</value>
+  </data>
+  <data name="Galeriye Resim Yükle" xml:space="preserve">
+    <value>Galeriye Resim Yükle</value>
+  </data>
+  <data name="Galeriye Yüklenen Resimler" xml:space="preserve">
+    <value>Galeriye Yüklenen Resimler</value>
+  </data>
+  <data name="Hizmet Listesi" xml:space="preserve">
+    <value>Hizmet Listesi</value>
+  </data>
+  <data name="Hizmet Güncelleme" xml:space="preserve">
+    <value>Hizmet Güncelleme</value>
+  </data>
+  <data name="Hizmet Oluşturma" xml:space="preserve">
+    <value>Hizmet Oluşturma</value>
+  </data>
+  <data name="Blog Kategori Listesi" xml:space="preserve">
+    <value>Blog Kategori Listesi</value>
+  </data>
+  <data name="Blog Kategorisi Güncelleme" xml:space="preserve">
+    <value>Blog Kategorisi Güncelleme</value>
+  </data>
+  <data name="Blog Kategorisi Oluşturma" xml:space="preserve">
+    <value>Blog Kategorisi Oluşturma</value>
+  </data>
+  <data name="İletişim Bilgisi Oluşturma" xml:space="preserve">
+    <value>İletişim Bilgisi Oluşturma</value>
+  </data>
+  <data name="İletişim Bilgisi Güncelleme" xml:space="preserve">
+    <value>İletişim Bilgisi Güncelleme</value>
+  </data>
+  <data name="İletişim Bilgisi Listesi" xml:space="preserve">
+    <value>İletişim Bilgisi Listesi</value>
+  </data>
+  <data name="Hakkımızda Bilgisi Oluşturma" xml:space="preserve">
+    <value>Hakkımızda Bilgisi Oluşturma</value>
+  </data>
+  <data name="Hakkımızda Bilgisi Güncelleme" xml:space="preserve">
+    <value>Hakkımızda Bilgisi Güncelleme</value>
+  </data>
+  <data name="Hakkımızda Bilgisi" xml:space="preserve">
+    <value>Hakkımızda Bilgisi</value>
+  </data>
+  <data name="Admin Listesi" xml:space="preserve">
+    <value>Admin Listesi</value>
+  </data>
+  <data name="Slider Oluşturma" xml:space="preserve">
+    <value>Slider Oluşturma</value>
+  </data>
+  <data name="Slider Güncelleme" xml:space="preserve">
+    <value>Slider Güncelleme</value>
+  </data>
+  <data name="Slider Listesi" xml:space="preserve">
+    <value>Slider Listesi</value>
+  </data>
+  <data name="Hakkımızda Kart Oluşturma" xml:space="preserve">
+    <value>Hakkımızda Kart Oluşturma</value>
+  </data>
+  <data name="Hakkımızda Kart Güncelleme" xml:space="preserve">
+    <value>Hakkımızda Kart Güncelleme</value>
+  </data>
+  <data name="Hakkımızda Kart Listesi" xml:space="preserve">
+    <value>Hakkımızda Kart Listesi</value>
+  </data>
+  <data name="Hakkımızda" xml:space="preserve">
+    <value>Hakkımızda</value>
+  </data>
+  <data name="Ana Sayfa" xml:space="preserve">
+    <value>Ana Sayfa</value>
+  </data>
+  <data name="Galeri" xml:space="preserve">
+    <value>Galeri</value>
+  </data>
+  <data name="Rezervasyon Detayı" xml:space="preserve">
+    <value>Rezervasyon Detayı</value>
+  </data>
+  <data name="Kaydet" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Güncelle" xml:space="preserve">
+    <value>Güncelle</value>
+  </data>
+  <data name="Geri Dön" xml:space="preserve">
+    <value>Geri Dön</value>
+  </data>
+  <data name="Yeni Bilgi Ekle" xml:space="preserve">
+    <value>Yeni Bilgi Ekle</value>
+  </data>
+  <data name="Eylemler" xml:space="preserve">
+    <value>Eylemler</value>
+  </data>
+  <data name="Düzenle" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="Sil" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="İptal" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Detay" xml:space="preserve">
+    <value>Detay</value>
+  </data>
+  <data name="Yükle" xml:space="preserve">
+    <value>Yükle</value>
+  </data>
+  <data name="Yeni Resim Yükle" xml:space="preserve">
+    <value>Yeni Resim Yükle</value>
+  </data>
+  <data name="Rol Yönetimi" xml:space="preserve">
+    <value>Rol Yönetimi</value>
+  </data>
+  <data name="Kullanıcı" xml:space="preserve">
+    <value>Kullanıcı</value>
+  </data>
+  <data name="Kullanıcılar" xml:space="preserve">
+    <value>Kullanıcılar</value>
+  </data>
+  <data name="Ad Soyad" xml:space="preserve">
+    <value>Ad Soyad</value>
+  </data>
+  <data name="Aktif" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
+  <data name="Pasif" xml:space="preserve">
+    <value>Pasif</value>
+  </data>
+  <data name="Aktiflik Durumu" xml:space="preserve">
+    <value>Aktiflik Durumu</value>
+  </data>
+  <data name="Profil Fotoğrafı" xml:space="preserve">
+    <value>Profil Fotoğrafı</value>
+  </data>
+  <data name="Açıklama" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="Fotoğraf" xml:space="preserve">
+    <value>Fotoğraf</value>
+  </data>
+  <data name="Kategori" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Yazar" xml:space="preserve">
+    <value>Yazar</value>
+  </data>
+  <data name="Kart Başlık 1" xml:space="preserve">
+    <value>Kart Başlık 1</value>
+  </data>
+  <data name="Kart Başlık 2" xml:space="preserve">
+    <value>Kart Başlık 2</value>
+  </data>
+  <data name="Kart İçeriği 1" xml:space="preserve">
+    <value>Kart İçeriği 1</value>
+  </data>
+  <data name="Kart İçeriği 2" xml:space="preserve">
+    <value>Kart İçeriği 2</value>
+  </data>
+  <data name="Hakkımızda Fotoğrafı" xml:space="preserve">
+    <value>Hakkımızda Fotoğrafı</value>
+  </data>
+  <data name="Oluşturulma Tarihi" xml:space="preserve">
+    <value>Oluşturulma Tarihi</value>
+  </data>
+  <data name="Eklenme Tarihi" xml:space="preserve">
+    <value>Eklenme Tarihi</value>
+  </data>
+  <data name="Oluşturan Kullanıcı" xml:space="preserve">
+    <value>Oluşturan Kullanıcı</value>
+  </data>
+  <data name="Düzenleme Tarihi" xml:space="preserve">
+    <value>Düzenleme Tarihi</value>
+  </data>
+  <data name="Güncelleyen Kullanıcı" xml:space="preserve">
+    <value>Güncelleyen Kullanıcı</value>
+  </data>
+  <data name="Yayın Durumu" xml:space="preserve">
+    <value>Yayın Durumu</value>
+  </data>
+  <data name="Silindi Mi (Soft Delete)" xml:space="preserve">
+    <value>Silindi Mi (Soft Delete)</value>
+  </data>
+  <data name="Silinme Tarihi" xml:space="preserve">
+    <value>Silinme Tarihi</value>
+  </data>
+  <data name="Silen Kullanıcı" xml:space="preserve">
+    <value>Silen Kullanıcı</value>
+  </data>
+  <data name="Kullanıcı ID" xml:space="preserve">
+    <value>Kullanıcı ID</value>
+  </data>
+  <data name="Kategori ID" xml:space="preserve">
+    <value>Kategori ID</value>
+  </data>
+  <data name="Blog Kategori Adı" xml:space="preserve">
+    <value>Blog Kategori Adı</value>
+  </data>
+  <data name="Adres" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Telefon" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="Site Başlığı" xml:space="preserve">
+    <value>Site Başlığı</value>
+  </data>
+  <data name="Site Açıklaması" xml:space="preserve">
+    <value>Site Açıklaması</value>
+  </data>
+  <data name="Site Logo" xml:space="preserve">
+    <value>Site Logo</value>
+  </data>
+  <data name="Site Logosu" xml:space="preserve">
+    <value>Site Logosu</value>
+  </data>
+  <data name="Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Doğum Tarihi" xml:space="preserve">
+    <value>Doğum Tarihi</value>
+  </data>
+  <data name="Hizmetlerimiz" xml:space="preserve">
+    <value>Hizmetlerimiz</value>
+  </data>
+  <data name="Size özel tasarlanmış spa ve wellness hizmetleri" xml:space="preserve">
+    <value>Size özel tasarlanmış spa ve wellness hizmetleri</value>
+  </data>
+  <data name="Spa merkezimizden görüntüler ve atmosfer" xml:space="preserve">
+    <value>Spa merkezimizden görüntüler ve atmosfer</value>
+  </data>
+  <data name="Tüm hakları saklıdır." xml:space="preserve">
+    <value>Tüm hakları saklıdır.</value>
+  </data>
 </root>

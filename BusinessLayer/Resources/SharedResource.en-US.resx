@@ -657,4 +657,247 @@
   <data name="Identity.UserAlreadyHasPassword" xml:space="preserve">
     <value>The account already has a password.</value>
   </data>
+  <data name="Kullanıcı &amp; Rol Yönetimi" xml:space="preserve">
+    <value>Users and Roles</value>
+  </data>
+  <data name="Rol Atama" xml:space="preserve">
+    <value>Assign Roles</value>
+  </data>
+  <data name="Rolleri Kaydet" xml:space="preserve">
+    <value>Save Roles</value>
+  </data>
+  <data name="Galeriye Resim Yükle" xml:space="preserve">
+    <value>Upload Gallery Image</value>
+  </data>
+  <data name="Galeriye Yüklenen Resimler" xml:space="preserve">
+    <value>Gallery Images</value>
+  </data>
+  <data name="Hizmet Listesi" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Hizmet Güncelleme" xml:space="preserve">
+    <value>Edit Service</value>
+  </data>
+  <data name="Hizmet Oluşturma" xml:space="preserve">
+    <value>Create Service</value>
+  </data>
+  <data name="Blog Kategori Listesi" xml:space="preserve">
+    <value>Blog Categories</value>
+  </data>
+  <data name="Blog Kategorisi Güncelleme" xml:space="preserve">
+    <value>Edit Blog Category</value>
+  </data>
+  <data name="Blog Kategorisi Oluşturma" xml:space="preserve">
+    <value>Create Blog Category</value>
+  </data>
+  <data name="İletişim Bilgisi Oluşturma" xml:space="preserve">
+    <value>Create Contact Details</value>
+  </data>
+  <data name="İletişim Bilgisi Güncelleme" xml:space="preserve">
+    <value>Edit Contact Details</value>
+  </data>
+  <data name="İletişim Bilgisi Listesi" xml:space="preserve">
+    <value>Contact Details</value>
+  </data>
+  <data name="Hakkımızda Bilgisi Oluşturma" xml:space="preserve">
+    <value>Create About Information</value>
+  </data>
+  <data name="Hakkımızda Bilgisi Güncelleme" xml:space="preserve">
+    <value>Edit About Information</value>
+  </data>
+  <data name="Hakkımızda Bilgisi" xml:space="preserve">
+    <value>About Information</value>
+  </data>
+  <data name="Admin Listesi" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="Slider Oluşturma" xml:space="preserve">
+    <value>Create Slider</value>
+  </data>
+  <data name="Slider Güncelleme" xml:space="preserve">
+    <value>Edit Slider</value>
+  </data>
+  <data name="Slider Listesi" xml:space="preserve">
+    <value>Sliders</value>
+  </data>
+  <data name="Hakkımızda Kart Oluşturma" xml:space="preserve">
+    <value>Create About Card</value>
+  </data>
+  <data name="Hakkımızda Kart Güncelleme" xml:space="preserve">
+    <value>Edit About Card</value>
+  </data>
+  <data name="Hakkımızda Kart Listesi" xml:space="preserve">
+    <value>About Cards</value>
+  </data>
+  <data name="Hakkımızda" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Ana Sayfa" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Galeri" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="Rezervasyon Detayı" xml:space="preserve">
+    <value>Message Details</value>
+  </data>
+  <data name="Kaydet" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Güncelle" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Geri Dön" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Yeni Bilgi Ekle" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Eylemler" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Düzenle" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Sil" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="İptal" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Detay" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Yükle" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="Yeni Resim Yükle" xml:space="preserve">
+    <value>Upload Image</value>
+  </data>
+  <data name="Rol Yönetimi" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Kullanıcı" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Kullanıcılar" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="Ad Soyad" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="Aktif" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Pasif" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="Aktiflik Durumu" xml:space="preserve">
+    <value>Account Status</value>
+  </data>
+  <data name="Profil Fotoğrafı" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="Açıklama" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Fotoğraf" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Kategori" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Yazar" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="Kart Başlık 1" xml:space="preserve">
+    <value>First Card Title</value>
+  </data>
+  <data name="Kart Başlık 2" xml:space="preserve">
+    <value>Second Card Title</value>
+  </data>
+  <data name="Kart İçeriği 1" xml:space="preserve">
+    <value>First Card Content</value>
+  </data>
+  <data name="Kart İçeriği 2" xml:space="preserve">
+    <value>Second Card Content</value>
+  </data>
+  <data name="Hakkımızda Fotoğrafı" xml:space="preserve">
+    <value>About Image</value>
+  </data>
+  <data name="Oluşturulma Tarihi" xml:space="preserve">
+    <value>Created Date</value>
+  </data>
+  <data name="Eklenme Tarihi" xml:space="preserve">
+    <value>Created Date</value>
+  </data>
+  <data name="Oluşturan Kullanıcı" xml:space="preserve">
+    <value>Created By</value>
+  </data>
+  <data name="Düzenleme Tarihi" xml:space="preserve">
+    <value>Updated Date</value>
+  </data>
+  <data name="Güncelleyen Kullanıcı" xml:space="preserve">
+    <value>Updated By</value>
+  </data>
+  <data name="Yayın Durumu" xml:space="preserve">
+    <value>Publication Status</value>
+  </data>
+  <data name="Silindi Mi (Soft Delete)" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="Silinme Tarihi" xml:space="preserve">
+    <value>Deleted Date</value>
+  </data>
+  <data name="Silen Kullanıcı" xml:space="preserve">
+    <value>Deleted By</value>
+  </data>
+  <data name="Kullanıcı ID" xml:space="preserve">
+    <value>User ID</value>
+  </data>
+  <data name="Kategori ID" xml:space="preserve">
+    <value>Category ID</value>
+  </data>
+  <data name="Blog Kategori Adı" xml:space="preserve">
+    <value>Blog Category</value>
+  </data>
+  <data name="Adres" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Telefon" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Site Başlığı" xml:space="preserve">
+    <value>Site Title</value>
+  </data>
+  <data name="Site Açıklaması" xml:space="preserve">
+    <value>Site Description</value>
+  </data>
+  <data name="Site Logo" xml:space="preserve">
+    <value>Site Logo</value>
+  </data>
+  <data name="Site Logosu" xml:space="preserve">
+    <value>Site Logo</value>
+  </data>
+  <data name="Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Doğum Tarihi" xml:space="preserve">
+    <value>Date of Birth</value>
+  </data>
+  <data name="Hizmetlerimiz" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Size özel tasarlanmış spa ve wellness hizmetleri" xml:space="preserve">
+    <value>Spa and wellness services designed for you</value>
+  </data>
+  <data name="Spa merkezimizden görüntüler ve atmosfer" xml:space="preserve">
+    <value>Images and atmosphere from our spa</value>
+  </data>
+  <data name="Tüm hakları saklıdır." xml:space="preserve">
+    <value>All rights reserved.</value>
+  </data>
 </root>

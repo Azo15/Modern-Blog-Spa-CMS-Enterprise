@@ -1,7 +1,7 @@
 @model IEnumerable<Slider>
 
 @{
-    ViewData["Title"] = "Slider Listesi";
+    ViewData["Title"] = L["Slider Listesi"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -29,7 +29,7 @@
                     <th>
                         @Html.DisplayNameFor(model => model.UpdatedDate)
                     </th>
-                    <th>Eylemler</th>
+                    <th>@L["Eylemler"]</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -64,10 +64,10 @@
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item text-warning" asp-action="Edit" asp-route-id="@item.Id">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Düzenle
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> @L["Düzenle"]
                                     </a>
                                     <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
-                                        <i class="fa-solid fa-trash me-1"></i> Sil
+                                        <i class="fa-solid fa-trash me-1"></i> @L["Sil"]
                                     </a>
                                 </div>
                             </div>

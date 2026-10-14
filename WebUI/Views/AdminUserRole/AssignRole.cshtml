@@ -1,7 +1,7 @@
 @model List<WebUI.Models.UserRoleAssignViewModel>
 
 @{
-    ViewData["Title"] = "Rol Atama";
+    ViewData["Title"] = L["Rol Atama"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -50,9 +50,9 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                        <a asp-action="Index" class="btn btn-secondary">@L["İptal"]</a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-floppy-disk me-1"></i>Rolleri Kaydet
+                            <i class="fa-solid fa-floppy-disk me-1"></i>@L["Rolleri Kaydet"]
                         </button>
                     </div>
                 </form>

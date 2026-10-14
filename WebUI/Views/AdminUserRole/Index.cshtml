@@ -1,7 +1,7 @@
 @model List<WebUI.Models.UserWithRolesViewModel>
 
 @{
-    ViewData["Title"] = "Kullanıcı & Rol Yönetimi";
+    ViewData["Title"] = L["Kullanıcı & Rol Yönetimi"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -19,7 +19,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Kullanıcı</th>
+                    <th>@L["Kullanıcı"]</th>
                     <th>E-Posta</th>
                     <th>Tanımlı Roller</th>
                     <th>Hesap Durumu</th>
@@ -80,7 +80,7 @@
                             }
                             else
                             {
-                                <span class="badge bg-label-success"><i class="fa-solid fa-check me-1"></i>Aktif</span>
+                                <span class="badge bg-label-success"><i class="fa-solid fa-check me-1"></i>@L["Aktif"]</span>
                             }
                         </td>
                         <td class="text-center">

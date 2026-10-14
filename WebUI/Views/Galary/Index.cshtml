@@ -1,6 +1,6 @@
-﻿@model List<Galary>
+@model List<Galary>
 @{
-    ViewData["Title"] = "Galeri";
+    ViewData["Title"] = L["Galeri"];
     Layout = "~/Views/Shared/_UILayout.cshtml";
 }
 
@@ -9,9 +9,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="section-title font-playfair" data-aos="fade-up">Galeri</h1>
+                    <h1 class="section-title font-playfair" data-aos="fade-up">@L["Galeri"]</h1>
                     <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
-                        Spa merkezimizden görüntüler ve atmosfer
+                        @L["Spa merkezimizden görüntüler ve atmosfer"]
                     </p>
                 </div>
             </div>
