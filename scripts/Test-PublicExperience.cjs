@@ -7,7 +7,7 @@ const base = process.env.BASE_URL || 'http://localhost:5157';
 const output = path.resolve('.artifacts/public-experience');
 fs.mkdirSync(output, { recursive: true });
 const checks = [], errors = [];
-const check = (name, ok) => { assert.ok(ok, name); checks.push(name); };
+const check = (name, ok) => { assert.ok(ok, name); checks.push(name); console.log('PASS: ' + name); };
 const pause = page => page.waitForTimeout(450);
 (async () => {
     const browser = await chromium.launch({ headless: true, channel: process.env.BROWSER_CHANNEL || 'msedge' });
@@ -18,6 +18,8 @@ const pause = page => page.waitForTimeout(450);
     });
     await context.addInitScript(() => { window.__drafts = []; window.open = url => { window.__drafts.push(url); return null; }; });
     const page = await context.newPage();
+    page.setDefaultTimeout(12000);
+    page.setDefaultNavigationTimeout(15000);
     page.on('pageerror', error => errors.push(error.message));
     const go = async route => {
         const response = await page.goto(base + route, { waitUntil: 'domcontentloaded' });
