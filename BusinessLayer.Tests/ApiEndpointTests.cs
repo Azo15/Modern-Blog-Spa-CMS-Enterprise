@@ -211,7 +211,7 @@ public sealed class ApiEndpointTests
     }
 
     [Fact]
-    public async Task NewsletterInterestRequiresCsrfAndPrefillsConfirmationWithoutSendingMail()
+    public async Task NewsletterInterestRequiresCsrfAndPersistsWithoutJavaScript()
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync();
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
@@ -223,12 +223,12 @@ public sealed class ApiEndpointTests
         Assert.NotEmpty(token);
         var response = await client.PostAsync("/iletisim/bulten", new FormUrlEncodedContent(new Dictionary<string,string>
             { ["email"]="reader@example.test", ["__RequestVerificationToken"]=token }));
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var html = await response.Content.ReadAsStringAsync();
-        Assert.Contains("reader@example.test", html);
-        Assert.Contains("ContactForm.Subject", html);
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/iletisim", response.Headers.Location?.OriginalString);
         using var scope = factory.Services.CreateScope();
-        Assert.Empty(await scope.ServiceProvider.GetRequiredService<AppDbContext>().ContactForms.ToListAsync());
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Equal("reader@example.test", Assert.Single(await db.ContactForms.ToListAsync()).Email);
+        Assert.Single(await db.Set<EntityLayer.Concrete.ContactEmailDelivery>().ToListAsync());
     }
 
     [Fact]

@@ -1,55 +1,113 @@
 @model WebUI.Models.BlogPostViewModel
 @using BusinessLayer.Security
 @inject Microsoft.AspNetCore.Authorization.IAuthorizationService CommentAuthorization
-@{var canComment=(await CommentAuthorization.AuthorizeAsync(User,null,AccessPolicies.ActiveMember)).Succeeded;}
+@{
+    var canComment = (await CommentAuthorization.AuthorizeAsync(User, null, AccessPolicies.ActiveMember)).Succeeded;
+    var en = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
+}
 <section id="comments" class="luxe-comments">
-<h2>@L["Comments"] (@Model.Comments.TotalCount @L["RootComments"])</h2>
-@if(TempData["CommentError"] is string error){<p class="text-danger">@error</p>}
-@if(TempData["CommentSuccess"] is string success){<p class="text-success">@success</p>}
-@foreach(var thread in Model.Comments.Items)
-{
-<article class="luxe-comment-thread">
-<div class="luxe-comment-head"><strong>@thread.Comment.AuthorName</strong> <time>@thread.Comment.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time></div>
-<p style="white-space:pre-wrap">@thread.Comment.Content</p>
-@foreach(var reply in thread.Children)
-{
-<div class="luxe-comment-reply"><strong>@reply.AuthorName</strong><time> @reply.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time><p style="white-space:pre-wrap">@reply.Content</p></div>
-}
-@if(canComment)
-{
-<details><summary>@L["Reply"]</summary>
-<form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
-<input type="hidden" name="blogId" value="@Model.Blog.Id"/><input type="hidden" name="parentCommentId" value="@thread.Comment.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
-<label for="reply-@thread.Comment.Id">@L["YourReply"]</label><textarea id="reply-@thread.Comment.Id" name="content" required maxlength="1000" class="form-control"></textarea>
-<button class="luxe-button luxe-button-dark">@L["SendReply"]</button></form></details>
-}
-</article>
-}
-<nav class="my-3">
-@if(Model.Comments.HasPreviousPage){<a asp-action="Post" asp-route-slug="@Model.Blog.Slug" asp-route-commentPage="@(Model.Comments.PageIndex-1)" asp-fragment="comments">@L["Previous"]</a>}
-@if(Model.Comments.HasNextPage){<a asp-action="Post" asp-route-slug="@Model.Blog.Slug" asp-route-commentPage="@(Model.Comments.PageIndex+1)" asp-fragment="comments">@L["Next"]</a>}
-</nav>
-@if(canComment)
-{
-<h3>@L["AddComment"]</h3><p>@L["CommentGuidance"]</p>
-<form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
-<input type="hidden" name="blogId" value="@Model.Blog.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
-<label for="new-comment">@L["YourComment"]</label><textarea id="new-comment" name="content" required maxlength="1000" class="form-control"></textarea>
-<button class="luxe-button luxe-button-dark">@L["SendApproval"]</button></form>
-@if(Model.OwnComments.Any())
-{
-<h3 class="mt-4">@L["MyRecentComments"]</h3>
-@foreach(var own in Model.OwnComments)
-{
-<details class="my-2"><summary>Yorum #@own.Id — @L[own.IsApproved ? "Approved" : "PendingApproval"]</summary>
-<form class="luxe-comment-form" asp-controller="Comment" asp-action="Update" method="post">
-<input type="hidden" name="id" value="@own.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/>
-<label for="edit-comment-@own.Id">@L["Content"]</label><textarea id="edit-comment-@own.Id" name="content" required maxlength="1000" class="form-control">@own.Content</textarea>
-<button class="luxe-button luxe-button-dark">@L["UpdateApproval"]</button></form>
-<form class="luxe-comment-form" asp-controller="Comment" asp-action="Delete" method="post"><input type="hidden" name="id" value="@own.Id"/><input type="hidden" name="slug" value="@Model.Blog.Slug"/><button class="btn btn-outline-danger mt-2">@L["Delete"]</button></form>
-</details>
-}
-}
-}
-else{<a asp-controller="Dashboard" asp-action="SignIn">@L["LoginComment"]</a>}
+    <h2>@L["Comments"] (@Model.Comments.TotalCount @L["RootComments"])</h2>
+    @if (TempData["CommentError"] is string error)
+    {
+        <p class="luxe-interaction-notice is-error" role="alert">@error</p>
+    }
+    @if (TempData["CommentSuccess"] is string success)
+    {
+        <p class="luxe-interaction-notice" role="status">@success</p>
+    }
+    @foreach (var thread in Model.Comments.Items)
+    {
+        <article class="luxe-comment-thread">
+            <div class="luxe-comment-head">
+                <strong>@thread.Comment.AuthorName</strong>
+                <time datetime="@thread.Comment.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ssZ")">@thread.Comment.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time>
+            </div>
+            <p>@thread.Comment.Content</p>
+            @foreach (var reply in thread.Children)
+            {
+                <div class="luxe-comment-reply">
+                    <div class="luxe-comment-head"><strong>@reply.AuthorName</strong><time datetime="@reply.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ssZ")">@reply.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC</time></div>
+                    <p>@reply.Content</p>
+                </div>
+            }
+            @if (canComment)
+            {
+                <button type="button" class="luxe-reply-toggle" data-reply-toggle aria-expanded="false" aria-controls="reply-panel-@thread.Comment.Id">
+                    <i class="fa-solid fa-reply" aria-hidden="true"></i><span>@(en ? "Write a reply" : "Cevap Yaz")</span><i class="fa-solid fa-chevron-down luxe-reply-chevron" aria-hidden="true"></i>
+                </button>
+                <div id="reply-panel-@thread.Comment.Id" class="luxe-reply-panel" hidden>
+                    <div class="luxe-reply-panel-inner">
+                        <form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
+                            <input type="hidden" name="blogId" value="@Model.Blog.Id" />
+                            <input type="hidden" name="parentCommentId" value="@thread.Comment.Id" />
+                            <input type="hidden" name="slug" value="@Model.Blog.Slug" />
+                            <label for="reply-@thread.Comment.Id">@L["YourReply"]</label>
+                            <textarea id="reply-@thread.Comment.Id" name="content" required maxlength="1000" class="form-control" rows="4"></textarea>
+                            <button type="submit" class="luxe-button luxe-button-dark">@L["SendReply"] <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </article>
+    }
+    @if (Model.Comments.HasPreviousPage || Model.Comments.HasNextPage)
+    {
+        <nav class="luxe-pagination" aria-label="@(en ? "Comment pages" : "Yorum sayfaları")">
+            @if (Model.Comments.HasPreviousPage)
+            {
+                <a asp-action="Post" asp-route-slug="@Model.Blog.Slug" asp-route-commentPage="@(Model.Comments.PageIndex - 1)" asp-fragment="comments">@L["Previous"]</a>
+            }
+            @if (Model.Comments.HasNextPage)
+            {
+                <a asp-action="Post" asp-route-slug="@Model.Blog.Slug" asp-route-commentPage="@(Model.Comments.PageIndex + 1)" asp-fragment="comments">@L["Next"]</a>
+            }
+        </nav>
+    }
+    @if (canComment)
+    {
+        <h3>@L["AddComment"]</h3><p>@L["CommentGuidance"]</p>
+        <form class="luxe-comment-form" asp-controller="Comment" asp-action="Create" method="post">
+            <input type="hidden" name="blogId" value="@Model.Blog.Id" />
+            <input type="hidden" name="slug" value="@Model.Blog.Slug" />
+            <label for="new-comment">@L["YourComment"]</label>
+            <textarea id="new-comment" name="content" required maxlength="1000" class="form-control" rows="5"></textarea>
+            <button type="submit" class="luxe-button luxe-button-dark">@L["SendApproval"] <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        </form>
+        @if (Model.OwnComments.Any())
+        {
+            <h3 class="mt-4">@L["MyRecentComments"]</h3>
+            @foreach (var own in Model.OwnComments)
+            {
+                <div class="luxe-own-comment">
+                    <button type="button" class="luxe-reply-toggle" data-reply-toggle aria-expanded="false" aria-controls="edit-panel-@own.Id">
+                        <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i><span>@(en ? "Comment" : "Yorum") #@own.Id · @L[own.IsApproved ? "Approved" : "PendingApproval"]</span><i class="fa-solid fa-chevron-down luxe-reply-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div id="edit-panel-@own.Id" class="luxe-reply-panel" hidden>
+                        <div class="luxe-reply-panel-inner">
+                            <form class="luxe-comment-form" asp-controller="Comment" asp-action="Update" method="post">
+                                <input type="hidden" name="id" value="@own.Id" />
+                                <input type="hidden" name="slug" value="@Model.Blog.Slug" />
+                                <label for="edit-comment-@own.Id">@L["Content"]</label>
+                                <textarea id="edit-comment-@own.Id" name="content" required maxlength="1000" class="form-control" rows="4">@own.Content</textarea>
+                                <button type="submit" class="luxe-button luxe-button-dark">@L["UpdateApproval"]</button>
+                            </form>
+                            <form class="luxe-comment-delete" asp-controller="Comment" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@own.Id" />
+                                <input type="hidden" name="slug" value="@Model.Blog.Slug" />
+                                <button type="submit" class="luxe-reply-toggle luxe-comment-delete-button"><i class="fa-regular fa-trash-can" aria-hidden="true"></i> @L["Delete"]</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else if (User.Identity?.IsAuthenticated == true)
+    {
+        <p class="luxe-interaction-notice is-error" role="status">@L["AccountDisabled"]</p>
+    }
+    else
+    {
+        <a class="luxe-text-link" asp-controller="Dashboard" asp-action="SignIn">@L["LoginComment"] <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+    }
 </section>
