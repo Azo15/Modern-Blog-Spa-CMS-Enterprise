@@ -10,6 +10,16 @@ namespace BusinessLayer.Tests;
 
 public sealed class PublicMediaTests : IDisposable
 {
+    public static TheoryData<string, string> RitualServices => new()
+    {
+        { "Klasik İsveç Masajı", "isvec" }, { "Türk Hamamı Ritüeli", "hamam" },
+        { "Altın Yüz Maskesi", "altinmaske" }, { "Derin Doku Masajı", "derindoku" },
+        { "Aromaterapi Masajı", "aromaterapi" }, { "Çiftler Masajı", "ciftler" },
+        { "Refleksoloji", "refleksoloji" }, { "Sauna & Buhar Odası", "sauna" },
+        { "Keratin Saç Bakımı", "keratin" }, { "Cilt Peeling Seansı", "peeling" },
+        { "Bebek Masajı Kursu", "bebek" }, { "Hamilelik Masajı", "hamilelik" }
+    };
+
     private readonly string root = Path.Combine(Path.GetTempPath(), "xspa-media-" + Guid.NewGuid().ToString("N"));
     private readonly PublicMediaService media;
 
@@ -19,6 +29,10 @@ public sealed class PublicMediaTests : IDisposable
         Directory.CreateDirectory(Path.Combine(root, "uploads", "blogs"));
         File.WriteAllText(Path.Combine(root, "img", "blog-derindoku.webp"), "existing legacy shared file");
         File.WriteAllText(Path.Combine(root, "uploads", "blogs", "mine.webp"), "existing custom upload");
+        Directory.CreateDirectory(Path.Combine(root, "img", "ritual"));
+        foreach (var data in RitualServices)
+            foreach (var phase in new[] { "preparation", "experience" })
+                File.WriteAllText(Path.Combine(root, "img", "ritual", $"service-{data[1]}-{phase}.webp"), "ritual fixture");
         var environment = new Mock<IWebHostEnvironment>();
         environment.SetupGet(e => e.WebRootPath).Returns(root);
         media = new PublicMediaService(environment.Object);
@@ -42,6 +56,45 @@ public sealed class PublicMediaTests : IDisposable
         const string uploaded = "~/uploads/blogs/mine.webp";
         Assert.Equal("/uploads/blogs/mine.webp", media.BlogImage("İsveç Masajı ve Faydaları", uploaded, 1));
         Assert.Equal("existing custom upload", File.ReadAllText(Path.Combine(root, "uploads", "blogs", "mine.webp")));
+    }
+
+    [Theory]
+    [MemberData(nameof(RitualServices))]
+    public void KnownServiceHasThreeStableIndependentRitualImages(string title, string asset)
+    {
+        var images = media.ServiceGallery(title, "/img/blog-derindoku.webp", 1);
+        Assert.Equal(3, images.Count);
+        Assert.Equal($"/img/service-{asset}.webp", images[0].Url);
+        Assert.Equal($"/img/ritual/service-{asset}-preparation.webp", images[1].Url);
+        Assert.Equal($"/img/ritual/service-{asset}-experience.webp", images[2].Url);
+        Assert.Equal(3, images.Select(image => image.Url).Distinct().Count());
+        Assert.Equal(images, media.ServiceGallery(title, "/img/blog-derindoku.webp", 1));
+        Assert.Equal(new[] { "RitualOverview", "RitualPreparation", "RitualExperience" }, images.Select(image => image.CaptionKey));
+    }
+
+    [Fact]
+    public void CustomServiceUploadRemainsTheFirstGalleryImage()
+    {
+        var images = media.ServiceGallery("Klasik İsveç Masajı", "~/uploads/blogs/mine.webp", 1);
+        Assert.Equal("/uploads/blogs/mine.webp", images[0].Url);
+        Assert.Equal(3, images.Count);
+        Assert.Equal("existing custom upload", File.ReadAllText(Path.Combine(root, "uploads", "blogs", "mine.webp")));
+    }
+
+    [Fact]
+    public void UnknownServiceDoesNotInheritAnUnrelatedRitualGallery()
+    {
+        var images = media.ServiceGallery("A custom new service", "~/uploads/blogs/mine.webp", 101);
+        Assert.Single(images);
+        Assert.Equal("/uploads/blogs/mine.webp", images[0].Url);
+    }
+
+    [Fact]
+    public void AllServiceGalleriesUseDifferentAssetUrls()
+    {
+        var urls = RitualServices.SelectMany(data => media.ServiceGallery((string)data[0], null)).Select(image => image.Url).ToArray();
+        Assert.Equal(36, urls.Length);
+        Assert.Equal(urls.Length, urls.Distinct().Count());
     }
 
     [Fact]
@@ -85,7 +138,8 @@ public sealed class PublicMediaTests : IDisposable
         var wwwroot = Path.Combine(repository, "WebUI", "wwwroot");
         using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(wwwroot, "img", "media-sources.json")));
         var assets = document.RootElement.GetProperty("assets").EnumerateArray().ToArray();
-        Assert.Equal(65, assets.Length);
+        Assert.True(assets.Length >= 89, "The original 65 photos and 24 independent ritual photos must be present.");
+        Assert.Equal(24, assets.Count(asset => asset.GetProperty("file").GetString()!.StartsWith("img/ritual/", StringComparison.Ordinal)));
         Assert.Equal(assets.Length, assets.Select(a => a.GetProperty("photoId").GetInt32()).Distinct().Count());
         var hashes = assets.Select(asset => {
             var file = Path.Combine(wwwroot, asset.GetProperty("file").GetString()!.Replace('/', Path.DirectorySeparatorChar));
