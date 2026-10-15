@@ -9,6 +9,10 @@ using WebUI.Models;
 using WebUI.Services;
 using BusinessLayer;
 using Microsoft.Extensions.Localization;
+using FluentValidation;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace WebUI.Controllers
 {
@@ -24,8 +28,9 @@ namespace WebUI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _cache;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IWebHostEnvironment _environment;
 
-        public ContactController(IContactSubmissionService submissionService, IContactService contactService, IReCaptchaVerifier captcha, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache, IHubContext<NotificationHub> hubContext, IStringLocalizer<SharedResource> localizer)
+        public ContactController(IContactSubmissionService submissionService, IContactService contactService, IReCaptchaVerifier captcha, ILogger<ContactController> logger, IConfiguration configuration, IMemoryCache cache, IHubContext<NotificationHub> hubContext, IStringLocalizer<SharedResource> localizer, IWebHostEnvironment environment)
         {
             _submissionService = submissionService;
             _contactService = contactService;
@@ -35,6 +40,7 @@ namespace WebUI.Controllers
             _configuration = configuration;
             _cache = cache;
             _hubContext = hubContext;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -67,7 +73,7 @@ namespace WebUI.Controllers
             }
 
             var recaptchaToken = Request.Form["g-recaptcha-response"];
-            if (!await _captcha.VerifyAsync(recaptchaToken, ip, HttpContext.RequestAborted))
+            if (RequiresCaptcha && !await _captcha.VerifyAsync(recaptchaToken, ip, HttpContext.RequestAborted))
             {
                 SetSweetAlertMessage(_localizer["Contact.CaptchaTitle"], _localizer["Contact.CaptchaRequired"], "info");
                 var vm = await BuildViewModel();
@@ -80,22 +86,19 @@ namespace WebUI.Controllers
                 await _submissionService.SubmitAsync(model.ContactForm, HttpContext.RequestAborted);
                 SetIpCooldown(ip, TimeSpan.FromSeconds(60));
 
-                // 📌 SignalR Canlı Bildirim (WebSocket)
-                try
-                {
-                    await _hubContext.Clients.Group(NotificationHub.ModerationGroup).SendAsync("ReceiveNotification",
-                        "Yeni İletişim Mesajı!",
-                        $"{model.ContactForm.FullName} isimli ziyaretçiden yeni mesaj geldi: \"{model.ContactForm.Subject}\"",
-                        "info", HttpContext.RequestAborted);
-                }
-                catch (Exception notificationError)
-                {
-                    _logger.LogWarning(notificationError, "Contact saved; live manager notification was unavailable.");
-                }
+                await NotifyManagersAsync(model.ContactForm);
                 _logger.LogInformation("Contact message persisted for background email delivery.");
                 SetSweetAlertMessage(_localizer["Contact.SuccessTitle"], _localizer["Contact.Success"], "success");
             }
-            catch (Exception ex)
+            catch (FluentValidation.ValidationException validation)
+            {
+                foreach (var error in validation.Errors)
+                    ModelState.AddModelError($"ContactForm.{error.PropertyName}", error.ErrorMessage);
+                var vm = await BuildViewModel();
+                vm.ContactForm = model.ContactForm;
+                return View("Index", vm);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "İletişim mesajı kaydedilirken hata oluştu.");
                 SetSweetAlertMessage(_localizer["Contact.ErrorTitle"], _localizer["Contact.SaveFailed"], "error");
@@ -107,24 +110,81 @@ namespace WebUI.Controllers
         [HttpPost("bulten"), ValidateAntiForgeryToken]
         public async Task<IActionResult> NewsletterInterest(string? email)
         {
-            var vm = await BuildViewModel();
-            if (string.IsNullOrWhiteSpace(email) || email.Length > 256 || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email))
-            {
-                ModelState.AddModelError("ContactForm.Email", _localizer["Contact.ValidationRequired"]);
-                return View("Index", vm);
-            }
             var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
-            vm.ContactForm!.Email = email.Trim();
-            vm.ContactForm.Subject = en ? "Wellbeing newsletter request" : "İyi yaşam bülteni talebi";
-            vm.ContactForm.Message = en ? "I would like information about your wellbeing newsletter. Please contact me about available updates." : "İyi yaşam bülteniniz hakkında bilgi almak istiyorum. Uygun güncellemeler için benimle iletişime geçebilirsiniz.";
-            ViewData["NewsletterNotice"] = en ? "Your email is ready. Complete the contact form to confirm your request." : "E-posta adresiniz hazır. Talebinizi onaylamak için iletişim formunu tamamlayın.";
-            return View("Index", vm);
+            var normalizedEmail = email?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedEmail) || normalizedEmail.Length > 254 || !new EmailAddressAttribute().IsValid(normalizedEmail))
+            {
+                if (IsAjaxRequest)
+                    return BadRequest(new { success = false, message = en ? "Please enter a valid email address." : "Lütfen geçerli bir e-posta adresi girin." });
+                ModelState.AddModelError("ContactForm.Email", _localizer["Contact.ValidationRequired"]);
+                return View("Index", await BuildViewModel());
+            }
+
+            var message = en ? "Thank you for your interest. Your request has been received." : "İlginiz için teşekkürler, kaydınız alındı.";
+            var emailKey = "newsletter-received:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalizedEmail.ToUpperInvariant())));
+            // A browser retry receives the same acknowledgement only after a successful durable write.
+            if (_cache.TryGetValue(emailKey, out _)) return NewsletterResponse(true, message);
+            var cooldownKey = $"newsletter-cooldown:{GetClientIp()}";
+            if (_cache.TryGetValue(cooldownKey, out _))
+            {
+                Response.Headers.RetryAfter = "60";
+                return NewsletterResponse(false, en ? "Please wait a minute before submitting another request." : "Yeni bir talep göndermeden önce bir dakika bekleyin.", StatusCodes.Status429TooManyRequests);
+            }
+
+            var form = new ContactForm
+            {
+                FullName = en ? "Newsletter visitor" : "Bülten ziyaretçisi", Email = normalizedEmail,
+                Subject = en ? "Wellbeing newsletter request" : "İyi yaşam bülteni talebi",
+                Message = en ? "I would like to receive information about your wellbeing newsletter and published articles." : "İyi yaşam bülteni ve yayımlanan yazılar hakkında bilgilendirme almak istiyorum."
+            };
+            try
+            {
+                // The existing submission service atomically stores both the request and its email delivery intent.
+                // A temporary mail/job outage cannot discard a visitor's registration.
+                await _submissionService.SubmitAsync(form, HttpContext.RequestAborted);
+                _cache.Set(emailKey, true, TimeSpan.FromMinutes(10));
+                _cache.Set(cooldownKey, true, TimeSpan.FromSeconds(60));
+                await NotifyManagersAsync(form);
+                return NewsletterResponse(true, message);
+            }
+            catch (Exception error) when (error is not OperationCanceledException)
+            {
+                _logger.LogError(error, "Newsletter request could not be persisted.");
+                return NewsletterResponse(false, en ? "We could not save your request. Please try again." : "Talebiniz kaydedilemedi. Lütfen tekrar deneyin.", StatusCodes.Status503ServiceUnavailable);
+            }
+        }
+
+        private bool RequiresCaptcha => !_environment.IsDevelopment() &&
+            !string.IsNullOrWhiteSpace(_configuration["GoogleReCaptcha:SiteKey"]) &&
+            !string.IsNullOrWhiteSpace(_configuration["GoogleReCaptcha:SecretKey"]);
+
+        private bool IsAjaxRequest => string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
+        private IActionResult NewsletterResponse(bool success, string message, int statusCode = StatusCodes.Status200OK)
+        {
+            if (IsAjaxRequest) return StatusCode(statusCode, new { success, message });
+            SetSweetAlertMessage(_localizer[success ? "Contact.SuccessTitle" : "Contact.ErrorTitle"], message, success ? "success" : "warning");
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task NotifyManagersAsync(ContactForm form)
+        {
+            try
+            {
+                await _hubContext.Clients.Group(NotificationHub.ModerationGroup).SendAsync("ReceiveNotification",
+                    "Yeni İletişim Mesajı!", $"{form.FullName} isimli ziyaretçiden yeni mesaj geldi: \"{form.Subject}\"",
+                    "info", HttpContext.RequestAborted);
+            }
+            catch (Exception notificationError) when (notificationError is not OperationCanceledException)
+            {
+                _logger.LogWarning(notificationError, "Contact saved; live manager notification was unavailable.");
+            }
         }
 
         // ViewModel'i her seferinde hazırla
         private async Task<ContactPageViewModel> BuildViewModel()
         {
-            ViewData["SiteKey"] = _configuration["GoogleReCaptcha:SiteKey"];
+            ViewData["SiteKey"] = RequiresCaptcha ? _configuration["GoogleReCaptcha:SiteKey"] : null;
 
             return new ContactPageViewModel
             {
