@@ -36,6 +36,8 @@ Font kaynakları/lisansları `wwwroot/fonts/SOURCES.md`, `outfit-OFL.txt` ve `pl
 - `BusinessLayer/Dtos/BlogReadDtos.cs`, `CQRS/Handlers/BlogHandlers.cs`: public DTO'da yaklaşık okuma süresi ve gerçek Like/Heart toplamları. Cache'de makale bilgisi bulunsa da toplamlar tek toplu sorguyla güncel okunur; kullanıcı/Identity entity'si dönmez. DTO cache anahtarı sürümlendirildi.
 - `BusinessLayer/Container/Additions.cs`, `Controllers/AdminAboutCardController.cs`, `Views/AdminAboutCard`: mevcut yönetim menüsündeki eksik servis/görünüm bağlantıları tamamlandı; altı profil için erişim sınırı doğrulandı.
 
+> Bu belge önceki arayüz tesliminin tarihsel kaydıdır. 15 Ekim 2026 tarihli medya, CAPTCHA, bülten ve VIP güncellemeleri için [güncel uygulama raporunu](ON_YUZ_ETKILESIM_UYGULAMA_RAPORU.md) okuyun.
+
 ## Güvenlik ve form davranışı
 
 Yorum/favori/reaksiyon ve dil değiştirme formlarının CSRF, rol, aktif hesap ve sahiplik denetimleri korunur. Blog/About rich text sunucu sanitizer'ından geçer. Galeri caption'ları, lightbox içinde HTML olarak yorumlanmaması için metin olarak kodlanır. Mesaj bildirimleri `text` üzerinden gösterilir.

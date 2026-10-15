@@ -192,29 +192,29 @@
             window.open(url, '_blank', 'noopener,noreferrer');
             completed = true;
             const acknowledge = () => {
-            if (!reduced.matches) {
-                const confetti = document.createElement('div');
-                confetti.className = 'luxe-confetti';
-                confetti.setAttribute('aria-hidden', 'true');
-                for (let index = 0; index < 34; index++) {
-                    const piece = document.createElement('span');
-                    piece.style.setProperty('--x', Math.random() * 100 + 'vw');
-                    piece.style.setProperty('--delay', Math.random() * .4 + 's');
-                    piece.style.setProperty('--drift', (Math.random() - .5) * 240 + 'px');
-                    confetti.append(piece);
+                if (!reduced.matches) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'luxe-confetti';
+                    confetti.setAttribute('aria-hidden', 'true');
+                    for (let index = 0; index < 34; index++) {
+                        const piece = document.createElement('span');
+                        piece.style.setProperty('--x', Math.random() * 100 + 'vw');
+                        piece.style.setProperty('--delay', Math.random() * .4 + 's');
+                        piece.style.setProperty('--drift', (Math.random() - .5) * 240 + 'px');
+                        confetti.append(piece);
+                    }
+                    document.body.append(confetti);
+                    setTimeout(() => confetti.remove(), 2300);
                 }
-                document.body.append(confetti);
-                setTimeout(() => confetti.remove(), 2300);
-            }
-            if (window.Swal) {
-                const link = document.createElement('a');
-                link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-                link.textContent = text('WhatsApp açılmadıysa buradan devam edin', 'If WhatsApp did not open, continue here');
-                Swal.fire({ icon: 'success', title: text('İlginiz için teşekkürler.', 'Thank you for choosing XSPA.'), text: text('Ön talebiniz hazır. WhatsApp’ta mesajı göndererek tamamlayın; ekibimiz randevu uygunluğunu sizinle teyit edecek.', 'Your request is ready. Send the message on WhatsApp; our team will confirm appointment availability.'), footer: link, confirmButtonText: text('Harika', 'Lovely'), customClass: { popup: 'luxe-alert' } });
-            } else {
-                error.hidden = false;
-                error.textContent = text('Ön talebiniz WhatsApp’ta hazır. Mesajı göndererek tamamlayın.', 'Your request is ready on WhatsApp. Send the message to continue.');
-            }
+                if (window.Swal) {
+                    const link = document.createElement('a');
+                    link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+                    link.textContent = text('WhatsApp açılmadıysa buradan devam edin', 'If WhatsApp did not open, continue here');
+                    Swal.fire({ icon: 'success', title: text('İlginiz için teşekkürler.', 'Thank you for choosing XSPA.'), text: text('Ön talebiniz hazır. WhatsApp’ta mesajı göndererek tamamlayın; ekibimiz randevu uygunluğunu sizinle teyit edecek.', 'Your request is ready. Send the message on WhatsApp; our team will confirm appointment availability.'), footer: link, confirmButtonText: text('Harika', 'Lovely'), customClass: { popup: 'luxe-alert' } });
+                } else {
+                    error.hidden = false;
+                    error.textContent = text('Ön talebiniz WhatsApp’ta hazır. Mesajı göndererek tamamlayın.', 'Your request is ready on WhatsApp. Send the message to continue.');
+                }
             };
             const instance = window.bootstrap ? bootstrap.Modal.getInstance(modal) : null;
             if (instance && window.Swal) {
