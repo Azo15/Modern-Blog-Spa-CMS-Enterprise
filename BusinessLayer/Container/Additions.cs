@@ -23,6 +23,10 @@ namespace BusinessLayer.Container
             services.AddScoped<IContactEmailQueue, HangfireContactEmailQueue>();
             services.AddScoped<ContactEmailJob>();
             services.AddScoped<ContactEmailRecoveryJob>();
+            services.AddScoped<IAppointmentEmailQueue, HangfireAppointmentEmailQueue>();
+            services.AddScoped<IAppointmentMailService, AppointmentMailService>();
+            services.AddScoped<AppointmentEmailJob>();
+            services.AddScoped<AppointmentEmailRecoveryJob>();
             services.AddScoped<TrashMaintenanceJob>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped(typeof(IGenericDal<>), typeof(GenericRepository<>));

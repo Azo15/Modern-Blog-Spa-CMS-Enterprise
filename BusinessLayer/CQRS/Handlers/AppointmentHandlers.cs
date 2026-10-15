@@ -1,0 +1,116 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using BusinessLayer.Abstract;
+using BusinessLayer.CQRS.Commands;
+using BusinessLayer.CQRS.Queries;
+using BusinessLayer.Dtos;
+using BusinessLayer.Security;
+using DataAccesLayer.Abstract;
+using DataAccesLayer.Concrete;
+using EntityLayer.Concrete;
+using EntityLayer.Enum;
+using FluentValidation;
+using FluentValidation.Results;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace BusinessLayer.CQRS.Handlers;
+
+public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQueue queue,
+    IManagerNotifier notifier, ILogger<CreateAppointmentHandler> logger) : IRequestHandler<CreateAppointmentCommand, AppointmentReceiptDto>
+{
+    public async Task<AppointmentReceiptDto> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
+    {
+        var existing = await db.Appointments.AsNoTracking().SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, cancellationToken);
+        if (existing is not null) return Receipt(existing, false);
+        var service = await db.Services.AsNoTracking().Where(x => x.Id == request.ServiceId && x.IsPublish)
+            .Select(x => new { x.Id, x.Title }).SingleOrDefaultAsync(cancellationToken);
+        if (service is null) throw new ValidationException([new ValidationFailure(nameof(request.ServiceId), "Bu hizmet şu anda randevuya açık değil.")]);
+
+        var appointment = new Appointment
+        {
+            ServiceId = service.Id, ServiceTitleSnapshot = service.Title ?? "Spa ritüeli",
+            FullName = request.FullName.Trim(), Phone = request.Phone.Trim(), Email = request.Email.Trim(),
+            AppointmentDate = request.AppointmentDate, TimeSlot = request.TimeSlot, GuestCount = request.GuestCount,
+            Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
+            Status = AppointmentStatus.Pending, ReferenceCode = "#XSPA-" + Convert.ToHexString(RandomNumberGenerator.GetBytes(6)),
+            ClientRequestId = request.ClientRequestId
+        };
+        var delivery = new AppointmentEmailDelivery { Appointment = appointment };
+        db.Appointments.Add(appointment);
+        db.AppointmentEmailDeliveries.Add(delivery);
+        try { await db.SaveChangesAsync(cancellationToken); }
+        catch (DbUpdateException)
+        {
+            // The unique database index also protects simultaneous retries across application instances.
+            var retry = await db.Appointments.AsNoTracking().SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, cancellationToken);
+            if (retry is null) throw;
+            db.Entry(appointment).State = EntityState.Detached;
+            db.Entry(delivery).State = EntityState.Detached;
+            return Receipt(retry, false);
+        }
+
+        try
+        {
+            var jobId = queue.Enqueue(delivery.Id);
+            await db.AppointmentEmailDeliveries.Where(x => x.Id == delivery.Id).ExecuteUpdateAsync(update => update
+                .SetProperty(x => x.HangfireJobId, jobId).SetProperty(x => x.LastEnqueuedAtUtc, DateTime.UtcNow), cancellationToken);
+        }
+        catch (Exception error) when (error is not OperationCanceledException)
+        {
+            logger.LogWarning(error, "Appointment {AppointmentId} saved; its durable receipt will be recovered.", appointment.Id);
+        }
+
+        try
+        {
+            await notifier.NotifyAsync("Yeni Rezervasyon", $"{appointment.FullName} - {appointment.ServiceTitleSnapshot} ({appointment.AppointmentDate.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture)} {appointment.TimeSlot})", cancellationToken);
+        }
+        catch (Exception error) when (error is not OperationCanceledException)
+        {
+            logger.LogWarning(error, "Appointment {AppointmentId} saved; live manager notification was unavailable.", appointment.Id);
+        }
+        return Receipt(appointment, true);
+    }
+
+    private static AppointmentReceiptDto Receipt(Appointment appointment, bool isNew) =>
+        new(appointment.ReferenceCode, appointment.AppointmentDate, appointment.TimeSlot, appointment.Status, isNew);
+}
+
+public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserService currentUser, IAuthorizationService authorization)
+    : IRequestHandler<GetAppointmentsQuery, PaginatedList<AppointmentAdminDto>>, IRequestHandler<ChangeAppointmentStatusCommand, bool>
+{
+    private async Task RequireManager()
+    {
+        if (!(await authorization.AuthorizeAsync(currentUser.User, AccessPolicies.ContentManager)).Succeeded)
+            throw new UnauthorizedAccessException();
+    }
+
+    public async Task<PaginatedList<AppointmentAdminDto>> Handle(GetAppointmentsQuery request, CancellationToken cancellationToken)
+    {
+        await RequireManager();
+        var query = db.Appointments.AsNoTracking();
+        if (request.Status.HasValue) query = query.Where(x => x.Status == request.Status.Value);
+        var count = await query.CountAsync(cancellationToken);
+        var items = await query.OrderBy(x => x.Status).ThenBy(x => x.AppointmentDate).ThenBy(x => x.TimeSlot).ThenByDescending(x => x.Id)
+            .Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize)
+            .Select(x => new AppointmentAdminDto(x.Id, x.ReferenceCode, x.FullName, x.Phone, x.Email,
+                x.ServiceTitleSnapshot, x.AppointmentDate, x.TimeSlot, x.GuestCount, x.Notes, x.Status, x.CreatedDate))
+            .ToListAsync(cancellationToken);
+        return new(items, count, request.PageIndex, request.PageSize);
+    }
+
+    public async Task<bool> Handle(ChangeAppointmentStatusCommand request, CancellationToken cancellationToken)
+    {
+        await RequireManager();
+        var appointment = await db.Appointments.SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        if (appointment is null) return false;
+        if (appointment.Status == request.Status) return true;
+        if (appointment.Status == AppointmentStatus.Cancelled || request.Status == AppointmentStatus.Pending)
+            throw new ValidationException([new ValidationFailure("Status", "İptal edilen randevu yeniden onaylanamaz. Yeni bir randevu talebi oluşturun.")]);
+        appointment.Status = request.Status;
+        await db.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+}
