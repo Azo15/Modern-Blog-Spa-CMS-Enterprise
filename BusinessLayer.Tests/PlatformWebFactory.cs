@@ -42,6 +42,7 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
             notifier.Setup(n => n.NotifyAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             services.AddSingleton(notifier.Object);
             services.AddSingleton(Mock.Of<IContactEmailQueue>());
+            services.AddSingleton(Mock.Of<IAppointmentEmailQueue>());
             if (failQueries)
             {
                 var sender = new Mock<MediatR.ISender>();
