@@ -64,6 +64,27 @@ public sealed class PublicMediaService(IWebHostEnvironment environment)
     public string ServiceImage(string? title, string? path, int entityId = 0) =>
         EntityImage("service", title, path, entityId, Services);
 
+    /// <summary>
+    /// A service's existing cover and its own independent illustrative ritual photographs.
+    /// Unknown services retain their own image rather than inheriting another service's set.
+    /// </summary>
+    public IReadOnlyList<ServiceGalleryImage> ServiceGallery(string? title, string? storedPath, int entityId = 0)
+    {
+        var cover = ServiceImage(title, storedPath, entityId);
+        var images = new List<ServiceGalleryImage> { new(cover, "RitualOverview") };
+        if (!Services.TryGetValue(GlobalHelper.ToSlug(title ?? ""), out var serviceAsset))
+            return images.AsReadOnly();
+
+        foreach (var (suffix, caption) in new[] { ("preparation", "RitualPreparation"), ("experience", "RitualExperience") })
+        {
+            var path = $"img/ritual/{serviceAsset}-{suffix}.webp";
+            if (ExistingPath(path) is { } existing && !images.Any(image => image.Url == "/" + existing))
+                images.Add(new ServiceGalleryImage("/" + existing, caption));
+        }
+
+        return images.AsReadOnly();
+    }
+
     public string BlogImage(string? title, string? path, int entityId = 0) =>
         EntityImage("blog", title, path, entityId, Blogs);
 
@@ -110,3 +131,5 @@ public sealed class PublicMediaService(IWebHostEnvironment environment)
     private static IReadOnlyDictionary<string, string> Map(params (string Title, string Asset)[] entries) =>
         entries.ToDictionary(x => GlobalHelper.ToSlug(x.Title), x => x.Asset, StringComparer.OrdinalIgnoreCase);
 }
+
+public sealed record ServiceGalleryImage(string Url, string CaptionKey);

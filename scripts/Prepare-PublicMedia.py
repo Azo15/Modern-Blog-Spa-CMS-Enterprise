@@ -29,7 +29,8 @@ def prepare(asset):
         with urllib.request.urlopen(request, timeout=60) as response:
             original = response.read()
         image = ImageOps.exif_transpose(Image.open(io.BytesIO(original))).convert('RGB')
-        image.thumbnail((2200, 1500) if destination.stem.startswith('hero') else (1200, 1300))
+        bounds = (2200, 1500) if destination.stem.startswith('hero') else ((1800, 1800) if destination.parent.name == 'ritual' else (1200, 1300))
+        image.thumbnail(bounds)
         destination.parent.mkdir(parents=True, exist_ok=True)
         image.save(destination, 'WEBP', quality=82, method=6)
         asset.update(width=image.width, height=image.height, bytes=destination.stat().st_size)

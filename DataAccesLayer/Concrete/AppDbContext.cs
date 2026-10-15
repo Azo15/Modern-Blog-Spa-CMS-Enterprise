@@ -32,6 +32,8 @@ namespace DataAccesLayer.Concrete
         public DbSet<BlogReaction> BlogReactions { get; set; }
         public DbSet<ContactEmailDelivery> ContactEmailDeliveries { get; set; }
         public DbSet<TrashArchiveEntry> TrashArchiveEntries { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<AppointmentEmailDelivery> AppointmentEmailDeliveries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
