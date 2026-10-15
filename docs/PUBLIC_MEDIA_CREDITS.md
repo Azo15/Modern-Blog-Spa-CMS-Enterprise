@@ -1,6 +1,6 @@
 # Halka Açık Medya Kaynakları
 
-15 Ekim 2026 tarihinde yenilenen 65 bağımsız fotoğraf: 3 hero, 1 hakkımızda, 2 portre, 12 hizmet, 29 blog, 12 galeri ve 6 VIP seçim kartı. Her dosya ayrı bir kaynak fotoğraf kullanır; aynı fotoğrafın başka adla kopyaları veya farklı kırpımları kullanılmaz.
+15 Ekim 2026 tarihinde yenilenen 89 bağımsız fotoğraf: 3 hero, 1 hakkımızda, 2 portre, 12 hizmet kapağı, 24 ek ritüel fotoğrafı, 29 blog, 12 galeri ve 6 VIP seçim kartı. Her dosya ayrı bir kaynak fotoğraf kullanır; aynı fotoğrafın başka adla kopyaları veya farklı kırpımları kullanılmaz.
 
 Fotoğraflar [Pexels lisansı](https://www.pexels.com/license/) kapsamında yerel WebP olarak sunulur. Bunlar örnek atmosfer fotoğraflarıdır; işletmenin gerçek mekânını veya çalışanlarını temsil ettikleri iddia edilmez. Kullanıcıların yüklediği gerçek görseller korunur.
 
@@ -73,3 +73,33 @@ Dosya ölçüleri, indirme adresleri ve SHA256 değerleri `WebUI/wwwroot/img/med
 - `img/vip-4.webp` — [Pexels 3865792](https://www.pexels.com/photo/3865792/)
 - `img/vip-5.webp` — [Pexels 12649751](https://www.pexels.com/photo/12649751/)
 - `img/vip-6.webp` — [Pexels 25084818](https://www.pexels.com/photo/25084818/)
+
+
+## Hizmet ritüeli galerileri
+
+Her hizmetin kendi kapağına iki bağımsız hazırlık ve uygulama fotoğrafı eklenir. Yeni görseller 1800 piksel sınırında, özgün en/boy oranları korunarak kodlanır. Bir görselin başka bir hizmette veya sayfa bölümünde tekrar kullanılması yerine her dosya ayrı kaynak kullanır.
+
+- `img/ritual/service-altinmaske-experience.webp` — [Pexels 8076239](https://www.pexels.com/photo/8076239/)
+- `img/ritual/service-altinmaske-preparation.webp` — [Pexels 9775363](https://www.pexels.com/photo/9775363/)
+- `img/ritual/service-aromaterapi-experience.webp` — [Pexels 32729955](https://www.pexels.com/photo/32729955/)
+- `img/ritual/service-aromaterapi-preparation.webp` — [Pexels 6693950](https://www.pexels.com/photo/6693950/)
+- `img/ritual/service-bebek-experience.webp` — [Pexels 5889963](https://www.pexels.com/photo/5889963/)
+- `img/ritual/service-bebek-preparation.webp` — [Pexels 5889961](https://www.pexels.com/photo/5889961/)
+- `img/ritual/service-ciftler-experience.webp` — [Pexels 19695947](https://www.pexels.com/photo/19695947/)
+- `img/ritual/service-ciftler-preparation.webp` — [Pexels 7365442](https://www.pexels.com/photo/7365442/)
+- `img/ritual/service-derindoku-experience.webp` — [Pexels 6629609](https://www.pexels.com/photo/6629609/)
+- `img/ritual/service-derindoku-preparation.webp` — [Pexels 6187261](https://www.pexels.com/photo/6187261/)
+- `img/ritual/service-hamam-experience.webp` — [Pexels 7427426](https://www.pexels.com/photo/7427426/)
+- `img/ritual/service-hamam-preparation.webp` — [Pexels 12940593](https://www.pexels.com/photo/12940593/)
+- `img/ritual/service-hamilelik-experience.webp` — [Pexels 7011301](https://www.pexels.com/photo/7011301/)
+- `img/ritual/service-hamilelik-preparation.webp` — [Pexels 5217131](https://www.pexels.com/photo/5217131/)
+- `img/ritual/service-isvec-experience.webp` — [Pexels 5659011](https://www.pexels.com/photo/5659011/)
+- `img/ritual/service-isvec-preparation.webp` — [Pexels 6560282](https://www.pexels.com/photo/6560282/)
+- `img/ritual/service-keratin-experience.webp` — [Pexels 10416604](https://www.pexels.com/photo/10416604/)
+- `img/ritual/service-keratin-preparation.webp` — [Pexels 7755680](https://www.pexels.com/photo/7755680/)
+- `img/ritual/service-peeling-experience.webp` — [Pexels 5308663](https://www.pexels.com/photo/5308663/)
+- `img/ritual/service-peeling-preparation.webp` — [Pexels 10650903](https://www.pexels.com/photo/10650903/)
+- `img/ritual/service-refleksoloji-experience.webp` — [Pexels 6188028](https://www.pexels.com/photo/6188028/)
+- `img/ritual/service-refleksoloji-preparation.webp` — [Pexels 9146383](https://www.pexels.com/photo/9146383/)
+- `img/ritual/service-sauna-experience.webp` — [Pexels 34097624](https://www.pexels.com/photo/34097624/)
+- `img/ritual/service-sauna-preparation.webp` — [Pexels 8092430](https://www.pexels.com/photo/8092430/)

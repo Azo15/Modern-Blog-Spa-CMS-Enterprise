@@ -1,0 +1,64 @@
+@{
+    var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+    var experiences = new[]
+    {
+        (
+            Quote: en
+                ? "From the welcoming tea to the quiet moments after my ritual, it felt like a little space in the day that belonged just to me."
+                : "Karşılama çayından ritüel sonrası sessizliğe kadar, günün içinde yalnızca bana ait küçük bir alan açılmış gibiydi.",
+            Occasion: en ? "A first spa visit" : "İlk spa ziyareti"
+        ),
+        (
+            Quote: en
+                ? "Discussing my preferences before the session made it easy to settle in. The warm atmosphere and unhurried pace were the details I enjoyed most."
+                : "Seans öncesinde tercihlerimin sorulması rahat hissetmemi sağladı. Sıcak atmosfer ve aceleye gelmeyen anlar en sevdiğim ayrıntılardı.",
+            Occasion: en ? "A massage ritual" : "Masaj ritüeli"
+        ),
+        (
+            Quote: en
+                ? "The warmth of the marble, the gentle foam and the pause afterwards made the hammam ritual a welcome change from the rush of everyday life."
+                : "Mermerin sıcaklığı, yumuşak köpük ve sonrasındaki dinlenme anı… Hamam ritüeli, günlük koşuşturmaya güzel bir ara gibiydi.",
+            Occasion: en ? "A hammam experience" : "Hamam deneyimi"
+        ),
+        (
+            Quote: en
+                ? "Sharing a calm afternoon together was a lovely way to mark a special day. We especially enjoyed having time to relax after the session."
+                : "Birlikte sakin bir öğleden sonra geçirmek, özel bir günü güzelleştirmenin zarif bir yoluydu. Seans sonrası dinlenmeye zaman ayırabilmek çok hoştu.",
+            Occasion: en ? "A shared moment of calm" : "Birlikte bir dinginlik anı"
+        )
+    };
+}
+<section class="luxe-section luxe-testimonials" aria-labelledby="guest-experiences-title">
+    <div class="container">
+        <div class="luxe-section-heading">
+            <div>
+                <span class="luxe-eyebrow">@(en ? "LITTLE MOMENTS, LASTING IMPRESSIONS" : "KÜÇÜK ANLAR, GÜZEL İZLER")</span>
+                <h2 id="guest-experiences-title">@(en ? "Gentle touches," : "Zarif dokunuşlar,")<br /><em>@(en ? "beautiful impressions." : "güzel izlenimler.")</em></h2>
+                <p id="guest-experiences-note" class="luxe-testimonial-disclosure">@(en ? "Illustrative guest experiences. These sample stories are not verified customer reviews." : "Temsili misafir deneyimleri. Bu örnek anlatımlar, doğrulanmış müşteri yorumları değildir.")</p>
+            </div>
+            <div class="luxe-testimonial-controls" aria-label="@(en ? "Guest experience navigation" : "Misafir deneyimleri gezinmesi")">
+                <button type="button" class="luxe-testimonial-prev" aria-label="@(en ? "Previous example experience" : "Önceki örnek deneyim")"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
+                <button type="button" class="luxe-testimonial-next" aria-label="@(en ? "Next example experience" : "Sonraki örnek deneyim")"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="swiper luxe-testimonials-swiper" role="region" aria-roledescription="@(en ? "carousel" : "slayt gösterisi")" aria-label="@(en ? "Illustrative guest experiences" : "Temsili misafir deneyimleri")" aria-describedby="guest-experiences-note">
+            <div class="swiper-wrapper">
+                @for (var i = 0; i < experiences.Length; i++)
+                {
+                    <div class="swiper-slide">
+                        <figure class="luxe-testimonial-card">
+                            <div class="luxe-testimonial-stars" role="img" aria-label="@(en ? "Illustrative five-star rating" : "Temsili beş yıldız değerlendirmesi")">
+                                @for (var star = 0; star < 5; star++)
+                                {
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                }
+                            </div>
+                            <blockquote class="luxe-testimonial-quote"><p>“@experiences[i].Quote”</p></blockquote>
+                            <figcaption class="luxe-testimonial-source"><span>@experiences[i].Occasion</span><small>@(en ? "Illustrative experience" : "Temsili deneyim") · @((i + 1).ToString("00"))</small></figcaption>
+                        </figure>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
