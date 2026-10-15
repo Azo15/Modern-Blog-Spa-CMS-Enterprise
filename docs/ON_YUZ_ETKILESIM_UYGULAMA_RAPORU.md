@@ -61,3 +61,9 @@ Yeni NuGet veya ön yüz CDN bağımlılığı eklenmedi. Bootstrap, SweetAlert2
 Tam test kaynağı `.artifacts/quality/2c79b9ef27764bd3b8e359609e2c7f7e/`, tarayıcı sonuçları ve ekran görüntüleri `.artifacts/public-experience/` altındadır. Tekrar çalıştırma: `scripts/Test-QualityGate.ps1` ve Playwright kurulu Node ortamında `node scripts/Test-PublicExperience.cjs`. Tarayıcı testinin `BASE_URL` ve `BROWSER_CHANNEL` seçenekleri vardır. Browser bülten taşıması yalnız UI testi için taklit edilmiştir; kalıcı kayıt xUnit entegrasyon testinde gerçek SQLite ile doğrulanır. WhatsApp açılışı testte yakalanır; dışarıya mesaj gönderilmez.
 
 Yerel geliştirme ön izlemesi: http://localhost:5157/ .
+
+## Detay görselleri ek düzeltmesi
+
+Blog kapaklarının sabit 460px/300px kırpılması ve hizmet detaylarının zorunlu kare/oval çerçevesi detay sayfaları için kaldırıldı. Fotoğraflar doğal en-boy oranında, tamamı görünecek şekilde, en fazla ekran yüksekliğinin %68'i/640px sınırında sunulur. Gerçek kaynakla uyuşmayan HTML boyutları kaldırıldı. Liste kartları ve hakkımızda tasarımı korunur.
+
+İki blog ve dört hizmet detayında 1920×1080, 1280×900 ve 390×844 ekranlarla toplam 18 görünüm kontrol edildi: kaynak oranı korunuyor, büyütme/kırpma ve yatay taşma yok, sayfalar 200 dönüyor. Bu ön yüz düzeltmesinde backend testleri yeniden çalıştırılmadı. Kanıtlar `.artifacts/detail-image-fix/` dizinindedir.

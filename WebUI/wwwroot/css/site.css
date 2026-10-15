@@ -152,3 +152,8 @@ html[data-theme=dark]{color-scheme:dark;--ink:#e4e9de;--muted:#acb9ae;--line:rgb
 [data-theme=dark] .luxe-blog-reactions,[data-theme=dark] .luxe-vip-progress .is-complete,[data-theme=dark] .luxe-vip-progress li>span{color:var(--champagne)}
 @media(max-width:767px){.luxe-vip .modal-dialog{padding:0;margin:12px}.luxe-vip-header{padding:28px 24px 23px}.luxe-vip-header h2{font-size:29px}.luxe-vip .modal-body{padding:22px 24px 25px}.luxe-vip-services{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.luxe-vip-choice img{height:95px}.luxe-vip-progress{gap:10px;margin-bottom:23px}.luxe-vip-progress li{font-size:10px;gap:6px}.luxe-vip legend{font-size:24px}.luxe-vip-fields{grid-template-columns:1fr;gap:16px}.luxe-vip-actions{gap:12px}.luxe-vip-actions .luxe-button{padding:13px 16px;gap:14px;font-size:11px}.luxe-interaction .luxe-interaction-button{padding:11px 13px;gap:8px}.luxe-interaction-actions{gap:10px}}
 @media(prefers-reduced-motion:reduce){html.js-boot .luxe-preloader{display:none}.luxe-confetti{display:none}.is-tilting{transform:none!important}.luxe-reply-panel{transition:none}}
+
+/* Detail photos keep their complete composition, including portrait uploads. */
+.luxe-post-cover{width:auto;height:auto;max-width:100%;max-height:min(68svh,640px);object-fit:contain;margin:32px auto 0}
+.luxe-service-detail-media{display:flex;justify-content:center;align-items:center;min-width:0}
+.luxe-story-media.luxe-service-detail-media img{width:auto;height:auto;max-width:100%;max-height:min(68svh,640px);aspect-ratio:auto;object-fit:contain;border-radius:0}
