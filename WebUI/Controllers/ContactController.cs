@@ -9,7 +9,6 @@ using WebUI.Models;
 using WebUI.Services;
 using BusinessLayer;
 using Microsoft.Extensions.Localization;
-using FluentValidation;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;

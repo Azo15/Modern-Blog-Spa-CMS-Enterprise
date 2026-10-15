@@ -42,7 +42,7 @@
                             <legend tabindex="-1">@(en ? "Let us welcome you." : "Sizi tanımak isteriz.")</legend>
                             <div class="luxe-vip-fields">
                                 <div><label for="vip-name">@(en ? "Your name" : "Adınız ve soyadınız")</label><input id="vip-name" name="vipName" class="form-control" autocomplete="name" minlength="2" maxlength="100" required /></div>
-                                <div><label for="vip-phone">@(en ? "Phone number" : "Telefon numaranız")</label><input id="vip-phone" name="vipPhone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" pattern="[+0-9 ()\-]{10,24}" maxlength="24" required /></div>
+                                <div><label for="vip-phone">@(en ? "Phone number" : "Telefon numaranız")</label><input id="vip-phone" name="vipPhone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" pattern="\+?[0-9 \(\)\-]{10,23}" maxlength="24" required /></div>
                             </div>
                             <div class="luxe-vip-summary" aria-live="polite"></div>
                             <p class="luxe-vip-note">@(en ? "Your details will open as a WhatsApp message draft. Send it to request your appointment; our team will confirm availability." : "Bilgileriniz WhatsApp mesaj taslağına aktarılır. Ön talebinizi gönderdiğinizde ekibimiz uygunluğu teyit eder.")</p>

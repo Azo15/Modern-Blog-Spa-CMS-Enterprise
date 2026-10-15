@@ -48,6 +48,16 @@ public class DevelopmentSeederTests
         Assert.Equal("+90 538 878 70 00", persistedContact.Phone);
         Assert.Equal("Preserve this business address", persistedContact.Adres);
         Assert.Equal("preserved@example.test", persistedContact.Mail);
+        var seededDb = verification.ServiceProvider.GetRequiredService<AppDbContext>();
+        var blogImages = await seededDb.Blogs.Select(x => x.Image).ToArrayAsync();
+        var serviceImages = await seededDb.Services.Select(x => x.Image).ToArrayAsync();
+        var galleryImages = await seededDb.Galaries.Select(x => x.Image).ToArrayAsync();
+        var editorialImages = blogImages.Concat(serviceImages).Concat(galleryImages).ToArray();
+        Assert.Equal(29, blogImages.Length);
+        Assert.Equal(12, serviceImages.Length);
+        Assert.Equal(12, galleryImages.Length);
+        Assert.Equal(editorialImages.Length, editorialImages.Distinct().Count());
+        Assert.All(editorialImages, path => Assert.EndsWith(".webp", path));
         Assert.Equal(5, await users.Users.CountAsync());
         Assert.Equal(5, await roles.Roles.CountAsync());
         Assert.False(await roles.RoleExistsAsync("Visitor"));

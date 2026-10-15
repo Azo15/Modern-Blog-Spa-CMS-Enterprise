@@ -236,19 +236,35 @@ namespace WebUI.Data
                 await context.SaveChangesAsync();
             }
 
-            // Repair only missing legacy/demo media; valid user uploads are preserved.
+            // Repair missing media and formerly shared editorial paths; valid custom uploads are preserved.
             var media = scope.ServiceProvider.GetRequiredService<WebUI.Services.PublicMediaService>();
             foreach (var contact in context.Contacts.Where(c => c.Phone != "+90 538 878 70 00"))
                 contact.Phone = "+90 538 878 70 00";
-            foreach (var blog in context.Blogs)
-                blog.Image = media.BlogImage(blog.Title, blog.Image).TrimStart('/');
-            foreach (var service in context.Services)
-                service.Image = media.ServiceImage(service.Title, service.Image).TrimStart('/');
+            var assignedEditorialImages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var blog in context.Blogs.OrderBy(b => b.Id))
+            {
+                var image = media.BlogImage(blog.Title, blog.Image, blog.Id);
+                if (image.StartsWith("/img/", StringComparison.Ordinal) && !assignedEditorialImages.Add(image))
+                    image = WebUI.Services.PublicMediaService.Placeholder("blog", blog.Id, blog.Title);
+                blog.Image = image.TrimStart('/');
+            }
+            foreach (var service in context.Services.OrderBy(s => s.Id))
+            {
+                var image = media.ServiceImage(service.Title, service.Image, service.Id);
+                if (image.StartsWith("/img/", StringComparison.Ordinal) && !assignedEditorialImages.Add(image))
+                    image = WebUI.Services.PublicMediaService.Placeholder("service", service.Id, service.Title);
+                service.Image = image.TrimStart('/');
+            }
             var slideIndex = 0;
             foreach (var slide in context.Sliders.OrderBy(s => s.Id))
                 slide.Image = media.Image(slide.Image, $"img/hero-{++slideIndex % 3 switch { 1 => 1, 2 => 2, _ => 3 }}.webp").TrimStart('/');
-            foreach (var gallery in context.Galaries)
-                gallery.Image = media.GalleryImage(gallery.Title, gallery.Image).TrimStart('/');
+            foreach (var gallery in context.Galaries.OrderBy(g => g.Id))
+            {
+                var image = media.GalleryImage(gallery.Title, gallery.Image, gallery.Id);
+                if (image.StartsWith("/img/", StringComparison.Ordinal) && !assignedEditorialImages.Add(image))
+                    image = WebUI.Services.PublicMediaService.Placeholder("gallery", gallery.Id, gallery.Title);
+                gallery.Image = image.TrimStart('/');
+            }
             foreach (var about in context.Abouts)
                 about.Image = media.Image(about.Image, "img/about-retreat.webp").TrimStart('/');
             await context.SaveChangesAsync();

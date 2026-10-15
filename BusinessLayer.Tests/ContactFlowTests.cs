@@ -80,8 +80,8 @@ public sealed class ContactFlowTests
         fixture.Submission.Verify(s => s.SubmitAsync(It.IsAny<ContactForm>(), It.IsAny<CancellationToken>()), Times.Once);
         fixture.Captcha.VerifyNoOtherCalls();
         fixture.Clients.Verify(c => c.Group(NotificationHub.ModerationGroup), Times.Once);
-        fixture.Clients.VerifyNoOtherCalls();
         fixture.Managers.Verify(p => p.SendCoreAsync("ReceiveNotification", It.IsAny<object?[]>(), It.IsAny<CancellationToken>()), Times.Once);
+        fixture.Clients.VerifyNoOtherCalls();
         Assert.Equal("success", fixture.Controller.TempData["Swal_Icon"]);
     }
 
@@ -114,6 +114,26 @@ public sealed class ContactFlowTests
         Assert.Equal(503, response.StatusCode);
         Assert.False(JsonSerializer.SerializeToElement(response.Value).GetProperty("success").GetBoolean());
         fixture.Clients.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task ContactFormWithoutCaptchaKeysPersistsMessageAndDeliveryIntent()
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false, HandleCookies = true });
+        var token = await Csrf(client);
+        var response = await client.PostAsync("/iletisim", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["ContactForm.FullName"] = "Test Visitor", ["ContactForm.Email"] = "visitor@example.test",
+            ["ContactForm.Subject"] = "Appointment question", ["ContactForm.Message"] = "Please tell me more about your rituals.",
+            ["__RequestVerificationToken"] = token
+        }));
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        using var scope = factory.Services.CreateScope(); var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Equal("visitor@example.test", Assert.Single(await db.ContactForms.ToListAsync()).Email);
+        Assert.Single(await db.Set<ContactEmailDelivery>().ToListAsync());
+        var confirmation = await client.GetStringAsync(response.Headers.Location!);
+        Assert.Contains("success", confirmation);
     }
 
     [Fact]

@@ -12,11 +12,19 @@ public sealed class _VipReservation(IServiceService services, PublicMediaService
         var published = await services.GetListAsync(
             filter: service => service.IsPublish,
             orderBy: query => query.OrderBy(service => service.Id),
-            take: 6);
-        var options = published.Select((service, index) => new VipServiceOption(
-            service.Id,
-            service.Title ?? "Spa ritüeli",
-            media.Image(null, $"img/vip-{index + 1}.webp"))).ToArray();
+            take: 50);
+        var preferred = new[] { "Klasik İsveç Masajı", "Türk Hamamı Ritüeli", "Altın Yüz Maskesi", "Derin Doku Masajı", "Refleksoloji", "Sauna & Buhar Odası" };
+        var options = published.OrderBy(service =>
+            {
+                var index = Array.IndexOf(preferred, service.Title);
+                return index < 0 ? preferred.Length : index;
+            }).ThenBy(service => service.Id).Take(6).Select(service =>
+            {
+                var photoIndex = Array.IndexOf(preferred, service.Title);
+                return new VipServiceOption(service.Id, service.Title ?? "Spa ritüeli",
+                    photoIndex >= 0 ? media.Image(null, $"img/vip-{photoIndex + 1}.webp") :
+                    PublicMediaService.Placeholder("service", service.Id, "vip:" + service.Title));
+            }).ToArray();
         return View(new VipReservationViewModel(options));
     }
 }
