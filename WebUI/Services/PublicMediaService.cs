@@ -72,7 +72,8 @@ public sealed class PublicMediaService(IWebHostEnvironment environment)
     {
         var cover = ServiceImage(title, storedPath, entityId);
         var images = new List<ServiceGalleryImage> { new(cover, "RitualOverview") };
-        if (!Services.TryGetValue(GlobalHelper.ToSlug(title ?? ""), out var serviceAsset))
+        if (cover.StartsWith("/media/placeholder/", StringComparison.Ordinal) ||
+            !Services.TryGetValue(GlobalHelper.ToSlug(title ?? ""), out var serviceAsset))
             return images.AsReadOnly();
 
         foreach (var (suffix, caption) in new[] { ("preparation", "RitualPreparation"), ("experience", "RitualExperience") })

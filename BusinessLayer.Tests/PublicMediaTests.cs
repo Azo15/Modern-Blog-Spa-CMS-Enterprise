@@ -90,6 +90,14 @@ public sealed class PublicMediaTests : IDisposable
     }
 
     [Fact]
+    public void ANewEntityWithASeededTitleDoesNotBorrowTheSeededGallery()
+    {
+        var images = media.ServiceGallery("Klasik İsveç Masajı", null, 101);
+        Assert.Single(images);
+        Assert.StartsWith("/media/placeholder/service/", images[0].Url);
+    }
+
+    [Fact]
     public void AllServiceGalleriesUseDifferentAssetUrls()
     {
         var urls = RitualServices.SelectMany(data => media.ServiceGallery((string)data[0], null)).Select(image => image.Url).ToArray();
