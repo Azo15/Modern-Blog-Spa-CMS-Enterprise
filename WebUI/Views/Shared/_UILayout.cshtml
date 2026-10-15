@@ -6,10 +6,12 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="luxe-body @(home ? "is-home" : "is-inner")">
+    <div class="luxe-preloader" aria-hidden="true"><img src="~/img/brand-mark.svg" width="70" height="70" alt="" /><span>XSPA</span></div>
     <a class="luxe-skip" href="#main-content">@(en ? "Skip to content" : "İçeriğe geç")</a>
     @await Component.InvokeAsync("_Navbar")
     <main id="main-content">@RenderBody()</main>
     @await Component.InvokeAsync("_Footer")
+    @await Component.InvokeAsync("_VipReservation")
     <a class="luxe-whatsapp" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer" aria-label="@(en ? "Book on WhatsApp" : "Hızlı WhatsApp iletişim")"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>@(en ? "Let's talk" : "Bir mesaj uzağınızdayız")</span></a>
     @await Html.PartialAsync("/Views/LayoutPartial/_Script.cshtml")
     @await RenderSectionAsync("Scripts", required: false)

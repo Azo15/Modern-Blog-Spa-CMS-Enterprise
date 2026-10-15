@@ -10,7 +10,7 @@
                 <span class="luxe-eyebrow">@(en ? "THE ART OF SLOW LIVING" : "İYİ YAŞAMIN ZARİF SANATI")</span>
                 @if(i==0){<h1 class="luxe-hero-title">@slide.Item1<br /><em>@slide.Item2</em></h1>}else{<h2 class="luxe-hero-title">@slide.Item1<br /><em>@slide.Item2</em></h2>}
                 <div class="luxe-hero-copy">@Html.Raw(SafeHtml.Sanitize(string.IsNullOrWhiteSpace(item?.Content) ? slide.Item3 : item.Content))</div>
-                <div class="luxe-hero-actions"><a class="luxe-button luxe-button-gold" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer">@(en ? "Discover your ritual" : "Ritüelinizi keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="luxe-hero-call" href="tel:+905388787000"><i class="fa-solid fa-phone" aria-hidden="true"></i><span><small>@(en ? "A PERSONAL INVITATION" : "SİZE ÖZEL BİR DAVET")</small>+90 538 878 70 00</span></a></div>
+                <div class="luxe-hero-actions"><button class="luxe-button luxe-button-gold" type="button" data-bs-toggle="modal" data-bs-target="#vip-reservation">@(en ? "Discover your ritual" : "Ritüelinizi keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button><a class="luxe-hero-call" href="tel:+905388787000"><i class="fa-solid fa-phone" aria-hidden="true"></i><span><small>@(en ? "A PERSONAL INVITATION" : "SİZE ÖZEL BİR DAVET")</small>+90 538 878 70 00</span></a></div>
             </div></div>
         </div>
     }

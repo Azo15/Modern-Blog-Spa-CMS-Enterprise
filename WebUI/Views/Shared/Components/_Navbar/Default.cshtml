@@ -19,6 +19,7 @@
                 </ul>
                 <div class="luxe-nav-actions">
                     @await Html.PartialAsync("_LanguageSelector")
+                    <button id="theme-toggle" class="luxe-theme-toggle" type="button" aria-pressed="false" aria-label="@(en ? "Switch to dark theme" : "Koyu temaya geç")"><i class="fa-regular fa-moon" aria-hidden="true"></i><span class="visually-hidden">@(en ? "Change theme" : "Temayı değiştir")</span></button>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <a class="luxe-account" asp-controller="Profile" asp-action="Index" aria-label="@L["Profile"]"><i class="fa-regular fa-user" aria-hidden="true"></i></a>
@@ -26,7 +27,7 @@
                         else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded){<a class="luxe-admin-link" asp-controller="AdminComment" asp-action="Index">@L["AdminPanel"]</a>}
                     }
                     else {<a class="luxe-account" asp-controller="Dashboard" asp-action="SignIn" aria-label="@(en ? "Sign in" : "Üye girişi")"><i class="fa-regular fa-user" aria-hidden="true"></i></a>}
-                    <a class="luxe-button luxe-button-gold luxe-nav-book" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer">@(en ? "Book a ritual" : "VIP Randevu")<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                    <button class="luxe-button luxe-button-gold luxe-nav-book" type="button" data-bs-toggle="modal" data-bs-target="#vip-reservation">@(en ? "Book a ritual" : "VIP Randevu")<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button>
                 </div>
             </div>
         </div>

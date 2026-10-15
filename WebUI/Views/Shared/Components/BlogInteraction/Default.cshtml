@@ -2,29 +2,78 @@
 @using BusinessLayer
 @using EntityLayer.Enum
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Text
+@{
+    var en = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
+    var authenticated = User.Identity?.IsAuthenticated == true;
+    var blocked = authenticated && !Model.CanInteract;
+    var loginUrl = Url.Action("SignIn", "Dashboard");
+    var loginPrompt = en ? "Please sign in to like or save this article." : "Bu yazıyı beğenmek veya favorilerinize eklemek için üye girişi yapmalısınız.";
+}
 <section class="luxe-interaction" aria-label="@Text["Interaction"]">
-    @if (TempData["InteractionSuccess"] is string success) { <div class="alert alert-success" role="status">@success</div> }
-    @if (TempData["InteractionError"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-    @if (Model.CanInteract)
+    @if (TempData["InteractionSuccess"] is string success)
     {
-        <form asp-controller="BlogInteraction" asp-action="Favorite" method="post" class="d-inline">
-            <input type="hidden" name="blogId" value="@Model.BlogId" /><input type="hidden" name="slug" value="@Model.Slug" />
-            <button type="submit" class="btn @(Model.Interaction.IsFavorite ? "btn-warning" : "btn-outline-secondary")" aria-pressed="@(Model.Interaction.IsFavorite ? "true" : "false")">@(Model.Interaction.IsFavorite ? Text["RemoveFavorite"] : Text["Favorite"])</button>
-        </form>
-        @foreach (var reaction in Enum.GetValues<ReactionType>())
+        <div class="luxe-interaction-notice" role="status">@success</div>
+    }
+    @if (TempData["InteractionError"] is string error)
+    {
+        <div class="luxe-interaction-notice is-error" role="alert">@error</div>
+    }
+    <div class="luxe-interaction-heading">
+        <span class="luxe-eyebrow">@(en ? "A LITTLE APPRECIATION" : "KÜÇÜK BİR TEŞEKKÜR")</span>
+        <p>@(en ? "Keep the inspiration. Share a little love." : "İlhamı saklayın. Biraz sevgi bırakın.")</p>
+    </div>
+    <div class="luxe-interaction-actions">
+        @if (Model.CanInteract)
         {
-            var count = reaction switch { ReactionType.Like => Model.Interaction.LikeCount, ReactionType.Heart => Model.Interaction.HeartCount, _ => Model.Interaction.ClapCount };
-            <form asp-controller="BlogInteraction" asp-action="Reaction" method="post" class="d-inline">
-                <input type="hidden" name="blogId" value="@Model.BlogId" /><input type="hidden" name="slug" value="@Model.Slug" /><input type="hidden" name="reactionType" value="@((int)reaction)" />
-                <button type="submit" class="btn @(Model.Interaction.Reaction == reaction ? "btn-primary" : "btn-outline-primary")" aria-pressed="@(Model.Interaction.Reaction == reaction ? "true" : "false")">@Text[reaction.ToString()] (@count)</button>
+            <form asp-controller="BlogInteraction" asp-action="Favorite" method="post" class="luxe-interaction-form">
+                <input type="hidden" name="blogId" value="@Model.BlogId" />
+                <input type="hidden" name="slug" value="@Model.Slug" />
+                <button type="submit" class="luxe-interaction-button luxe-favorite-button @(Model.Interaction.IsFavorite ? "is-selected" : "")" aria-pressed="@(Model.Interaction.IsFavorite ? "true" : "false")">
+                    <i class="@(Model.Interaction.IsFavorite ? "fa-solid" : "fa-regular") fa-bookmark" aria-hidden="true"></i>
+                    <span>@(Model.Interaction.IsFavorite ? Text["RemoveFavorite"] : Text["Favorite"])</span>
+                </button>
             </form>
         }
-    }
-    else
-    {
-        <span>@Text["Like"]: @Model.Interaction.LikeCount · @Text["Heart"]: @Model.Interaction.HeartCount · @Text["Clap"]: @Model.Interaction.ClapCount</span>
-        <span class="text-muted">@(User.Identity?.IsAuthenticated == true ? Text["AccountDisabled"] : Text["LoginToInteract"])</span>
-    }
+        else
+        {
+            <button type="button" class="luxe-interaction-button luxe-favorite-button" disabled="@blocked"
+                    data-login-required data-login-url="@loginUrl" data-login-message="@loginPrompt"
+                    data-login-confirm="@(en ? "Sign in" : "Giriş Yap")" data-login-cancel="@(en ? "Keep reading" : "Okumaya devam et")">
+                <i class="fa-regular fa-bookmark" aria-hidden="true"></i><span>@Text["Favorite"]</span>
+            </button>
+        }
+        @foreach (var reaction in Enum.GetValues<ReactionType>())
+        {
+            var selected = Model.Interaction.Reaction == reaction;
+            var count = reaction switch { ReactionType.Like => Model.Interaction.LikeCount, ReactionType.Heart => Model.Interaction.HeartCount, _ => Model.Interaction.ClapCount };
+            var icon = reaction switch { ReactionType.Like => "fa-thumbs-up", ReactionType.Heart => "fa-heart", _ => "fa-hands-clapping" };
+            @if (Model.CanInteract)
+            {
+                <form asp-controller="BlogInteraction" asp-action="Reaction" method="post" class="luxe-interaction-form">
+                    <input type="hidden" name="blogId" value="@Model.BlogId" />
+                    <input type="hidden" name="slug" value="@Model.Slug" />
+                    <input type="hidden" name="reactionType" value="@((int)reaction)" />
+                    <button type="submit" class="luxe-interaction-button luxe-reaction-button @(selected ? "is-selected" : "")" aria-pressed="@(selected ? "true" : "false")">
+                        <i class="fa-solid @icon" aria-hidden="true"></i><span>@Text[reaction.ToString()]</span><span class="luxe-interaction-count">@count</span>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <button type="button" class="luxe-interaction-button luxe-reaction-button" disabled="@blocked"
+                        data-login-required data-login-url="@loginUrl" data-login-message="@loginPrompt"
+                        data-login-confirm="@(en ? "Sign in" : "Giriş Yap")" data-login-cancel="@(en ? "Keep reading" : "Okumaya devam et")">
+                    <i class="fa-solid @icon" aria-hidden="true"></i><span>@Text[reaction.ToString()]</span><span class="luxe-interaction-count">@count</span>
+                </button>
+            }
+        }
     </div>
+    @if (blocked)
+    {
+        <p class="luxe-interaction-notice is-error" role="status">@Text["AccountDisabled"]</p>
+    }
+    @if (!authenticated)
+    {
+        <noscript><p><a href="@loginUrl">@(en ? "Sign in to like or save this article." : "Beğenmek veya favoriye eklemek için giriş yapın.")</a></p></noscript>
+    }
 </section>

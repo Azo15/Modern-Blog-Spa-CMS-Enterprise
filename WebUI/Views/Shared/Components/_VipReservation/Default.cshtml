@@ -1,0 +1,67 @@
+@model VipReservationViewModel
+@{ var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; }
+<div class="modal fade luxe-vip" id="vip-reservation" tabindex="-1" aria-labelledby="vip-title" aria-describedby="vip-intro" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="luxe-vip-header">
+                <span class="luxe-eyebrow">XSPA · PRIVATE RITUALS</span>
+                <button class="luxe-modal-close" type="button" data-bs-dismiss="modal" aria-label="@(en ? "Close" : "Kapat")"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                <h2 id="vip-title">@(en ? "A moment, just for you." : "Size ayrılmış özel bir an.")</h2>
+                <p id="vip-intro">@(en ? "Plan your VIP appointment request in three simple steps. Our team will confirm availability on WhatsApp." : "VIP randevu ön talebinizi üç adımda hazırlayın. Ekibimiz uygunluğu WhatsApp üzerinden sizinle teyit etsin.")</p>
+            </div>
+            <div class="modal-body">
+                @if (Model.Services.Count > 0)
+                {
+                    <ol class="luxe-vip-progress" aria-label="@(en ? "Appointment steps" : "Randevu adımları")">
+                        <li data-vip-progress="0" aria-current="step"><span>01</span>@(en ? "Your ritual" : "Ritüeliniz")</li>
+                        <li data-vip-progress="1"><span>02</span>@(en ? "Your time" : "Zamanınız")</li>
+                        <li data-vip-progress="2"><span>03</span>@(en ? "Your details" : "Bilgileriniz")</li>
+                    </ol>
+                    <form id="vip-form" novalidate>
+                        <fieldset data-vip-step="0">
+                            <legend tabindex="-1">@(en ? "Which ritual speaks to you?" : "Hangi ritüel size iyi gelir?")</legend>
+                            <div class="luxe-vip-services">
+                                @foreach (var service in Model.Services)
+                                {
+                                    <label class="luxe-vip-service">
+                                        <input type="radio" name="vipService" value="@service.Title" data-service-id="@service.Id" required />
+                                        <span class="luxe-vip-choice"><img src="@service.ImageUrl" alt="" width="400" height="240" loading="lazy" /><span>@service.Title<i class="fa-solid fa-check" aria-hidden="true"></i></span></span>
+                                    </label>
+                                }
+                            </div>
+                        </fieldset>
+                        <fieldset data-vip-step="1" hidden>
+                            <legend tabindex="-1">@(en ? "Make room for yourself." : "Kendinize zaman ayırın.")</legend>
+                            <div class="luxe-vip-fields">
+                                <div><label for="vip-date">@(en ? "Preferred date" : "Tercih ettiğiniz gün")</label><input id="vip-date" name="vipDate" type="date" class="form-control" required /></div>
+                                <div><label for="vip-time">@(en ? "Time window" : "Saat aralığı")</label><select id="vip-time" name="vipTime" class="form-select" required><option value="">@(en ? "Select a time" : "Saat seçin")</option><option value="09:00–12:00" data-end-hour="12">09:00–12:00</option><option value="12:00–15:00" data-end-hour="15">12:00–15:00</option><option value="15:00–18:00" data-end-hour="18">15:00–18:00</option><option value="18:00–21:00" data-end-hour="21">18:00–21:00</option><option value="21:00–00:00" data-end-hour="24">21:00–00:00</option></select></div>
+                            </div>
+                            <p class="luxe-vip-note"><i class="fa-regular fa-clock" aria-hidden="true"></i>@(en ? "Every day · 09:00–00:00 · Türkiye time" : "Haftanın her günü · 09:00–00:00 · Türkiye saati")</p>
+                        </fieldset>
+                        <fieldset data-vip-step="2" hidden>
+                            <legend tabindex="-1">@(en ? "Let us welcome you." : "Sizi tanımak isteriz.")</legend>
+                            <div class="luxe-vip-fields">
+                                <div><label for="vip-name">@(en ? "Your name" : "Adınız ve soyadınız")</label><input id="vip-name" name="vipName" class="form-control" autocomplete="name" minlength="2" maxlength="100" required /></div>
+                                <div><label for="vip-phone">@(en ? "Phone number" : "Telefon numaranız")</label><input id="vip-phone" name="vipPhone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" pattern="[+0-9 ()\-]{10,24}" maxlength="24" required /></div>
+                            </div>
+                            <div class="luxe-vip-summary" aria-live="polite"></div>
+                            <p class="luxe-vip-note">@(en ? "Your details will open as a WhatsApp message draft. Send it to request your appointment; our team will confirm availability." : "Bilgileriniz WhatsApp mesaj taslağına aktarılır. Ön talebinizi gönderdiğinizde ekibimiz uygunluğu teyit eder.")</p>
+                        </fieldset>
+                        <p class="luxe-vip-error" role="alert" hidden></p>
+                        <div class="luxe-vip-actions">
+                            <button class="luxe-vip-back" type="button" data-vip-back hidden><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>@(en ? "Back" : "Geri")</button>
+                            <button class="luxe-button luxe-button-gold" type="button" data-vip-next>@(en ? "Continue" : "Devam edin")<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                            <button class="luxe-button luxe-button-gold" type="submit" data-vip-submit hidden>@(en ? "Complete request" : "Randevuyu tamamla")<i class="fa-brands fa-whatsapp" aria-hidden="true"></i></button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p>@(en ? "Contact our team to find your ritual." : "Size uygun ritüeli belirlemek için ekibimizle iletişime geçin.")</p>
+                    <a class="luxe-button luxe-button-gold" href="tel:+905388787000">+90 538 878 70 00</a>
+                }
+                <noscript><p><a asp-controller="Contact" asp-action="Index">@(en ? "Contact us to request an appointment." : "Randevu talebiniz için iletişim sayfamızı kullanın.")</a></p></noscript>
+            </div>
+        </div>
+    </div>
+</div>
