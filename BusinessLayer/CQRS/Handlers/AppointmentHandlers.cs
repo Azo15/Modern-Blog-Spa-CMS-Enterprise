@@ -24,7 +24,7 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
     public async Task<AppointmentReceiptDto> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
     {
         var existing = await db.Appointments.AsNoTracking().SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, cancellationToken);
-        if (existing is not null) return Receipt(existing, false);
+        if (existing is not null) return Replay(existing, request);
         var service = await db.Services.AsNoTracking().Where(x => x.Id == request.ServiceId && x.IsPublish)
             .Select(x => new { x.Id, x.Title }).SingleOrDefaultAsync(cancellationToken);
         if (service is null) throw new ValidationException([new ValidationFailure(nameof(request.ServiceId), "Bu hizmet şu anda randevuya açık değil.")]);
@@ -49,7 +49,7 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
             if (retry is null) throw;
             db.Entry(appointment).State = EntityState.Detached;
             db.Entry(delivery).State = EntityState.Detached;
-            return Receipt(retry, false);
+            return Replay(retry, request);
         }
 
         try
@@ -76,6 +76,19 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
 
     private static AppointmentReceiptDto Receipt(Appointment appointment, bool isNew) =>
         new(appointment.ReferenceCode, appointment.AppointmentDate, appointment.TimeSlot, appointment.Status, isNew);
+
+    private static AppointmentReceiptDto Replay(Appointment existing, CreateAppointmentCommand request)
+    {
+        if (existing.ServiceId != request.ServiceId || existing.AppointmentDate != request.AppointmentDate ||
+            existing.TimeSlot != request.TimeSlot || existing.GuestCount != request.GuestCount ||
+            existing.FullName != request.FullName.Trim() || existing.Phone != request.Phone.Trim() ||
+            !string.Equals(existing.Email, request.Email.Trim(), StringComparison.OrdinalIgnoreCase) ||
+            (existing.Notes ?? "") != (request.Notes?.Trim() ?? ""))
+            throw new ValidationException([new ValidationFailure(nameof(request.ClientRequestId),
+                $"{existing.ReferenceCode} kodlu talebiniz zaten kaydedildi. Değişiklik için bu kodla ekibimize ulaşın; mevcut kayıt değiştirilmedi.")
+                { ErrorCode = "AppointmentReplayConflict" }]);
+        return Receipt(existing, false);
+    }
 }
 
 public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserService currentUser, IAuthorizationService authorization)

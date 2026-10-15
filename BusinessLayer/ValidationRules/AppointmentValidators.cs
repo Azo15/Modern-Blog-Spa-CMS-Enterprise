@@ -22,7 +22,7 @@ public sealed class CreateAppointmentValidator : AbstractValidator<CreateAppoint
     public CreateAppointmentValidator()
     {
         RuleFor(x => x.ServiceId).GreaterThan(0).WithMessage("Lütfen bir hizmet seçin.");
-        RuleFor(x => x.FullName).NotEmpty().Length(2, 120).WithMessage("Ad soyad 2–120 karakter olmalıdır.");
+        RuleFor(x => x.FullName).NotEmpty().MaximumLength(120).Must(name => name?.Trim().Length is >= 2 and <= 120).WithMessage("Ad soyad 2–120 karakter olmalıdır.");
         RuleFor(x => x.Phone).NotEmpty().MaximumLength(30)
             .Must(phone => phone is not null && System.Text.RegularExpressions.Regex.IsMatch(phone, @"^\+?[0-9 ()-]+$") && phone.Count(char.IsDigit) is >= 10 and <= 15)
             .WithMessage("Geçerli bir telefon numarası girin.");

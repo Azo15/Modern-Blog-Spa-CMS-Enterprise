@@ -18,6 +18,9 @@ public static class ApiRateLimitRegistration
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
+                if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path.Equals("/randevu", StringComparison.OrdinalIgnoreCase))
+                    return RateLimitPartition.GetFixedWindowLimiter("appointment:" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
+                        _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0, AutoReplenishment = true });
                 if (!ApiProblemResponses.IsApi(context)) return RateLimitPartition.GetNoLimiter("web-ui");
                 var id = context.User.Identity?.IsAuthenticated == true ? context.User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
                 var key = id is null ? "ip:" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown") : "user:" + id;

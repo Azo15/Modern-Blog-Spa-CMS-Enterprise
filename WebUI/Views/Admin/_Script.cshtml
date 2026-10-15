@@ -26,12 +26,40 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const soundButton = document.getElementById('notification-sound');
+        const english = document.documentElement.lang.startsWith('en');
+        let audio;
+        let soundOn = false;
+        const updateSoundButton = () => {
+            if (!soundButton) return;
+            soundButton.setAttribute('aria-pressed', String(soundOn));
+            soundButton.textContent = soundOn ? (english ? 'Notification sound on' : 'Bildirim sesi açık') : (english ? 'Enable notification sound' : 'Bildirim sesini aç');
+        };
+        soundButton?.addEventListener('click', async () => {
+            try {
+                if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+                await audio.resume();
+                soundOn = !soundOn;
+                updateSoundButton();
+            } catch { soundOn = false; updateSoundButton(); }
+        });
+        const playReservationSound = () => {
+            if (!soundOn || audio?.state !== 'running') return;
+            [660, 880].forEach((frequency, index) => {
+                const oscillator = audio.createOscillator(), volume = audio.createGain();
+                const start = audio.currentTime + index * .2;
+                oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+                volume.gain.setValueAtTime(0, start); volume.gain.linearRampToValueAtTime(.09, start + .02); volume.gain.exponentialRampToValueAtTime(.001, start + .25);
+                oscillator.connect(volume); volume.connect(audio.destination); oscillator.start(start); oscillator.stop(start + .28);
+            });
+        };
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/notificationHub")
             .withAutomaticReconnect()
             .build();
 
         connection.on("ReceiveNotification", function (title, message, type) {
+            if (title === 'Yeni Rezervasyon') playReservationSound();
             if (typeof toastr !== "undefined") {
                 toastr.options = {
                     "closeButton": true,

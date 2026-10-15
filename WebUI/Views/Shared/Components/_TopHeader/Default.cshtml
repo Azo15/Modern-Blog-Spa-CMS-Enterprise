@@ -12,6 +12,10 @@
 
         <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
             <ul class="navbar-nav flex-row align-items-center ms-md-auto">
+                @if ((await HeaderAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
+                {
+                    <li class="nav-item me-3"><button type="button" class="btn btn-sm btn-outline-secondary" id="notification-sound" aria-pressed="false">@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "Enable notification sound" : "Bildirim sesini aç")</button></li>
+                }
                 <!-- Theme Toggle -->
                 <li class="nav-item me-4">
                     <button class="btn btn-link nav-link px-0 hide-arrow" id="theme-toggle" title="Toggle Theme">

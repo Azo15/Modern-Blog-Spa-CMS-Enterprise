@@ -38,6 +38,8 @@ public sealed class AppointmentController(ISender sender, ILogger<AppointmentCon
         }
         catch (ValidationException error)
         {
+            var conflict = error.Errors.FirstOrDefault(failure => failure.ErrorCode == "AppointmentReplayConflict");
+            if (conflict is not null) return Conflict(new { success = false, message = conflict.ErrorMessage });
             return BadRequest(new { success = false, message = "Lütfen formdaki alanları kontrol edin.",
                 errors = error.Errors.GroupBy(e => e.PropertyName).ToDictionary(group => group.Key, group => group.Select(e => e.ErrorMessage).Distinct().ToArray()) });
         }
