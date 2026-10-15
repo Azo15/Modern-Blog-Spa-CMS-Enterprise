@@ -1,0 +1,56 @@
+@model string
+@{
+    var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+    var prefix = string.Concat((Model ?? "ritual").Where(char.IsLetterOrDigit));
+    if (string.IsNullOrEmpty(prefix)) prefix = "ritual";
+    var accordionId = $"{prefix}-faq";
+    var questions = new[]
+    {
+        (
+            Question: en ? "How early should I arrive?" : "Randevuya kaç dakika önce gelmeliyim?",
+            Answer: en
+                ? "We recommend arriving 15 minutes before your appointment, so we can welcome you, discuss your preferences and prepare for your ritual at an unhurried pace."
+                : "Sizi karşılamak, tercihlerinizi birlikte değerlendirmek ve ritüelinize sakince hazırlanmak için randevunuzdan 15 dakika önce gelmenizi öneririz."
+        ),
+        (
+            Question: en ? "What should I bring?" : "Yanımda ne getirmeliyim?",
+            Answer: en
+                ? "We provide a peshtemal, slippers and towels. Please let us know about any allergies or special requirements when making your reservation, so we can help you prepare for your visit."
+                : "Peştamal, terlik ve havlu tarafımızdan sağlanır. Ziyaretinizi birlikte planlayabilmemiz için alerjilerinizi veya özel ihtiyaçlarınızı rezervasyon sırasında bizimle paylaşabilirsiniz."
+        ),
+        (
+            Question: en ? "How can I cancel or reschedule?" : "İptal ve erteleme şartları nelerdir?",
+            Answer: en
+                ? "To cancel or reschedule, please contact our team as early as possible on +90 538 878 70 00 and share your reservation reference. We will explain the applicable conditions and help you find another available time."
+                : "İptal veya erteleme için lütfen mümkün olan en erken zamanda +90 538 878 70 00 üzerinden ekibimizle iletişime geçip rezervasyon kodunuzu paylaşın. Talebinize ait koşulları ve uygun alternatif saatleri birlikte değerlendirelim."
+        )
+    };
+}
+<section class="luxe-section luxe-faq" aria-labelledby="@(accordionId)-title">
+    <div class="container">
+        <div class="luxe-faq-heading">
+            <span class="luxe-eyebrow">@(en ? "BEFORE YOUR VISIT" : "ZİYARETİNİZDEN ÖNCE")</span>
+            <h2 id="@(accordionId)-title">@(en ? "A little peace of mind." : "Aklınızdaki küçük sorular.")</h2>
+            <p>@(en ? "A few details to help you feel at ease before your ritual begins." : "Ritüelinize başlamadan önce kendinizi rahat hissetmeniz için birkaç küçük ayrıntı.")</p>
+        </div>
+        <div class="accordion luxe-faq-accordion" id="@accordionId">
+            @for (var i = 0; i < questions.Length; i++)
+            {
+                var headingId = $"{accordionId}-question-{i}";
+                var panelId = $"{accordionId}-answer-{i}";
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="@headingId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#@panelId" aria-expanded="false" aria-controls="@panelId">
+                            <span class="luxe-faq-number" aria-hidden="true">@((i + 1).ToString("00"))</span>
+                            @questions[i].Question
+                        </button>
+                    </h3>
+                    <div id="@panelId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#@accordionId">
+                        <div class="accordion-body">@questions[i].Answer</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
