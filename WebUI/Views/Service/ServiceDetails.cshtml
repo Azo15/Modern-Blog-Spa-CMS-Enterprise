@@ -1,4 +1,65 @@
 @model Service
-@{ViewData["Title"]=Model.Title;var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";}
-<section class="luxe-page-hero"><div class="container"><span class="luxe-eyebrow">@(en?"YOUR PERSONAL RITUAL":"SİZE ÖZEL BİR RİTÜEL")</span><h1 class="luxe-title">@Model.Title</h1><p class="luxe-lead">@Model.Content</p></div></section>
-<section class="luxe-section"><div class="container luxe-story"><div class="luxe-story-media luxe-service-detail-media" data-aos="fade-up"><img src="@Media.ServiceImage(Model.Title,Model.Image,Model.Id)" alt="@Model.Title" decoding="async" /></div><div class="luxe-story-text" data-aos="fade-up"><span class="luxe-eyebrow">@(en?"SLOW DOWN, SETTLE IN":"YAVAŞLAYIN, DİNLENİN")</span><h2>@(en?"A moment":"Bu an,")<br /><em>@(en?"just for you.":"sadece sizin.")</em></h2><div class="luxe-prose">@Html.Raw(SafeHtml.Sanitize(Model.Details))</div><div class="luxe-signature">@Model.Content</div><a class="luxe-button luxe-button-dark" href="https://wa.me/905388787000?text=@Uri.EscapeDataString((en?"Hello, I would like information about ":"Merhaba, bilgi ve randevu almak istiyorum: ")+Model.Title)" target="_blank" rel="noopener noreferrer">@(en?"Plan this experience":"Bu deneyimi planlayın") <i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a><p class="mt-4"><a class="luxe-text-link" asp-action="Index">@(en?"All rituals":"Tüm ritüeller") <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a></p></div></div></section>
+@{
+    ViewData["Title"] = Model.Title;
+    var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+    var gallery = Media.ServiceGallery(Model.Title, Model.Image, Model.Id);
+    var offer = (Model.Content ?? "").Split('—', 2, StringSplitOptions.TrimEntries);
+    var duration = offer.Length == 2 ? offer[0] : (en ? "Personal consultation" : "Kişisel danışmanlık");
+    var price = offer.Length == 2 ? offer[1] : Model.Content;
+    string Caption(string key) => key switch
+    {
+        "RitualPreparation" => en ? "Preparing your ritual" : "Ritüelinize hazırlık",
+        "RitualExperience" => en ? "A moment of care" : "Özenli bir deneyim",
+        _ => en ? "Your signature ritual" : "Size özel ritüel"
+    };
+}
+<section class="luxe-page-hero"><div class="container">
+    <span class="luxe-eyebrow">@(en ? "YOUR PERSONAL RITUAL" : "SİZE ÖZEL BİR RİTÜEL")</span>
+    <h1 class="luxe-title">@Model.Title</h1><p class="luxe-lead">@Model.Content</p>
+</div></section>
+<section class="luxe-section"><div class="container luxe-ritual-detail">
+    <figure class="luxe-ritual-gallery" data-ritual-gallery>
+        <div class="luxe-ritual-stage" data-ritual-stage>
+            @for (var i = 0; i < gallery.Count; i++)
+            {
+                var photo = gallery[i];
+                var caption = Caption(photo.CaptionKey);
+                var safeCaption = System.Net.WebUtility.HtmlEncode(Model.Title + " · " + caption);
+                <a class="luxe-ritual-main" data-ritual-main data-fancybox="@("ritual-" + Model.Id)" data-caption="@safeCaption" href="@photo.Url" hidden="@(i != 0)" aria-label="@(en ? "Open full photo" : "Fotoğrafı tam ekran aç")">
+                    <img src="@photo.Url" alt="@Model.Title · @caption" decoding="async" loading="@(i == 0 ? "eager" : "lazy")" fetchpriority="@(i == 0 ? "high" : "low")" />
+                    <span class="luxe-ritual-expand"><i class="fa-solid fa-expand" aria-hidden="true"></i>@(en ? "View photo" : "Fotoğrafı büyüt")</span>
+                </a>
+            }
+        </div>
+        <div class="luxe-ritual-thumbnails" role="group" aria-label="@(en ? "Ritual photos" : "Ritüel fotoğrafları")">
+            @for (var i = 0; i < gallery.Count; i++)
+            {
+                <button type="button" data-ritual-select="@i" data-caption="@Caption(gallery[i].CaptionKey)" aria-pressed="@(i == 0 ? "true" : "false")" aria-label="@(i + 1). @Caption(gallery[i].CaptionKey)">
+                    <img src="@gallery[i].Url" alt="" width="240" height="160" loading="lazy" /><span>@((i + 1).ToString("00"))</span>
+                </button>
+            }
+        </div>
+        <figcaption data-ritual-caption>@Caption(gallery[0].CaptionKey)</figcaption>
+    </figure>
+    <div class="luxe-ritual-description">
+        <span class="luxe-eyebrow">@(en ? "SLOW DOWN, SETTLE IN" : "YAVAŞLAYIN, DİNLENİN")</span>
+        <h2>@(en ? "A moment" : "Bu an,")<br /><em>@(en ? "just for you." : "sadece sizin.")</em></h2>
+        <div class="luxe-prose">@Html.Raw(SafeHtml.Sanitize(Model.Details))</div>
+        <div class="luxe-price-card">
+            <div><span>@(en ? "Your ritual" : "Deneyim bedeli")</span><strong>@price</strong></div>
+            <div><i class="fa-regular fa-clock" aria-hidden="true"></i><span>@(en ? "Duration" : "Seans süresi")<b>@duration</b></span></div>
+        </div>
+        <button type="button" class="luxe-button luxe-button-gold" data-bs-toggle="modal" data-bs-target="#vip-reservation" data-service-id="@Model.Id">@(en ? "Plan this experience" : "Bu deneyimi planlayın")<i class="fa-regular fa-calendar-check" aria-hidden="true"></i></button>
+        <p class="luxe-contact-support">@(en ? "For urgent questions:" : "Acil sorularınız için:") <a href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer">WhatsApp @(en ? "Concierge Line" : "Danışma Hattı")</a></p>
+        <a class="luxe-text-link" asp-action="Index">@(en ? "All rituals" : "Tüm ritüeller")<i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+    </div>
+</div></section>
+<section class="luxe-section luxe-section-light luxe-journey"><div class="container">
+    <div class="luxe-section-heading"><div><span class="luxe-eyebrow">@(en ? "THE JOURNEY" : "RİTÜELİN AŞAMALARI")</span><h2>@(en ? "Care in every moment." : "Her anında özen.")</h2></div></div>
+    <ol class="luxe-journey-steps">
+        <li><span>01</span><i class="fa-solid fa-mug-hot" aria-hidden="true"></i><h3>@(en ? "A warm welcome" : "Sıcak bir karşılama")</h3><p>@(en ? "Herbal tea, a conversation about your preferences and time to settle in." : "Bitki çayı ikramı, tercihlerinize özel bir konsültasyon ve kendinize ayırdığınız sakin bir başlangıç.")</p></li>
+        <li><span>02</span><i class="fa-solid fa-spa" aria-hidden="true"></i><h3>@(en ? "Your personal ritual" : "Kişiselleştirilmiş seans")</h3><p>@(en ? "Thoughtful care adapted to your preferences by our team." : "Ekibimizin tercihlerinizi dikkate alarak hazırladığı, size özel bir uygulama.")</p></li>
+        <li><span>03</span><i class="fa-solid fa-leaf" aria-hidden="true"></i><h3>@(en ? "A little more calm" : "Dinginliğe biraz daha zaman")</h3><p>@(en ? "Unwind in the relaxation lounge and enjoy a refreshing pause." : "Dinlenme odasında acele etmeden geçirilen anlar ve seans sonrasında ferah bir mola.")</p></li>
+    </ol>
+</div></section>
+@await Html.PartialAsync("_RitualFaq", "service-" + Model.Id)

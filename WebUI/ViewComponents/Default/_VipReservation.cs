@@ -18,12 +18,12 @@ public sealed class _VipReservation(IServiceService services, PublicMediaService
             {
                 var index = Array.IndexOf(preferred, service.Title);
                 return index < 0 ? preferred.Length : index;
-            }).ThenBy(service => service.Id).Take(6).Select(service =>
+            }).ThenBy(service => service.Id).Select(service =>
             {
                 var photoIndex = Array.IndexOf(preferred, service.Title);
                 return new VipServiceOption(service.Id, service.Title ?? "Spa ritüeli",
                     photoIndex >= 0 ? media.Image(null, $"img/vip-{photoIndex + 1}.webp") :
-                    PublicMediaService.Placeholder("service", service.Id, "vip:" + service.Title));
+                    media.ServiceImage(service.Title, service.Image, service.Id));
             }).ToArray();
         return View(new VipReservationViewModel(options));
     }

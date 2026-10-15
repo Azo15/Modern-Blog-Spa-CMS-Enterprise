@@ -211,6 +211,8 @@ using (var scope = app.Services.CreateScope())
         Cron.Daily(2), new RecurringJobOptions { TimeZone = timeZone });
     jobs.AddOrUpdate<ContactEmailRecoveryJob>("recover-contact-emails", job => job.RecoverAsync(CancellationToken.None),
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
+    jobs.AddOrUpdate<AppointmentEmailRecoveryJob>("recover-appointment-emails", job => job.RecoverAsync(CancellationToken.None),
+        Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
 }
 
 // 9. Geliştirme ve üretim ortamlarına göre hata sayfası
