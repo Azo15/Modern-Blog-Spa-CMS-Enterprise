@@ -1,3 +1,12 @@
 @model IEnumerable<Galary>
+@functions {
+    private static string GalleryCategory(string? title) => title switch
+    {
+        "VIP Masaj Odası" or "Çift Masaj Odası" or "Yoga & Meditasyon Odası" => "ritueller",
+        "Aromaterapi Koleksiyonu" or "Premium Ürün Vitrini" => "urunler",
+        "Resepsiyon" or "Makyaj & Saç Bakım Stüdyosu" => "ekip",
+        _ => "mekan"
+    };
+}
 @{var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US";var items=Model.ToList();var names=new[]{en?"A quiet treatment":"Dingin bir dokunuş",en?"Warmth & nature":"Sıcaklık ve doğa",en?"A moment of water":"Suya ayrılan bir an",en?"Tea & stillness":"Çay ve sessizlik",en?"Hydrotherapy":"Hidroterapi",en?"A private ritual":"Özel bir ritüel",en?"Shared wellbeing":"Birlikte iyi yaşam",en?"A softer pace":"Daha sakin bir ritim"};}
-<div class="luxe-gallery-grid">@if(items.Count>0){@foreach(var item in items){var image=Media.GalleryImage(item.Title,item.Image,item.Id);<a class="luxe-gallery-item" href="@image" data-fancybox="spa-gallery" data-caption="@System.Net.WebUtility.HtmlEncode(item.Title ?? "")" data-aos="fade-up"><img src="@image" alt="@item.Title" width="1200" height="1333" loading="lazy" /><span>@item.Title</span><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></a>}}else{@for(var i=0;i<8;i++){<a class="luxe-gallery-item" href="/img/gallery-@(i+1).webp" data-fancybox="spa-gallery" data-caption="@names[i]"><img src="/img/gallery-@(i+1).webp" alt="@names[i]" width="1200" height="1333" loading="lazy" /><span>@names[i]</span><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></a>}}</div>
+<div class="luxe-gallery-grid">@if(items.Count>0){@foreach(var item in items){var image=Media.GalleryImage(item.Title,item.Image,item.Id);<a class="luxe-gallery-item" href="@image" data-category="@GalleryCategory(item.Title)" data-fancybox="spa-gallery" data-caption="@System.Net.WebUtility.HtmlEncode(item.Title ?? "")" data-aos="fade-up"><img src="@image" alt="@item.Title" width="1200" height="1333" loading="lazy" /><span>@item.Title</span><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></a>}}else{@for(var i=0;i<8;i++){<a class="luxe-gallery-item" href="/img/gallery-@(i+1).webp" data-category="@(new[] { "ritueller", "mekan", "mekan", "ekip", "urunler", "mekan", "ritueller", "mekan" }[i])" data-fancybox="spa-gallery" data-caption="@names[i]"><img src="/img/gallery-@(i+1).webp" alt="@names[i]" width="1200" height="1333" loading="lazy" /><span>@names[i]</span><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></a>}}</div>
