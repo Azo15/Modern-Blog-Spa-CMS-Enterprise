@@ -418,3 +418,5 @@ html[data-theme=dark]{color-scheme:dark;--ink:#e4e9de;--muted:#acb9ae;--line:rgb
 .luxe-search:has(#blog-search){border:1px solid var(--champagne);padding:5px 12px;transition:box-shadow .25s,border-color .25s;min-width:250px;background:var(--ivory)}.luxe-search:has(#blog-search):focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.16),0 5px 25px rgba(212,175,55,.09)}#blog-search{color:var(--ink);font-family:var(--sans);width:100%;outline:none}.luxe-search-status{font-size:12px;color:var(--muted);margin:0 0 20px}.luxe-search-status:empty{display:none}
 
 .luxe-blog-statistics{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);background:var(--cream);padding:17px 22px;font-size:13px;margin-bottom:30px}.luxe-blog-statistics i,.luxe-blog-statistics>span{color:var(--champagne)}
+
+.luxe-gallery-hero{padding:28px 0 22px}.luxe-gallery-hero .luxe-title{font-size:clamp(34px,4vw,52px)}.luxe-gallery-hero .luxe-lead{margin-bottom:0}.luxe-gallery-section{padding-top:24px}
