@@ -505,7 +505,7 @@
     <value>Tell us about your request...</value>
   </data>
   <data name="SendContact" xml:space="preserve">
-    <value>Send appointment request</value>
+    <value>Send Message</value>
   </data>
   <data name="Okay" xml:space="preserve">
     <value>Okay</value>

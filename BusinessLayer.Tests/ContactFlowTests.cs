@@ -121,6 +121,15 @@ public sealed class ContactFlowTests
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync();
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false, HandleCookies = true });
+        var page = WebUtility.HtmlDecode(await client.GetStringAsync("/iletisim"));
+        Assert.Contains("Bize bir not bırakın.", page);
+        var contactForm = Regex.Match(page, "<form\\b[^>]*action=\"/iletisim\"[\\s\\S]*?</form>").Value;
+        Assert.NotEmpty(contactForm);
+        Assert.Matches("<button[^>]*type=\"submit\"[^>]*>\\s*Mesajı Gönder\\s*<i", contactForm);
+        Assert.DoesNotContain("Randevu talebi gönder", contactForm);
+        Assert.DoesNotContain("/randevu", contactForm);
+        Assert.Contains("href=\"/randevu\">Online Randevu Al", page);
+        Assert.Contains("WhatsApp Danışma Hattı", page);
         var token = await Csrf(client);
         var response = await client.PostAsync("/iletisim", new FormUrlEncodedContent(new Dictionary<string, string>
         {
@@ -132,8 +141,13 @@ public sealed class ContactFlowTests
         using var scope = factory.Services.CreateScope(); var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Equal("visitor@example.test", Assert.Single(await db.ContactForms.ToListAsync()).Email);
         Assert.Single(await db.Set<ContactEmailDelivery>().ToListAsync());
+        Assert.Empty(await db.Appointments.ToListAsync());
         var confirmation = await client.GetStringAsync(response.Headers.Location!);
         Assert.Contains("success", confirmation);
+        var messageJson = Regex.Match(confirmation, """const message=("(?:\\.|[^"\\])*");""").Groups[1].Value;
+        var message = JsonSerializer.Deserialize<string>(messageJson);
+        Assert.Equal("Mesajınız kaydedildi. E-posta bildirimi sıraya alındı.", message);
+        Assert.DoesNotContain("randevu", message!, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

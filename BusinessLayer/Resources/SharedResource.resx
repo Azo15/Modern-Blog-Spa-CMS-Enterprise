@@ -505,7 +505,7 @@
     <value>Özel isteklerinizi belirtiniz...</value>
   </data>
   <data name="SendContact" xml:space="preserve">
-    <value>Randevu talebi gönder</value>
+    <value>Mesajı Gönder</value>
   </data>
   <data name="Okay" xml:space="preserve">
     <value>Tamam</value>
