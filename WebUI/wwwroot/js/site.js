@@ -6,7 +6,16 @@
         const text = (tr, english) => en ? english : tr;
         document.body.classList.add('js-ready');
         document.documentElement.classList.remove('js-boot');
-        if (window.AOS && !reduced.matches) AOS.init({ duration: 800, once: true, offset: 45, easing: 'ease-out-cubic' });
+        // Scroll effects are optional: a failed init must never hide the page or stop its controls.
+        const revealContent = () => document.querySelectorAll('[data-aos]').forEach(node => node.classList.add('aos-animate'));
+        const scrollEffects = action => {
+            try { action(); }
+            catch { console.warn('XSPA: scroll effects are unavailable; page content remains visible.'); }
+            finally { revealContent(); }
+        };
+        scrollEffects(() => {
+            if (window.AOS && !reduced.matches) window.AOS.init({ duration: 800, once: true, offset: 45, easing: 'ease-out-cubic' });
+        });
         if (window.Fancybox) Fancybox.bind('[data-fancybox]', { hideScrollbar: false });
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
@@ -149,7 +158,7 @@
                 });
                 filters.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.serviceFilter === category)));
                 document.querySelector('[data-service-count]').textContent = count + text(' ritüel sizi bekliyor.', ' rituals await you.');
-                if (window.AOS) AOS.refresh();
+                scrollEffects(() => window.AOS?.refresh());
             };
             filters.hidden = false;
             filters.querySelectorAll('button').forEach(button => button.addEventListener('click', () => apply(button.dataset.serviceFilter)));

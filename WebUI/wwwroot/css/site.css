@@ -30,6 +30,10 @@
 .luxe-hour-range{display:block;font-family:var(--serif);font-size:34px;line-height:1.5;color:#91713B;font-weight:400;letter-spacing:-.03em;margin:8px 0 13px}
 
 /* Quiet transitions and accessible interaction surfaces. */
+/* Content is visible before JS, after init and when a scroll library is unavailable.
+   Scope this to decorative animation markers; hidden forms, menus and modals keep their state. */
+.luxe-body [data-aos]{opacity:1!important;visibility:visible!important}
+.luxe-body [data-aos]:not(.is-tilting){transform:none!important}
 [hidden]{display:none!important}
 html{scrollbar-width:thin;scrollbar-color:var(--champagne) var(--emerald);color-scheme:light}
 ::-webkit-scrollbar{width:7px;height:7px}

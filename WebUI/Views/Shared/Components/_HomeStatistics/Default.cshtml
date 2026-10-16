@@ -1,0 +1,31 @@
+@model HomeStatisticsViewModel
+@{
+    var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+    var unavailable = en ? "Currently unavailable" : "Şu anda görüntülenemiyor";
+}
+<section class="luxe-home-statistics" id="home-statistics" aria-labelledby="home-statistics-title">
+    <div class="container">
+        <div class="luxe-home-statistics-intro">
+            <span class="luxe-eyebrow">@(en ? "YOUR TIME, CONSIDERED" : "ZAMANINIZA DEĞER VERİYORUZ")</span>
+            <h2 id="home-statistics-title">@(en ? "A little space for yourself." : "Kendinize ayırdığınız bir an.")</h2>
+        </div>
+        <dl class="luxe-home-statistics-grid">
+            <div class="luxe-home-statistic">
+                <dt>@(en ? "Available rituals" : "Sizi bekleyen ritüel")</dt>
+                <dd aria-label="@(Model.PublishedServiceCount.HasValue ? null : unavailable)">@(Model.PublishedServiceCount?.ToString() ?? "—")</dd>
+            </div>
+            <div class="luxe-home-statistic">
+                <dt>@(en ? "Wellbeing articles" : "İlham veren blog yazısı")</dt>
+                <dd aria-label="@(Model.PublishedBlogCount.HasValue ? null : unavailable)">@(Model.PublishedBlogCount?.ToString() ?? "—")</dd>
+            </div>
+            <div class="luxe-home-statistic">
+                <dt>@(en ? "Days a week" : "Haftanın her günü")</dt>
+                <dd>7</dd>
+            </div>
+            <div class="luxe-home-statistic luxe-home-statistic-hours">
+                <dt>@(en ? "Daily opening hours" : "Her gün açık")</dt>
+                <dd><time datetime="09:00">09:00</time><span aria-hidden="true">–</span><time datetime="00:00">00:00</time></dd>
+            </div>
+        </dl>
+    </div>
+</section>

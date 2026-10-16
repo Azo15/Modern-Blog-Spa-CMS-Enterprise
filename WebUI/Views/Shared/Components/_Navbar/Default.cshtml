@@ -1,12 +1,55 @@
 @model SiteTable
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService NavigationAuthorization
-@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";}
+@{
+    var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var accountName = User.Identity?.Name ?? (en ? "My account" : "Hesabım");
+    string? panelController = null;
+    if (signedIn)
+    {
+        if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Admin)).Succeeded)
+            panelController = "AdminUserList";
+        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded)
+            panelController = "AdminBlog";
+        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
+            panelController = "AdminComment";
+    }
+}
 <header class="luxe-header" id="site-header">
     <div class="luxe-topbar"><div class="container"><span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Kırklareli <span class="luxe-topbar-divider">/</span> @(en ? "A moment, just for you." : "Kendinize ayırdığınız bir an.")</span><a href="tel:+905388787000"><i class="fa-solid fa-phone" aria-hidden="true"></i> +90 538 878 70 00</a></div></div>
     <nav class="navbar navbar-expand-xl luxe-nav" aria-label="@(en ? "Main navigation" : "Ana menü")">
         <div class="container">
             <a class="luxe-brand" asp-controller="Default" asp-action="Index" aria-label="XSPA — @L["Home"]"><img src="~/img/brand-mark.svg" width="50" height="50" alt="" /><span>XSPA<small>SPA &amp; WELLNESS</small></span></a>
+            <div class="luxe-nav-account">
+                @if (signedIn)
+                {
+                    <div class="dropdown luxe-account-dropdown">
+                        <button id="navbar-account" class="luxe-account luxe-account-trigger dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@(en ? $"Account menu for {accountName}" : $"{accountName} için hesap menüsü")">
+                            <i class="fa-regular fa-user" aria-hidden="true"></i>
+                            <span class="luxe-account-label">@accountName</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end luxe-account-menu" aria-labelledby="navbar-account">
+                            <li><span class="luxe-account-name">@accountName</span></li>
+                            <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fa-regular fa-user" aria-hidden="true"></i>@L["Profile"]</a></li>
+                            @if (panelController is not null)
+                            {
+                                <li><a class="dropdown-item luxe-admin-link" asp-controller="@panelController" asp-action="@(panelController == "AdminUserList" ? "UserList" : "Index")"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Panel</a></li>
+                            }
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form asp-controller="Dashboard" asp-action="Logout" method="post" class="luxe-account-logout">
+                                    <button class="dropdown-item" type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>@(en ? "Sign out" : "Çıkış Yap")</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a class="luxe-account luxe-account-signin" asp-controller="Dashboard" asp-action="SignIn"><i class="fa-regular fa-user" aria-hidden="true"></i><span>@(en ? "Sign in" : "Giriş Yap")</span></a>
+                }
+            </div>
             <button class="luxe-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="@(en ? "Toggle menu" : "Menüyü aç veya kapat")"><span></span><span></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
@@ -20,13 +63,6 @@
                 <div class="luxe-nav-actions">
                     @await Html.PartialAsync("_LanguageSelector")
                     <button id="theme-toggle" class="luxe-theme-toggle" type="button" aria-pressed="false" aria-label="@(en ? "Switch to dark theme" : "Koyu temaya geç")"><i class="fa-regular fa-moon" aria-hidden="true"></i><span class="visually-hidden">@(en ? "Change theme" : "Temayı değiştir")</span></button>
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a class="luxe-account" asp-controller="Profile" asp-action="Index" aria-label="@L["Profile"]"><i class="fa-regular fa-user" aria-hidden="true"></i></a>
-                        @if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded){<a class="luxe-admin-link" asp-controller="AdminBlog" asp-action="Index">@L["AdminPanel"]</a>}
-                        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded){<a class="luxe-admin-link" asp-controller="AdminComment" asp-action="Index">@L["AdminPanel"]</a>}
-                    }
-                    else {<a class="luxe-account" asp-controller="Dashboard" asp-action="SignIn" aria-label="@(en ? "Sign in" : "Üye girişi")"><i class="fa-regular fa-user" aria-hidden="true"></i></a>}
                     <button class="luxe-button luxe-button-gold luxe-nav-book" type="button" data-bs-toggle="modal" data-bs-target="#vip-reservation">@(en ? "Book a ritual" : "VIP Randevu")<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button>
                 </div>
             </div>
