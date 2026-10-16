@@ -410,3 +410,5 @@ html[data-theme=dark]{color-scheme:dark;--ink:#e4e9de;--muted:#acb9ae;--line:rgb
 }
 
 .luxe-about-hero{padding:30px 0 24px}.luxe-about-hero .luxe-title{font-size:clamp(36px,4vw,54px)}.luxe-about-hero .luxe-lead{margin-bottom:0}.luxe-about-story{padding-top:35px}
+
+.luxe-about-features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}.luxe-about-feature{min-width:0}.luxe-about-feature .luxe-hours{margin:0;padding:25px 20px}.luxe-about-feature h3{font-size:24px;overflow-wrap:anywhere}.luxe-about-feature p{font-size:13px}@media(max-width:991px){.luxe-about-features{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}}@media(max-width:575px){.luxe-about-feature .luxe-hours{padding:20px 15px}.luxe-about-feature h3{font-size:21px}}
