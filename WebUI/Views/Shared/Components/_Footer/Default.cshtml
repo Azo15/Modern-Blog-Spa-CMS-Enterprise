@@ -1,5 +1,5 @@
 @model FooterViewModel
-@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; var mail = Model.Contact?.Mail; var socials = new[] { (Model.Contact?.InstagramUrl,"instagram"), (Model.Contact?.FacebookUrl,"facebook-f"), (Model.Contact?.YoutubeUrl,"youtube"), (Model.Contact?.TwitterUrl,"twitter") };}
+@{var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; var mail = Model.Contact?.Mail; var socials = new[] { ("https://instagram.com/xspawellness","instagram"), ("https://facebook.com/xspawellness","facebook-f"), ("https://youtube.com/@xspawellness","youtube"), ("https://twitter.com/xspawellness","twitter") };}
 <section class="luxe-booking-band"><div class="container"><div><span class="luxe-eyebrow">@(en ? "YOUR NEXT CHAPTER OF CALM" : "DİNGİNLİĞE İLK ADIM")</span><h2>@(en ? "Make time for yourself." : "Bugün, kendinize zaman ayırın.")</h2></div><button type="button" class="luxe-button luxe-button-outline" data-bs-toggle="modal" data-bs-target="#vip-reservation">@(en ? "Plan your visit" : "Deneyiminizi planlayın") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div></section>
 <footer class="luxe-footer"><div class="container">
     <div class="luxe-footer-grid">
