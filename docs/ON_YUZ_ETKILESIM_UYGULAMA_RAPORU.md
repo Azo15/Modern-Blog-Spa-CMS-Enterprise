@@ -1,5 +1,7 @@
 # XSPA Ön Yüz ve Etkileşim Uygulama Raporu
 
+> **Tarihsel not — 16 Ekim 2026:** Bu belge 15 Ekim'deki ilk ön yüz teslimini kaydeder. Aşağıdaki WhatsApp taslağına dayalı VIP akışı ve “migration gerekmiyor” bilgisi o aşamaya aittir. Güncel site içi rezervasyon, yeni randevu tabloları, concierge ve hizmet galerisi çalışmaları [Online Rezervasyon Uygulama Raporu](ONLINE_REZERVASYON_UYGULAMA_RAPORU.md) içinde belgelenmiştir.
+
 15 Ekim 2026 · Mevcut ASP.NET Core MVC uygulamasına uygulandı.
 
 ## Sonuç
