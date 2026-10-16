@@ -58,6 +58,20 @@
             galleryFilters.querySelectorAll('button').forEach(button => button.addEventListener('click', () => applyGalleryFilter(button.dataset.galleryFilter)));
             applyGalleryFilter('all');
         }
+        const businessStatuses = [...document.querySelectorAll('[data-business-status]')];
+        if (businessStatuses.length) {
+            const updateBusinessStatus = () => {
+                const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Istanbul', hour: '2-digit', hourCycle: 'h23' }).format(new Date()));
+                const open = hour >= 9 && hour < 24;
+                businessStatuses.forEach(badge => {
+                    badge.textContent = open ? text('● Açık', '● Open') : text('● Kapalı', '● Closed');
+                    badge.classList.toggle('is-open', open);
+                    badge.classList.toggle('is-closed', !open);
+                });
+            };
+            updateBusinessStatus();
+            setInterval(updateBusinessStatus, 60000);
+        }
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
         const menuToggle = document.querySelector('.luxe-menu-toggle');
