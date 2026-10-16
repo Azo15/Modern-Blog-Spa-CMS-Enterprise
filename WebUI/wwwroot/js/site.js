@@ -38,6 +38,26 @@
             blogSearch.addEventListener('input', filterBlogs);
             // The existing GET form searches the complete, paginated archive on Enter.
         }
+        const galleryFilters = document.querySelector('[data-gallery-filters]');
+        if (galleryFilters) {
+            const items = [...document.querySelectorAll('.luxe-gallery-grid [data-category]')];
+            const applyGalleryFilter = category => {
+                let count = 0;
+                items.forEach(item => {
+                    item.hidden = category !== 'all' && item.dataset.category !== category;
+                    item.dataset.fancybox = item.hidden ? 'gallery-filtered-out' : 'spa-gallery';
+                    if (!item.hidden) count++;
+                });
+                galleryFilters.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.galleryFilter === category)));
+                const status = document.querySelector('[data-gallery-count]');
+                if (status) status.textContent = count + text(' fotoğraf', ' photographs');
+                const empty = document.querySelector('[data-gallery-empty]');
+                if (empty) empty.hidden = count > 0;
+            };
+            galleryFilters.hidden = false;
+            galleryFilters.querySelectorAll('button').forEach(button => button.addEventListener('click', () => applyGalleryFilter(button.dataset.galleryFilter)));
+            applyGalleryFilter('all');
+        }
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
         const menuToggle = document.querySelector('.luxe-menu-toggle');
