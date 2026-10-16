@@ -17,6 +17,27 @@
             if (window.AOS && !reduced.matches) window.AOS.init({ duration: 800, once: true, offset: 45, easing: 'ease-out-cubic' });
         });
         if (window.Fancybox) Fancybox.bind('[data-fancybox]', { hideScrollbar: false });
+        const blogSearch = document.getElementById('blog-search');
+        if (blogSearch) {
+            const blogCards = [...document.querySelectorAll('#blog-results .luxe-blog-card')];
+            const normalize = value => value.toLocaleLowerCase(en ? 'en-US' : 'tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ı/g, 'i').trim();
+            const filterBlogs = () => {
+                const query = normalize(blogSearch.value);
+                let count = 0;
+                blogCards.forEach(card => {
+                    const label = (card.querySelector('h3')?.textContent || '') + ' ' + (card.querySelector('.luxe-blog-category')?.textContent || '');
+                    card.hidden = !!query && !normalize(label).includes(query);
+                    if (!card.hidden) count++;
+                });
+                const empty = document.getElementById('blog-search-empty');
+                if (empty) empty.hidden = !query || count > 0;
+                const status = document.getElementById('blog-search-status');
+                if (status) status.textContent = query ? count + text(' yazı bu sayfada eşleşti. Tüm arşivde aramak için Enter’a basın.', ' posts matched on this page. Press Enter to search the full archive.') : '';
+            };
+            blogSearch.addEventListener('keyup', filterBlogs);
+            blogSearch.addEventListener('input', filterBlogs);
+            // The existing GET form searches the complete, paginated archive on Enter.
+        }
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
         const menuToggle = document.querySelector('.luxe-menu-toggle');
