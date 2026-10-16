@@ -2,7 +2,26 @@
 @await Component.InvokeAsync("_WelCome")
 @await Component.InvokeAsync("_HomeService")
 @await Component.InvokeAsync("_HomeStatistics")
-<section class="luxe-section"><div class="container luxe-story"><div class="luxe-story-media" data-aos="fade-up"><img src="~/img/about-retreat.webp" width="1200" height="1200" loading="lazy" alt="@(en ? "Quiet waters and natural spa textures" : "Dingin su ve doğal spa dokuları")" /></div><div class="luxe-story-text" data-aos="fade-up"><span class="luxe-eyebrow">@(en ? "THE XSPA PHILOSOPHY" : "XSPA FELSEFESİ")</span><h2>@(en ? "Less hurry." : "Biraz yavaşlayın.")<br /><em>@(en ? "More you." : "Biraz kendinize dönün.")</em></h2><p>@(en ? "We believe wellbeing begins when you make room for yourself. A gentle touch, the scent of nature, the quiet warmth of water. Every detail invites you to be present." : "İyi yaşamın, kendinize alan açtığınız anda başladığına inanıyoruz. Zarif bir dokunuş, doğanın kokusu, suyun sessiz sıcaklığı. Her detay sizi o anın içinde olmaya davet ediyor.")</p><div class="luxe-signature">@(en ? "Your moment. Your balance." : "Sizin anınız. Sizin dengeniz.")</div><a class="luxe-text-link" asp-controller="About" asp-action="Index">@(en ? "Our story" : "Hikâyemizi keşfedin") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></section>
+<section class="luxe-section" id="home-story" aria-labelledby="home-story-title">
+    <div class="container luxe-story">
+        <div class="luxe-story-media">
+            <img src="~/img/about-retreat.webp" width="1200" height="1200" loading="lazy" alt="@(en ? "Quiet waters and natural spa textures" : "Dingin su ve doğal spa dokuları")" />
+        </div>
+        <div class="luxe-story-text">
+            <span class="luxe-eyebrow">@(en ? "THE XSPA PHILOSOPHY" : "XSPA FELSEFESİ")</span>
+            <h2 id="home-story-title">@(en ? "The Elegant Art of Wellbeing" : "İyi Yaşamın Zarif Sanatı")</h2>
+            <p>@(en ? "We believe wellbeing begins with a quiet moment for yourself. Natural textures, calming water and carefully considered rituals offer an unhurried pause from everyday life." : "İyi yaşamın, kendinize ayırdığınız sakin bir anla başladığına inanıyoruz. Doğal dokular, suyun dinginliği ve özenle tasarlanan ritüellerle günlük yaşamın temposuna zarif bir mola sunuyoruz.")</p>
+            <p>@(en ? "Our expert team listens to each guest and personalises every experience. Bringing traditional spa culture together with contemporary care, we keep your comfort and attention to detail at the heart of every visit." : "Uzman ekibimiz, her misafirin tercihlerini dinleyerek deneyimini kişiselleştirir. Geleneksel spa kültürünü çağdaş bakım anlayışıyla bir araya getirir; her adımda konforunuzu ve özeni ön planda tutar.")</p>
+            <ul class="luxe-story-benefits">
+                <li><i class="fa-solid fa-award" aria-hidden="true"></i><span>@(en ? "10+ years of experience" : "10+ yıllık deneyim")</span></li>
+                <li><i class="fa-solid fa-user-check" aria-hidden="true"></i><span>@(en ? "Certified expert therapists" : "Sertifikalı uzman terapistler")</span></li>
+                <li><i class="fa-solid fa-leaf" aria-hidden="true"></i><span>@(en ? "Natural and organic products" : "Doğal ve organik ürünler")</span></li>
+                <li><i class="fa-solid fa-sliders" aria-hidden="true"></i><span>@(en ? "Personalised programmes" : "Kişiye özel program")</span></li>
+            </ul>
+            <a class="luxe-button luxe-button-dark" asp-controller="About" asp-action="Index">@(en ? "More About Us" : "Hakkımızda Daha Fazla") <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
 @await Component.InvokeAsync("_HomeBlog")
 <partial name="_GuestExperiences" />
 @await Component.InvokeAsync("_Galary")

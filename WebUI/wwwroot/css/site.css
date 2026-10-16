@@ -30,6 +30,12 @@
 .luxe-hour-range{display:block;font-family:var(--serif);font-size:34px;line-height:1.5;color:#91713B;font-weight:400;letter-spacing:-.03em;margin:8px 0 13px}
 
 /* Quiet transitions and accessible interaction surfaces. */
+.luxe-story .luxe-story-text{min-width:0;opacity:1!important;visibility:visible!important;transform:none!important}
+.luxe-story-media img{height:auto}
+.luxe-story-benefits{list-style:none;padding:0;margin:25px 0 30px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 22px}
+.luxe-story-benefits li{display:flex;align-items:center;gap:11px;font-size:13px;line-height:1.6}
+.luxe-story-benefits i{flex-shrink:0;display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;color:var(--champagne)}
+@media(max-width:575px){.luxe-story-benefits{grid-template-columns:minmax(0,1fr);gap:13px}}
 /* Content is visible before JS, after init and when a scroll library is unavailable.
    Scope this to decorative animation markers; hidden forms, menus and modals keep their state. */
 .luxe-body [data-aos]{opacity:1!important;visibility:visible!important}

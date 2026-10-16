@@ -36,5 +36,14 @@ public sealed class HomeSectionEndpointTests
         Assert.Equal(new[] { "1", "2", "7" }, values);
         Assert.Contains("09:00", statistics);
         Assert.Contains("00:00", statistics);
+        var story = Regex.Match(html, "<section[^>]*id=\"home-story\"[\\s\\S]*?</section>").Value;
+        Assert.Contains("İyi Yaşamın Zarif Sanatı", story);
+        Assert.Equal(2, Regex.Matches(story, "<p>").Count);
+        Assert.Equal(4, Regex.Matches(story, "<li>").Count);
+        foreach (var benefit in new[] { "10+ yıllık deneyim", "Sertifikalı uzman terapistler", "Doğal ve organik ürünler", "Kişiye özel program" })
+            Assert.Contains(benefit, story);
+        Assert.Contains("href=\"/hakkimizda\"", story);
+        Assert.Contains("Hakkımızda Daha Fazla", story);
+        Assert.DoesNotContain("data-aos", story);
     }
 }
