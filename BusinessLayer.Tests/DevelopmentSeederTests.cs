@@ -58,6 +58,9 @@ public class DevelopmentSeederTests
         Assert.Equal(12, galleryImages.Length);
         Assert.Equal(editorialImages.Length, editorialImages.Distinct().Count());
         Assert.All(editorialImages, path => Assert.EndsWith(".webp", path));
+        Assert.Equal("XSPA Ekibi", (await users.FindByEmailAsync("admin@spa.com"))!.FullName);
+        Assert.Equal("XSPA Editörü", (await users.FindByEmailAsync("editor@spa.com"))!.FullName);
+        Assert.Equal("Wellness Uzmanı", (await users.FindByEmailAsync("author@spa.com"))!.FullName);
         Assert.Equal(5, await users.Users.CountAsync());
         Assert.Equal(5, await roles.Roles.CountAsync());
         Assert.False(await roles.RoleExistsAsync("Visitor"));

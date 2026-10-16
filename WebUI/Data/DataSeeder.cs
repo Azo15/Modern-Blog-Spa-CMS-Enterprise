@@ -54,12 +54,28 @@ namespace WebUI.Data
                     if (!await userManager.CheckPasswordAsync(user, "P@ssword123!"))
                         Ensure(await userManager.ResetPasswordAsync(user, await userManager.GeneratePasswordResetTokenAsync(user), "P@ssword123!"));
                 }
+                // Development demo display names are stable on both fresh and existing databases.
+                var displayName = email switch
+                {
+                    "admin@spa.com" => ("XSPA", "Ekibi"),
+                    "editor@spa.com" => ("XSPA", "Editörü"),
+                    "author@spa.com" => ("Wellness", "Uzmanı"),
+                    _ => (user.FirstName, user.LastName)
+                };
+                if (user.FirstName != displayName.Item1 || user.LastName != displayName.Item2)
+                {
+                    user.FirstName = displayName.Item1;
+                    user.LastName = displayName.Item2;
+                    Ensure(await userManager.UpdateAsync(user));
+                }
                 // Keep demo accounts deterministic and prevent stale elevated roles.
                 var existingRoles = await userManager.GetRolesAsync(user);
                 if (existingRoles.Any(r => r != role))
                     Ensure(await userManager.RemoveFromRolesAsync(user, existingRoles.Where(r => r != role)));
                 if (!await userManager.IsInRoleAsync(user, role)) Ensure(await userManager.AddToRoleAsync(user, role));
             }
+            var publicCache = scope.ServiceProvider.GetService<BusinessLayer.Abstract.ICacheService>();
+            if (publicCache is not null) await publicCache.RemoveByPrefixAsync("blogs_");
             var seederUser = await userManager.FindByEmailAsync("admin@spa.com")
                 ?? throw new InvalidOperationException("Development admin account was not created.");
 
