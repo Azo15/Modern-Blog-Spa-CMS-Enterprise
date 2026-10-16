@@ -18,6 +18,7 @@ public sealed class BlogController(ISender sender, IAuthorizationService authori
         ViewBag.PublicCategories = await sender.Send(new GetPublicCategoriesQuery(), ct);
         ViewBag.Search = search;
         ViewBag.TotalBlogs = result.TotalCount;
+        ViewBag.PublishedArticleCount = (await sender.Send(new GetPublicBlogsQuery(1, 1), ct)).TotalCount;
         ViewBag.CategoryId = categoryId;
         return View(result);
     }
