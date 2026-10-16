@@ -72,6 +72,35 @@
             updateBusinessStatus();
             setInterval(updateBusinessStatus, 60000);
         }
+        if (!reduced.matches) document.body.classList.add('page-entering');
+        let navigationPending = false;
+        let navigationRestore;
+        const restorePage = () => {
+            document.body.classList.remove('page-leaving');
+            navigationPending = false;
+            clearTimeout(navigationRestore);
+        };
+        window.addEventListener('pageshow', restorePage);
+        document.addEventListener('click', event => {
+            if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || reduced.matches) return;
+            const link = event.target.closest?.('a[href]');
+            if (!link || (link.target && link.target !== '_self') || link.hasAttribute('download') || link.hasAttribute('data-fancybox') || link.hasAttribute('data-bs-toggle') || link.hasAttribute('data-no-transition')) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+            const destination = new URL(link.href, window.location.href);
+            if (!['http:', 'https:'].includes(destination.protocol) || destination.origin !== window.location.origin || destination.hash || /\.(pdf|xlsx?|zip|webp|jpe?g|png|svg)$/i.test(destination.pathname) || destination.pathname.startsWith('/Reports/')) return;
+            if (destination.href === window.location.href) return;
+            event.preventDefault();
+            if (navigationPending) return;
+            navigationPending = true;
+            document.body.classList.remove('page-entering');
+            document.body.classList.add('page-leaving');
+            navigationRestore = setTimeout(restorePage, 1800);
+            setTimeout(() => {
+                try { window.location.assign(destination.href); }
+                catch { restorePage(); }
+            }, 200);
+        });
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
         const menuToggle = document.querySelector('.luxe-menu-toggle');
