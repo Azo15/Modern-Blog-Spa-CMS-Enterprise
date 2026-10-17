@@ -879,6 +879,9 @@ namespace DataAccesLayer.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("EnableSsl")
+                        .HasColumnType("bit");
+
                     b.Property<string>("GoogleSearch")
                         .HasColumnType("nvarchar(max)");
 
@@ -907,6 +910,9 @@ namespace DataAccesLayer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SiteUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SmtpUsername")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SocialImage")

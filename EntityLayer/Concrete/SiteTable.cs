@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
@@ -30,5 +30,7 @@ namespace EntityLayer.Concrete
 
         [Display(Name = "SMTP Şifresi")]
         public string? Password { get; set; }
+        public string? SmtpUsername { get; set; }
+        public bool EnableSsl { get; set; } = true;
     }
 }
