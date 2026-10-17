@@ -738,6 +738,9 @@ namespace DataAccesLayer.Migrations
                     b.Property<bool>("IsPublish")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 

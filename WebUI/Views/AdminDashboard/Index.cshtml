@@ -1,0 +1,11 @@
+@model BusinessLayer.Dtos.AdminDashboardDto
+@{ Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "XSPA Yönetim Özeti"; }
+<section class="xspa-dashboard"><header><span>XSPA · İŞLETME ÖZETİ</span><h1>Bugünün ritmi</h1><p>Türkiye saatine göre güncel randevu ve hizmet görünümü.</p></header>
+<div class="card p-4 my-4"><h2 class="h5">Bu ay tahmini hizmet bedeli</h2><strong>@Model.EstimatedMonthlyRevenue.ToString("N2") ₺</strong><p>Onaylı randevular × güncel hizmet tarifesi. Tahsilat veya muhasebe raporu değildir.</p><span>@Model.Customers farklı müşteri · @Model.Guests toplam misafir</span></div>
+<!-- pending-banner -->
+<!-- metric-cards -->
+<!-- trend-chart -->
+<!-- distribution-chart -->
+<!-- recent-appointments -->
+<!-- system-health -->
+</section>

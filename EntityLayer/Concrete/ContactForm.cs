@@ -1,10 +1,11 @@
-﻿using EntityLayer.Enum;
+using EntityLayer.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
 {
     public class ContactForm : BaseEntity
     {
+        public bool IsRead { get; set; }
         [Display(Name = "Adınız Soyadınız")]
         public string? FullName { get; set; }
 
