@@ -1,9 +1,15 @@
+<link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
 @model BusinessLayer.Dtos.AdminDashboardDto
 @{ Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "XSPA Yönetim Özeti"; }
 <section class="xspa-dashboard"><header><span>XSPA · İŞLETME ÖZETİ</span><h1>Bugünün ritmi</h1><p>Türkiye saatine göre güncel randevu ve hizmet görünümü.</p></header>
 <div class="card p-4 my-4"><h2 class="h5">Bu ay tahmini hizmet bedeli</h2><strong>@Model.EstimatedMonthlyRevenue.ToString("N2") ₺</strong><p>Onaylı randevular × güncel hizmet tarifesi. Tahsilat veya muhasebe raporu değildir.</p><span>@Model.Customers farklı müşteri · @Model.Guests toplam misafir</span></div>
 @if(Model.Pending > 0){<a class="alert alert-warning d-flex justify-content-between align-items-center" asp-controller="AdminAppointment" asp-action="Index" asp-route-status="Pending"><strong>@Model.Pending Adet Yeni Randevu Onay Bekliyor</strong><span>İncelemek için tıklayın →</span></a>}
-<!-- metric-cards -->
+<div class="dashboard-metrics">
+<article><span>Bugünkü Randevu</span><strong>@Model.Today</strong><small>@(Model.Today-Model.Yesterday >= 0 ? "↑" : "↓") Düne göre @(Model.Today-Model.Yesterday)</small></article>
+<article><span>Onay Bekleyenler</span><strong>@Model.Pending</strong><small>● Güncel onay kuyruğu</small></article>
+<article><span>Toplam Misafir</span><strong>@Model.Guests</strong><small>@Model.Customers farklı müşteri</small></article>
+<article><span>Aktif Hizmetler</span><strong>@Model.ActiveServices</strong><small>● Randevuya açık</small></article>
+</div>
 <!-- trend-chart -->
 <!-- distribution-chart -->
 <!-- recent-appointments -->
