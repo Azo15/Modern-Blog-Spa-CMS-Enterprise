@@ -18,7 +18,11 @@
 @foreach(var item in Model.Recent){<tr><td>@item.ReferenceCode</td><td>@item.FullName<br /><small>@item.GuestCount misafir</small></td><td>@item.ServiceTitle<br /><small>@item.AppointmentDate.ToString("dd.MM.yyyy") · @item.TimeSlot</small></td><td><span class="dashboard-status @item.Status">@(item.Status == EntityLayer.Enum.AppointmentStatus.Pending ? "Onay Bekliyor" : item.Status == EntityLayer.Enum.AppointmentStatus.Confirmed ? "Onaylandı" : "İptal")</span></td><td>@if(item.Status == EntityLayer.Enum.AppointmentStatus.Pending){<form asp-controller="AdminAppointment" asp-action="Approve" method="post"><input type="hidden" name="id" value="@item.Id" /><button class="btn btn-sm btn-success" type="submit">Onayla</button></form>}@if(item.Status != EntityLayer.Enum.AppointmentStatus.Cancelled){<form asp-controller="AdminAppointment" asp-action="Cancel" method="post" class="mt-2"><input type="hidden" name="id" value="@item.Id" /><button class="btn btn-sm btn-outline-danger" type="submit">İptal Et</button></form>}</td></tr>}
 @if(Model.Recent.Count == 0){<tr><td colspan="5">Henüz randevu kaydı bulunmuyor.</td></tr>}
 </tbody></table></div></section>
-<!-- system-health -->
+<section class="card p-4 my-4"><h2 class="h5">XSPA Sistem Sağlık Kontrolü</h2><p>Ayar ve iş kuyruğu özeti · SMTP durumu bağlantı testi yerine geçmez.</p><ul class="dashboard-health">
+<li class="@(Model.SmtpConfigured ? "good" : "attention")">@(Model.SmtpConfigured ? "● SMTP yapılandırılmış" : "● SMTP ayarları eksik") @if(User.IsInRole(BusinessLayer.Security.AppRoles.SystemAdmin)){<a asp-controller="AdminSettings" asp-action="Smtp">Ayarları incele →</a>}</li>
+<li class="@(Model.Pending == 0 ? "good" : "attention")">● @Model.Pending randevu onay bekliyor <a asp-controller="AdminAppointment" asp-action="Index" asp-route-status="Pending">İncele →</a></li>
+<li class="@(Model.UnreadMessages == 0 ? "good" : "attention")">● @Model.UnreadMessages okunmamış mesaj @if(User.IsInRole(BusinessLayer.Security.AppRoles.SystemAdmin)){<a asp-controller="AdminMessage" asp-action="Index">Mesajlar →</a>}</li>
+</ul></section>
 </section>
 
 @section Scripts {

@@ -47,6 +47,16 @@ namespace WebUI.Controllers
             return View(contactForm);
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkRead(int id)
+        {
+            var message = await _contactFormService.GetByIDAsync(id);
+            if (message is null) return NotFound();
+            message.IsRead = true;
+            await _contactFormService.UpdateAsync(message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
         //[HttpGet]
         //public async Task<IActionResult> Delete(int? id)
         //{

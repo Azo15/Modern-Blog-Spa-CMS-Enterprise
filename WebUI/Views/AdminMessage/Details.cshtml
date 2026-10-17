@@ -94,3 +94,4 @@
 @section Scripts {
     <script src="~/js/rezervationTime.js"></script>
 }
+@if(!Model.IsRead){<form asp-action="MarkRead" method="post" class="my-3"><input type="hidden" name="id" value="@Model.Id" /><button type="submit" class="btn btn-success">Okundu Olarak İşaretle</button></form>}
