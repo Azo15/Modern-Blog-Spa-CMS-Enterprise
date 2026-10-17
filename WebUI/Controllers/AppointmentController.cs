@@ -28,7 +28,7 @@ public sealed class AppointmentController(ISender sender, ILogger<AppointmentCon
         try
         {
             var receipt = await sender.Send(new CreateAppointmentCommand(request.ServiceId, request.AppointmentDate,
-                request.TimeSlot, request.GuestCount, request.FullName, request.Phone, request.Email, request.Notes, request.ClientRequestId), cancellationToken);
+                request.TimeSlot, request.GuestCount, request.FullName, request.Phone, request.Email, request.Notes, request.ClientRequestId, request.GiftCode), cancellationToken);
             return StatusCode(receipt.IsNew ? StatusCodes.Status201Created : StatusCodes.Status200OK, new
             {
                 success = true, receipt.ReferenceCode, appointmentDate = receipt.AppointmentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),

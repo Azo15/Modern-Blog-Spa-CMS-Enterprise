@@ -34,6 +34,8 @@ public sealed class CreateAppointmentValidator : AbstractValidator<CreateAppoint
             .WithMessage("Randevu tarihi bugün ile önümüzdeki 90 gün arasında olmalıdır.");
         RuleFor(x => x.AppointmentDate).Must((request, date) => AppointmentSchedule.IsFutureSlot(date, request.TimeSlot))
             .WithMessage("Lütfen henüz geçmemiş bir gün ve saat seçin.");
+        RuleFor(x => x.GiftCode).MaximumLength(40).Matches(@"^[A-Za-z0-9][A-Za-z0-9-]{2,39}$")
+            .When(x => !string.IsNullOrEmpty(x.GiftCode)).WithMessage("Kod 3–40 karakter olmalı; yalnızca harf, rakam ve tire kullanın.");
         RuleFor(x => x.ClientRequestId).NotEmpty().WithMessage("Talep kimliği eksik. Sayfayı yenileyip tekrar deneyin.");
     }
 }

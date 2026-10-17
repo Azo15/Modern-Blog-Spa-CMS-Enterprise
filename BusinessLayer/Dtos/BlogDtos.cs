@@ -9,19 +9,19 @@ namespace BusinessLayer.Dtos
         public int Id { get; set; }
 
         [Display(Name = "Başlık")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Display(Name = "Slug")]
-        public string Slug { get; set; }
+        public string Slug { get; set; } = string.Empty;
 
         [Display(Name = "Alt Başlık")]
-        public string SubTitle { get; set; }
+        public string SubTitle { get; set; } = string.Empty;
 
         [Display(Name = "İçerik")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Display(Name = "Görsel")]
-        public string Image { get; set; }
+        public string Image { get; set; } = string.Empty;
 
         [Display(Name = "Oluşturulma Tarihi")]
         public DateTime CreatedDate { get; set; }
@@ -33,25 +33,25 @@ namespace BusinessLayer.Dtos
         public int CatagoryId { get; set; }
 
         [Display(Name = "Kategori Adı")]
-        public string CatagoryTitle { get; set; }
+        public string CatagoryTitle { get; set; } = string.Empty;
 
         [Display(Name = "Yazar")]
-        public string AppUserFullName { get; set; }
+        public string AppUserFullName { get; set; } = string.Empty;
     }
 
     public class BlogCreateDto
     {
         [Display(Name = "Başlık")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Display(Name = "Slug")]
         public string? Slug { get; set; }
 
         [Display(Name = "Alt Başlık")]
-        public string SubTitle { get; set; }
+        public string SubTitle { get; set; } = string.Empty;
 
         [Display(Name = "İçerik")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Display(Name = "Görsel")]
         public string? Image { get; set; }
@@ -66,16 +66,16 @@ namespace BusinessLayer.Dtos
         public int Id { get; set; }
 
         [Display(Name = "Başlık")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Display(Name = "Slug")]
         public string? Slug { get; set; }
 
         [Display(Name = "Alt Başlık")]
-        public string SubTitle { get; set; }
+        public string SubTitle { get; set; } = string.Empty;
 
         [Display(Name = "İçerik")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Display(Name = "Görsel")]
         public string? Image { get; set; }

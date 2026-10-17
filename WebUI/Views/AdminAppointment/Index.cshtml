@@ -30,7 +30,7 @@
                     var color = appointment.Status switch { AppointmentStatus.Confirmed => "success", AppointmentStatus.Cancelled => "secondary", _ => "warning" };
                     var phone = new string(appointment.Phone.Where(character => char.IsDigit(character) || character == '+').ToArray());
                     <tr>
-                        <td><strong>@appointment.ReferenceCode</strong><div class="mt-1">@appointment.ServiceTitle</div><small class="text-muted">@appointment.GuestCount misafir</small></td>
+                        <td><strong>@appointment.ReferenceCode</strong><div class="mt-1">@appointment.ServiceTitle</div>@if(!string.IsNullOrWhiteSpace(appointment.GiftCode)){<small>VIP: @appointment.GiftCode</small>}<small class="text-muted">@appointment.GuestCount misafir</small></td>
                         <td><strong>@appointment.FullName</strong><div><a href="tel:@phone">@appointment.Phone</a></div><div>@appointment.Email</div></td>
                         <td class="text-nowrap">@appointment.AppointmentDate.ToString("dd.MM.yyyy")<br /><strong>@appointment.TimeSlot</strong></td>
                         <td style="min-width:180px;max-width:320px;white-space:pre-wrap;overflow-wrap:anywhere">@(string.IsNullOrWhiteSpace(appointment.Notes) ? "—" : appointment.Notes)</td>

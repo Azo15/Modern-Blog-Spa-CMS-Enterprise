@@ -37,9 +37,10 @@ public sealed class AdminDashboardHandler(AppDbContext db, ICurrentUserService c
         var dates = await active.Where(x => x.AppointmentDate >= start && x.AppointmentDate <= today)
             .GroupBy(x => x.AppointmentDate).Select(x => new { Date = x.Key, Count = x.Count() }).ToListAsync(token);
         var trend = Enumerable.Range(0,14).Select(i => { var date = start.AddDays(i); return new DashboardDay(date.ToString("dd.MM", CultureInfo.InvariantCulture), dates.FirstOrDefault(x => x.Date == date)?.Count ?? 0); }).ToList();
-        var distribution = await active.GroupBy(x => x.ServiceTitleSnapshot).Select(x => new DashboardDistribution(x.Key, x.Count())).OrderByDescending(x => x.Count).Take(8).ToListAsync(token);
+        var distributionRows = await active.GroupBy(x => x.ServiceTitleSnapshot).Select(x => new { Service = x.Key, Count = x.Count() }).OrderByDescending(x => x.Count).Take(8).ToListAsync(token);
+        var distribution = distributionRows.Select(x => new DashboardDistribution(x.Service, x.Count)).ToList();
         var recent = await db.Appointments.AsNoTracking().OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.Id).Take(8)
-            .Select(x => new AppointmentAdminDto(x.Id,x.ReferenceCode,x.FullName,x.Phone,x.Email,x.ServiceTitleSnapshot,x.AppointmentDate,x.TimeSlot,x.GuestCount,x.Notes,x.Status,x.CreatedDate)).ToListAsync(token);
+            .Select(x => new AppointmentAdminDto(x.Id,x.ReferenceCode,x.FullName,x.Phone,x.Email,x.ServiceTitleSnapshot,x.AppointmentDate,x.TimeSlot,x.GuestCount,x.Notes,x.Status,x.CreatedDate,x.GiftCode)).ToListAsync(token);
         var unread = await db.ContactForms.CountAsync(x => !x.IsRead, token);
         var smtp = await db.SiteTables.AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(token);
         bool Present(string key, string? fallback) => !string.IsNullOrWhiteSpace(configuration[key] ?? fallback);

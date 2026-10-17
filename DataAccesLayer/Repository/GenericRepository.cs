@@ -57,7 +57,7 @@ namespace DataAccesLayer.Repository
 
 
         // ID'ye göre getir + Include destekli
-        public async Task<T> TGetByIDAsync(
+        public async Task<T?> TGetByIDAsync(
             int id,
             params Expression<Func<T, object>>[] includes)
         {
@@ -111,7 +111,7 @@ namespace DataAccesLayer.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<T> TFirstOrDefaultAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool tracking = true, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> TFirstOrDefaultAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool tracking = true, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
 
@@ -132,12 +132,12 @@ namespace DataAccesLayer.Repository
             {
                 query = orderBy(query);
             }
-            return await query?
+            return await query
                 .Where(predicate)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<T> TLastOrDefaultAsync(
+        public async Task<T?> TLastOrDefaultAsync(
             Expression<Func<T, bool>>? predicate = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             bool tracking = true,

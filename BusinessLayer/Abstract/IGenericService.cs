@@ -21,17 +21,17 @@ namespace BusinessLayer.Abstract
             bool tracking = true,
             params Expression<Func<T, object>>[] includes);
 
-        Task<T> GetByIDAsync(
+        Task<T?> GetByIDAsync(
             int id,
             params Expression<Func<T, object>>[] includes);
 
-        Task<T> FirstOrDefaultAsync(
+        Task<T?> FirstOrDefaultAsync(
             Expression<Func<T, bool>> predicate,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             bool tracking = true,
             params Expression<Func<T, object>>[] includes);
 
-        Task<T> LastOrDefaultAsync(
+        Task<T?> LastOrDefaultAsync(
            Expression<Func<T, bool>>? predicate = null,
            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
            bool tracking = true,

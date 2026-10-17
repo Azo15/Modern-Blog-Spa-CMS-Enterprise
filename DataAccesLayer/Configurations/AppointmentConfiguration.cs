@@ -17,6 +17,7 @@ public sealed class AppointmentConfiguration : IEntityTypeConfiguration<Appointm
         builder.Property(x => x.AppointmentDate).HasColumnType("date");
         builder.Property(x => x.TimeSlot).HasMaxLength(5).IsRequired();
         builder.Property(x => x.Notes).HasMaxLength(2000);
+        builder.Property(x => x.GiftCode).HasMaxLength(40);
         builder.Property(x => x.ReferenceCode).HasMaxLength(30).IsRequired();
         builder.Property(x => x.Status).HasDefaultValue(AppointmentStatus.Pending).IsConcurrencyToken();
         builder.HasIndex(x => x.ReferenceCode).IsUnique();

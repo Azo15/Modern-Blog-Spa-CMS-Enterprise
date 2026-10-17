@@ -8,7 +8,7 @@ namespace BusinessLayer.Dtos
         public int Id { get; set; }
 
         [Display(Name = "Kategori Adı")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Display(Name = "Yayınlandı")]
         public bool IsPublish { get; set; }
@@ -17,7 +17,7 @@ namespace BusinessLayer.Dtos
     public class CatagoryCreateDto
     {
         [Display(Name = "Kategori Adı")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
     }
 
     public class CatagoryUpdateDto
@@ -26,7 +26,7 @@ namespace BusinessLayer.Dtos
         public int Id { get; set; }
 
         [Display(Name = "Kategori Adı")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         
         [Display(Name = "Yayınlandı")]
         public bool IsPublish { get; set; }

@@ -57,7 +57,7 @@ public class ApiPublicQueryTests
         f.As(null);
         await f.Sender.Send(new GetPublicBlogsQuery(Search: "public-search-one"));
         await f.Sender.Send(new GetPublicBlogsQuery(Search: "public-search-two"));
-        var keys = f.Cache.Invocations.Where(x => x.Method.Name == "SetAsync").Select(x => (string)x.Arguments[0]).ToArray();
+        var keys = f.Cache.Invocations.Where(x => x.Method.Name == "SetAsync").Select(x => Assert.IsType<string>(x.Arguments[0])).ToArray();
         Assert.Equal(2, keys.Length);
         Assert.NotEqual(keys[0], keys[1]);
         Assert.All(keys, key => Assert.DoesNotContain("public-search-", key));

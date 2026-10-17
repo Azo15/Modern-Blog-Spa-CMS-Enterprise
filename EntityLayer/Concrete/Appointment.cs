@@ -14,6 +14,7 @@ public sealed class Appointment : BaseEntity
     public string TimeSlot { get; set; } = string.Empty;
     public int GuestCount { get; set; } = 1;
     public string? Notes { get; set; }
+    public string? GiftCode { get; set; }
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
     public string ReferenceCode { get; set; } = string.Empty;
     // A browser retains this token when retrying a request whose response was lost.

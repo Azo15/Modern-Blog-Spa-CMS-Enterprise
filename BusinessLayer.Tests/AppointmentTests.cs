@@ -295,4 +295,47 @@ public sealed class AppointmentTests
         await fixture.Job().SendAsync(delivery.Id, CancellationToken.None);
         fixture.Mail.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task GiftCodeIsNormalizedPersistedAndIncludedInReplayProtection()
+    {
+        using var fixture = new Fixture();
+        var request = Request() with { GiftCode = "vip-2026" };
+        await fixture.Sender.Send(request);
+        Assert.Equal("VIP-2026", (await fixture.Db.Appointments.AsNoTracking().SingleAsync()).GiftCode);
+        Assert.False((await fixture.Sender.Send(request with { GiftCode = "VIP-2026" })).IsNew);
+        await Assert.ThrowsAsync<ValidationException>(() => fixture.Sender.Send(request with { GiftCode = "OTHER" }));
+    }
+
+    [Theory]
+    [InlineData("<script>")] [InlineData("ab")] [InlineData("VIP CODE")]
+    public async Task InvalidGiftCodeCannotCreateAppointment(string code)
+    {
+        using var fixture = new Fixture();
+        await Assert.ThrowsAsync<ValidationException>(() => fixture.Sender.Send(Request() with { GiftCode = code }));
+        Assert.Empty(await fixture.Db.Appointments.ToListAsync());
+    }
+
+    [Fact]
+    public async Task ConfirmationIsDurableAndRepeatedApprovalDoesNotDuplicateIt()
+    {
+        using var fixture = new Fixture();
+        await fixture.Sender.Send(Request()); fixture.As(AppRoles.Admin);
+        await fixture.Sender.Send(new ChangeAppointmentStatusCommand(1, AppointmentStatus.Confirmed));
+        await fixture.Sender.Send(new ChangeAppointmentStatusCommand(1, AppointmentStatus.Confirmed));
+        Assert.Equal(2, await fixture.Db.AppointmentEmailDeliveries.CountAsync());
+        Assert.Single(await fixture.Db.AppointmentEmailDeliveries.Where(x => x.IsConfirmation).ToListAsync());
+    }
+
+    [Fact]
+    public async Task CancelledAppointmentNeverSendsQueuedConfirmation()
+    {
+        using var fixture = new Fixture();
+        await fixture.Sender.Send(Request()); fixture.As(AppRoles.Admin);
+        await fixture.Sender.Send(new ChangeAppointmentStatusCommand(1, AppointmentStatus.Confirmed));
+        var id = await fixture.Db.AppointmentEmailDeliveries.Where(x => x.IsConfirmation).Select(x => x.Id).SingleAsync();
+        await fixture.Sender.Send(new ChangeAppointmentStatusCommand(1, AppointmentStatus.Cancelled));
+        await fixture.Job().SendAsync(id, CancellationToken.None);
+        fixture.Mail.Verify(x => x.SendReceiptAsync(It.IsAny<Appointment>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }

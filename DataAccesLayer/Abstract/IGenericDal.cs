@@ -9,16 +9,16 @@ public interface IGenericDal<T> where T : class
         bool tracking = true,
         params Expression<Func<T, object>>[] includes);
 
-    Task<T> TGetByIDAsync(
+    Task<T?> TGetByIDAsync(
         int id,
         params Expression<Func<T, object>>[] includes);
 
-    Task<T> TFirstOrDefaultAsync(
+    Task<T?> TFirstOrDefaultAsync(
         Expression<Func<T, bool>> predicate,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
         bool tracking = true,
         params Expression<Func<T, object>>[] includes);
-    Task<T> TLastOrDefaultAsync(
+    Task<T?> TLastOrDefaultAsync(
         Expression<Func<T, bool>>? predicate = null,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
         bool tracking = true,

@@ -36,7 +36,7 @@ namespace WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(SignInViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrEmpty(model.Password))
                 return View(model);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -64,7 +64,7 @@ namespace WebUI.Controllers
 
                 // Giriş denemesi
                 var result = await _signInManager.PasswordSignInAsync(
-                    user.UserName,
+                    user,
                     model.Password,
                     model.RememberMe,
                     lockoutOnFailure: false
@@ -110,7 +110,7 @@ namespace WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrEmpty(model.Password))
                 return View(model);
 
             var existingUser = await _userManager.FindByEmailAsync(model.Email);

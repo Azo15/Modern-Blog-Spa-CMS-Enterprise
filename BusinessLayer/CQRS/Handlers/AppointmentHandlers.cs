@@ -34,6 +34,7 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
             ServiceId = service.Id, ServiceTitleSnapshot = service.Title ?? "Spa ritüeli",
             FullName = request.FullName.Trim(), Phone = request.Phone.Trim(), Email = request.Email.Trim(),
             AppointmentDate = request.AppointmentDate, TimeSlot = request.TimeSlot, GuestCount = request.GuestCount,
+            GiftCode = string.IsNullOrWhiteSpace(request.GiftCode) ? null : request.GiftCode.Trim().ToUpperInvariant(),
             Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
             Status = AppointmentStatus.Pending, ReferenceCode = "#XSPA-" + Convert.ToHexString(RandomNumberGenerator.GetBytes(6)),
             ClientRequestId = request.ClientRequestId
@@ -83,7 +84,8 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
             existing.TimeSlot != request.TimeSlot || existing.GuestCount != request.GuestCount ||
             existing.FullName != request.FullName.Trim() || existing.Phone != request.Phone.Trim() ||
             !string.Equals(existing.Email, request.Email.Trim(), StringComparison.OrdinalIgnoreCase) ||
-            (existing.Notes ?? "") != (request.Notes?.Trim() ?? ""))
+            (existing.Notes ?? "") != (request.Notes?.Trim() ?? "") ||
+            (existing.GiftCode ?? "") != (request.GiftCode?.Trim().ToUpperInvariant() ?? ""))
             throw new ValidationException([new ValidationFailure(nameof(request.ClientRequestId),
                 $"{existing.ReferenceCode} kodlu talebiniz zaten kaydedildi. Değişiklik için bu kodla ekibimize ulaşın; mevcut kayıt değiştirilmedi.")
                 { ErrorCode = "AppointmentReplayConflict" }]);
@@ -109,7 +111,7 @@ public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserServic
         var items = await query.OrderBy(x => x.Status).ThenBy(x => x.AppointmentDate).ThenBy(x => x.TimeSlot).ThenByDescending(x => x.Id)
             .Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize)
             .Select(x => new AppointmentAdminDto(x.Id, x.ReferenceCode, x.FullName, x.Phone, x.Email,
-                x.ServiceTitleSnapshot, x.AppointmentDate, x.TimeSlot, x.GuestCount, x.Notes, x.Status, x.CreatedDate))
+                x.ServiceTitleSnapshot, x.AppointmentDate, x.TimeSlot, x.GuestCount, x.Notes, x.Status, x.CreatedDate, x.GiftCode))
             .ToListAsync(cancellationToken);
         return new(items, count, request.PageIndex, request.PageSize);
     }
