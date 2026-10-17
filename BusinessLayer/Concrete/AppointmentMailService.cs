@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using System.Globalization;
 using System.Net;
 using BusinessLayer.Abstract;
@@ -11,15 +12,15 @@ using MimeKit;
 
 namespace BusinessLayer.Concrete;
 
-public sealed class AppointmentMailService(ISiteTableService siteSettings, IConfiguration configuration) : IAppointmentMailService
+public sealed class AppointmentMailService(ISiteTableService siteSettings, IConfiguration configuration, IDataProtectionProvider? protection = null) : IAppointmentMailService
 {
     public async Task SendReceiptAsync(Appointment appointment, string messageId, CancellationToken cancellationToken = default)
     {
         var settings = await siteSettings.GetQueryable().AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(cancellationToken);
         var host = configuration["Smtp:Host"] ?? settings?.Host;
         var portText = configuration["Smtp:Port"] ?? settings?.Port;
-        var username = configuration["Smtp:Username"] ?? settings?.Mail;
-        var password = configuration["Smtp:Password"] ?? settings?.Password;
+        var username = configuration["Smtp:Username"] ?? settings?.SmtpUsername ?? settings?.Mail;
+        var password = configuration["Smtp:Password"] ?? SmtpSecret.Read(protection, settings?.Password);
         var sender = configuration["Smtp:SenderEmail"] ?? settings?.Mail;
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(sender) || string.IsNullOrWhiteSpace(username) ||
             string.IsNullOrWhiteSpace(password) || !int.TryParse(portText, out var port) || port is < 1 or > 65535)

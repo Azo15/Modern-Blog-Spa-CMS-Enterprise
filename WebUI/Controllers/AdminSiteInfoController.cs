@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -42,6 +43,9 @@ namespace WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(SiteTable model, IFormFile? NewImageFile, IFormFile? NewSocialMediaFile)
         {
+            var smtp = await _siteTableService.GetQueryable().AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync();
+            model.Host = smtp?.Host; model.Port = smtp?.Port; model.Mail = smtp?.Mail;
+            model.Password = smtp?.Password; model.SmtpUsername = smtp?.SmtpUsername; model.EnableSsl = smtp?.EnableSsl ?? true;
             if (!ModelState.IsValid)
             {
                 ViewData["Title"] = model.Id == 0 ? "Site Tablosu Oluştur" : "Site Tablosu Düzenle";

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
 using MailKit.Net.Smtp;
@@ -9,7 +10,7 @@ using System.Net;
 
 namespace BusinessLayer.Concrete;
 
-public sealed class MailService(ISiteTableService siteTableService, IConfiguration configuration) : IMailService
+public sealed class MailService(ISiteTableService siteTableService, IConfiguration configuration, IDataProtectionProvider? protection = null) : IMailService
 {
     public async Task SendContactMailAsync(ContactForm model, string? messageId = null,
         CancellationToken cancellationToken = default)
@@ -19,8 +20,8 @@ public sealed class MailService(ISiteTableService siteTableService, IConfigurati
         // Environment variables / User Secrets override the existing dashboard configuration.
         var host = configuration["Smtp:Host"] ?? settings?.Host;
         var portText = configuration["Smtp:Port"] ?? settings?.Port;
-        var user = configuration["Smtp:Username"] ?? settings?.Mail;
-        var password = configuration["Smtp:Password"] ?? settings?.Password;
+        var user = configuration["Smtp:Username"] ?? settings?.SmtpUsername ?? settings?.Mail;
+        var password = configuration["Smtp:Password"] ?? SmtpSecret.Read(protection, settings?.Password);
         var sender = configuration["Smtp:SenderEmail"] ?? settings?.Mail;
         var recipient = configuration["Smtp:RecipientEmail"] ?? sender;
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(sender) ||

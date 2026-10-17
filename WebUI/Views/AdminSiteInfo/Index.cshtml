@@ -1,4 +1,4 @@
-﻿@model SiteTable
+@model SiteTable
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -22,39 +22,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
-                <!-- Başlık -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Host" class="form-label"></label>
-                        <input asp-for="Host" class="form-control" />
-                        <span asp-validation-for="Host" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Port" class="form-label"></label>
-                        <input asp-for="Port" class="form-control" />
-                        <span asp-validation-for="Port" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Mail" class="form-label"></label>
-                        <input asp-for="Mail" type="email" class="form-control" />
-                        <span asp-validation-for="Mail" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-                </div>
-
+                <p><a asp-controller="AdminSettings" asp-action="Smtp">Güvenli SMTP ayarlarını yönet →</a></p>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="SiteTitle" class="form-label"></label>
