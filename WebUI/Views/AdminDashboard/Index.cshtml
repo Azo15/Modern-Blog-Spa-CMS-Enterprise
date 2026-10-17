@@ -12,7 +12,8 @@
 </div>
 <section class="card p-4 my-4"><h2 class="h5">Son 14 Gün · Randevu Trendi</h2><div class="dashboard-chart"><canvas id="appointment-trend" role="img" aria-label="Son 14 günün randevu sayıları"></canvas></div><details><summary>Grafik verilerini görüntüle</summary><ul>@foreach(var day in Model.Trend){<li>@day.Date: @day.Count</li>}</ul></details></section>
 <script type="application/json" id="appointment-trend-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Trend))</script>
-<!-- distribution-chart -->
+<section class="card p-4 my-4"><h2 class="h5">Popüler Hizmetler</h2>@if(Model.Distribution.Count == 0){<p>İlk randevu ile hizmet dağılımı oluşacak.</p>}else{<div class="dashboard-chart"><canvas id="service-distribution" role="img" aria-label="İptal edilmeyen randevuların hizmet dağılımı"></canvas></div><details><summary>Dağılım verilerini görüntüle</summary><ul>@foreach(var item in Model.Distribution){<li>@item.Service: @item.Count</li>}</ul></details>}<small>İptal edilmeyen randevular · En popüler 8 hizmet</small></section>
+<script type="application/json" id="service-distribution-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Distribution))</script>
 <!-- recent-appointments -->
 <!-- system-health -->
 </section>
