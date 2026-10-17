@@ -25,7 +25,9 @@ public sealed class AppointmentEmailJob(AppDbContext db, IAppointmentMailService
                 .Include(x => x.Appointment).SingleAsync(x => x.Id == deliveryId, cancellationToken);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             deadline.CancelAfter(TimeSpan.FromSeconds(90));
-            await mail.SendReceiptAsync(delivery.Appointment, delivery.MessageId, deadline.Token);
+            // A cancelled/deleted booking must never emit a stale confirmation.
+            if (!delivery.Appointment.IsDeleted && (!delivery.IsConfirmation || delivery.Appointment.Status == EntityLayer.Enum.AppointmentStatus.Confirmed))
+                await mail.SendReceiptAsync(delivery.Appointment, delivery.MessageId, deadline.Token);
             await db.AppointmentEmailDeliveries.Where(x => x.Id == deliveryId && x.LeaseToken == leaseToken)
                 .ExecuteUpdateAsync(update => update.SetProperty(x => x.SentAtUtc, DateTime.UtcNow)
                     .SetProperty(x => x.LeaseToken, (string?)null).SetProperty(x => x.LeaseExpiresAtUtc, (DateTime?)null)

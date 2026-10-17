@@ -329,6 +329,9 @@ namespace DataAccesLayer.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("IsConfirmation")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("LastEnqueuedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -353,7 +356,7 @@ namespace DataAccesLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId")
+                    b.HasIndex("AppointmentId", "IsConfirmation")
                         .IsUnique();
 
                     b.HasIndex("SentAtUtc", "LastEnqueuedAtUtc");
@@ -1153,8 +1156,8 @@ namespace DataAccesLayer.Migrations
             modelBuilder.Entity("EntityLayer.Concrete.AppointmentEmailDelivery", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Appointment", "Appointment")
-                        .WithOne()
-                        .HasForeignKey("EntityLayer.Concrete.AppointmentEmailDelivery", "AppointmentId")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -91,7 +91,7 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
     }
 }
 
-public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserService currentUser, IAuthorizationService authorization)
+public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserService currentUser, IAuthorizationService authorization, IAppointmentEmailQueue? queue = null, ILogger<AppointmentAdminHandlers>? logger = null)
     : IRequestHandler<GetAppointmentsQuery, PaginatedList<AppointmentAdminDto>>, IRequestHandler<ChangeAppointmentStatusCommand, bool>
 {
     private async Task RequireManager()
@@ -123,7 +123,25 @@ public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserServic
         if (appointment.Status == AppointmentStatus.Cancelled || request.Status == AppointmentStatus.Pending)
             throw new ValidationException([new ValidationFailure("Status", "İptal edilen randevu yeniden onaylanamaz. Yeni bir randevu talebi oluşturun.")]);
         appointment.Status = request.Status;
+        AppointmentEmailDelivery? confirmation = null;
+        if (request.Status == AppointmentStatus.Confirmed)
+        {
+            confirmation = new AppointmentEmailDelivery { Appointment = appointment, IsConfirmation = true };
+            db.AppointmentEmailDeliveries.Add(confirmation);
+        }
+        // Status change and delivery intent commit in the same database transaction.
         await db.SaveChangesAsync(cancellationToken);
+        if (confirmation is not null && queue is not null)
+        {
+            try
+            {
+                var job = queue.Enqueue(confirmation.Id);
+                await db.AppointmentEmailDeliveries.Where(x => x.Id == confirmation.Id).ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.HangfireJobId, job).SetProperty(x => x.LastEnqueuedAtUtc, DateTime.UtcNow), cancellationToken);
+            }
+            catch (Exception error) when (error is not OperationCanceledException)
+            { logger?.LogWarning("Confirmation delivery {DeliveryId} awaits recovery: {ErrorType}", confirmation.Id, error.GetType().Name); }
+        }
         return true;
     }
 }

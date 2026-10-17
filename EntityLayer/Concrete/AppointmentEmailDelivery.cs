@@ -5,6 +5,7 @@ public sealed class AppointmentEmailDelivery
 {
     public int Id { get; set; }
     public int AppointmentId { get; set; }
+    public bool IsConfirmation { get; set; }
     public Appointment Appointment { get; set; } = null!;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public string MessageId { get; set; } = $"{Guid.NewGuid():N}@xspa.local";

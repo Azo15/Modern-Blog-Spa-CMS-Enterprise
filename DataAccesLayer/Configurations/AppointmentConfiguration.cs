@@ -32,9 +32,9 @@ public sealed class AppointmentEmailDeliveryConfiguration : IEntityTypeConfigura
     public void Configure(EntityTypeBuilder<AppointmentEmailDelivery> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.AppointmentId).IsUnique();
+        builder.HasIndex(x => new { x.AppointmentId, x.IsConfirmation }).IsUnique();
         builder.HasIndex(x => new { x.SentAtUtc, x.LastEnqueuedAtUtc });
-        builder.HasOne(x => x.Appointment).WithOne().HasForeignKey<AppointmentEmailDelivery>(x => x.AppointmentId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.Appointment).WithMany().HasForeignKey(x => x.AppointmentId).OnDelete(DeleteBehavior.Restrict);
         builder.Property(x => x.MessageId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.LeaseToken).HasMaxLength(40);
         builder.Property(x => x.HangfireJobId).HasMaxLength(100);
