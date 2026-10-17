@@ -10,8 +10,14 @@
 <article><span>Toplam Misafir</span><strong>@Model.Guests</strong><small>@Model.Customers farklı müşteri</small></article>
 <article><span>Aktif Hizmetler</span><strong>@Model.ActiveServices</strong><small>● Randevuya açık</small></article>
 </div>
-<!-- trend-chart -->
+<section class="card p-4 my-4"><h2 class="h5">Son 14 Gün · Randevu Trendi</h2><div class="dashboard-chart"><canvas id="appointment-trend" role="img" aria-label="Son 14 günün randevu sayıları"></canvas></div><details><summary>Grafik verilerini görüntüle</summary><ul>@foreach(var day in Model.Trend){<li>@day.Date: @day.Count</li>}</ul></details></section>
+<script type="application/json" id="appointment-trend-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Trend))</script>
 <!-- distribution-chart -->
 <!-- recent-appointments -->
 <!-- system-health -->
 </section>
+
+@section Scripts {
+<script src="~/lib/chartjs/chart.umd.js" asp-append-version="true"></script>
+<script src="~/js/admin-dashboard.js" asp-append-version="true"></script>
+}
