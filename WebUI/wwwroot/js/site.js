@@ -101,6 +101,21 @@
                 catch { restorePage(); }
             }, 200);
         });
+        const announcement = document.getElementById('xspa-announcement');
+        if (announcement) {
+            let dismissed = false;
+            try { dismissed = localStorage.getItem('xspa-announcement-hours-v1') === 'closed'; } catch { }
+            announcement.hidden = dismissed;
+            const syncAnnouncement = () => document.documentElement.style.setProperty('--announcement-height', announcement.hidden ? '0px' : `${announcement.getBoundingClientRect().height}px`);
+            syncAnnouncement();
+            document.getElementById('announcement-close')?.addEventListener('click', () => {
+                announcement.hidden = true;
+                try { localStorage.setItem('xspa-announcement-hours-v1', 'closed'); } catch { }
+                syncAnnouncement();
+            });
+            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncAnnouncement).observe(announcement);
+            else window.addEventListener('resize', syncAnnouncement);
+        }
         const header = document.getElementById('site-header');
         const nav = document.getElementById('navbarNav');
         const menuToggle = document.querySelector('.luxe-menu-toggle');
