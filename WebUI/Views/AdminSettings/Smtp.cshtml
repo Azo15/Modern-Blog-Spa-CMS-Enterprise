@@ -10,3 +10,13 @@
 <label asp-for="Password">SMTP Şifresi</label><input asp-for="Password" type="password" autocomplete="new-password" value="" /><small>@(Model.HasPassword ? "Parola kayıtlı. Değiştirmek istemiyorsanız boş bırakın." : "İlk kurulum için parola girin.") Parola tekrar görüntülenmez.</small>
 <input type="hidden" name="EnableSsl" value="true" /><p class="mt-3">🔒 TLS bağlantısı zorunludur.</p><button type="submit">Ayarları Kaydet</button></form>
 </section>
+
+<section class="smtp-panel mt-4"><h2>Bağlantıyı doğrulayın</h2><p>Kaydedilmiş ayarlarla yalnızca kendi doğrulanmış yönetici adresinize gönderilir.</p><form asp-action="TestEmail" method="post" id="smtp-test"><button type="submit">Test E-postası Gönder</button><p role="status" aria-live="polite" id="smtp-test-status"></p></form></section>
+@section Scripts {
+<script>
+document.getElementById('smtp-test').addEventListener('submit', async event => {
+ event.preventDefault(); const form=event.currentTarget, button=form.querySelector('button'), status=document.getElementById('smtp-test-status'); button.disabled=true; status.textContent='Bağlantı kontrol ediliyor…';
+ try { const response=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'X-Requested-With':'XMLHttpRequest'}}); const result=await response.json();status.textContent=result.message || 'İşlem tamamlanamadı.'; } catch { status.textContent='Bağlantı kurulamadı. Tekrar deneyin.'; } finally { button.disabled=false; }
+});
+</script>
+}
