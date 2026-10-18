@@ -14,6 +14,18 @@ public sealed class CustomerRegistrationTests
     private static string Token(string html)=>WebUtility.HtmlDecode(Regex.Match(html,"name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"").Groups[1].Value);
     private static Dictionary<string,string> Values(string token)=>new(){["FirstName"]="Customer",["LastName"]="Test",["Phone"]="+90 538 000 00 00",["Email"]="new-customer@example.test",["Password"]="CustomerPassword1!",["ConfirmPassword"]="CustomerPassword1!",["KvkkAccepted"]="true",["Role"]="System Admin",["__RequestVerificationToken"]=token};
     [Fact]
+    public async Task RegistrationCheckboxUsesBooleanClientValidationInsteadOfNumericRange()
+    {
+        using var f = new PlatformWebFactory(); await f.InitializeAsync(); using var c = Client(f);
+        var html = await c.GetStringAsync("/dashboard/kayit");
+        var checkbox = Regex.Match(html, "<input[^>]*id=\"KvkkAccepted\"[^>]*>").Value;
+        Assert.NotEmpty(checkbox);
+        Assert.Contains("data-val-mustbetrue=", checkbox);
+        Assert.DoesNotContain("data-val-range", checkbox);
+        Assert.Contains("acknowledgement-validation.js", html);
+    }
+
+    [Fact]
     public async Task PublicRegistrationAlwaysAssignsCustomerAndRecordsNoticeAcknowledgement()
     {
         using var f=new PlatformWebFactory();await f.InitializeAsync();using var c=Client(f);

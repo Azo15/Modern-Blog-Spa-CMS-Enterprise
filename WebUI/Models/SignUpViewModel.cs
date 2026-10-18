@@ -8,7 +8,7 @@ public sealed class SignUpViewModel
     [Required, Phone, StringLength(30), RegularExpression(@"^\+?[0-9 ()-]{10,30}$")]
     public string Phone { get; set; } = string.Empty;
     [Required, StringLength(100, MinimumLength = 8), DataType(DataType.Password)] public string Password { get; set; } = string.Empty;
-    [Required, Compare(nameof(Password)), DataType(DataType.Password)] public string ConfirmPassword { get; set; } = string.Empty;
-    [Range(typeof(bool), "true", "true", ErrorMessage = "KVKK aydınlatma metnini okuduğunuzu belirtin.")]
+    [Required, Compare(nameof(Password), ErrorMessage = "Parolalar eşleşmiyor."), DataType(DataType.Password)] public string ConfirmPassword { get; set; } = string.Empty;
+    [Validation.MustBeTrue(ErrorMessage = "KVKK aydınlatma metnini okuduğunuzu belirtin.")]
     public bool KvkkAccepted { get; set; }
 }
