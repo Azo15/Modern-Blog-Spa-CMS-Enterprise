@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using BusinessLayer.Abstract;
 using BusinessLayer.Security;
 using DataAccesLayer.Abstract;
@@ -29,6 +30,18 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+// External authentication is registered only when both secrets are configured.
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientId"]) &&
+    !string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientSecret"]))
+    builder.Services.AddAuthentication().AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = false;
+        options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "verified_email", System.Security.Claims.ClaimValueTypes.Boolean);
+    });
+
 
 // 📌 SignalR Canlı Bildirim Servisi
 builder.Services.AddSignalR();

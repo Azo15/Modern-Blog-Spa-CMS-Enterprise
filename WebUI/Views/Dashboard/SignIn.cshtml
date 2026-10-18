@@ -9,7 +9,7 @@
 <label asp-for="Password">@L["Password"]</label><input asp-for="Password" type="password" class="form-control" autocomplete="current-password" required /><span asp-validation-for="Password"></span>
 <label class="auth-check"><input asp-for="RememberMe" /> @L["RememberMe"]</label><button type="submit" id="loginBtn" class="auth-submit">@(en ? "Sign In" : "Giriş Yap") →</button>
 @if(TempData["RemainingSeconds"] is int seconds){<p class="auth-wait" role="status">@(en ? "Please wait before trying again:" : "Yeniden denemeden önce bekleyin:") <span id="auth-wait" data-seconds="@seconds">@seconds</span> @(en ? "seconds" : "saniye")</p>}
-</form><!-- google-auth --><a class="auth-home" href="/">← @(en ? "Return to XSPA" : "XSPA’ya dön")</a></section>
+</form>@await Html.PartialAsync("_GoogleSignIn")<a class="auth-home" href="/">← @(en ? "Return to XSPA" : "XSPA’ya dön")</a></section>
 @section Scripts {
 <script>
 const wait=document.getElementById('auth-wait');if(wait){let seconds=Number(wait.dataset.seconds);const button=document.getElementById('loginBtn');button.disabled=seconds>0;const timer=setInterval(()=>{seconds=Math.max(0,seconds-1);wait.textContent=String(seconds);if(seconds===0){clearInterval(timer);button.disabled=false;}},1000);}
