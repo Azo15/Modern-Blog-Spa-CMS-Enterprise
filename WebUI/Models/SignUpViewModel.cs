@@ -1,33 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace WebUI.Models
+using System.ComponentModel.DataAnnotations;
+namespace WebUI.Models;
+public sealed class SignUpViewModel
 {
-    public class SignUpViewModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string? Email { get; set; }
-
-        [Required]
-        [StringLength(100, MinimumLength = 6)]
-        [Display(Name = "Password")]
-        public string? Password { get; set; }
-
-        [Required]
-        [Compare("Password")]
-        [Display(Name = "ConfirmPassword")]
-        public string? ConfirmPassword { get; set; }
-
-        [Display(Name = "FirstName")]
-        [Required]
-        public string? FirstName { get; set; }
-
-        [Display(Name = "LastName")]
-        [Required]
-        public string? LastName { get; set; }
-
-        [Display(Name = "Doğum Tarihi")]
-        public DateTime? BirthDate { get; set; }
-    }
+    [Required, StringLength(100)] public string FirstName { get; set; } = string.Empty;
+    [Required, StringLength(100)] public string LastName { get; set; } = string.Empty;
+    [Required, EmailAddress, StringLength(254)] public string Email { get; set; } = string.Empty;
+    [Required, Phone, StringLength(30), RegularExpression(@"^\+?[0-9 ()-]{10,30}$")]
+    public string Phone { get; set; } = string.Empty;
+    [Required, StringLength(100, MinimumLength = 8), DataType(DataType.Password)] public string Password { get; set; } = string.Empty;
+    [Required, Compare(nameof(Password)), DataType(DataType.Password)] public string ConfirmPassword { get; set; } = string.Empty;
+    [Range(typeof(bool), "true", "true", ErrorMessage = "KVKK aydınlatma metnini okuduğunuzu belirtin.")]
+    public bool KvkkAccepted { get; set; }
 }
