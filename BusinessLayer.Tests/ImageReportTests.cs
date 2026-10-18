@@ -169,10 +169,10 @@ public sealed class ImageReportTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true, true)]
-    [InlineData(AppRoles.ContentManager, true, false)]
-    [InlineData(AppRoles.Moderator, true, false)]
-    [InlineData(AppRoles.Author, false, false)]
-    [InlineData(AppRoles.RegisteredUser, false, false)]
+    [InlineData(AppRoles.Staff, true, false)]
+    [InlineData(AppRoles.Staff, true, false)]
+    [InlineData(AppRoles.Staff, false, false)]
+    [InlineData(AppRoles.Customer, false, false)]
     [InlineData(null, false, false)]
     public async Task ReportServiceEnforcesRoleMatrixBeforeDataExport(string? role, bool contacts, bool system)
     {

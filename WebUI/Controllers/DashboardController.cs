@@ -132,7 +132,7 @@ namespace WebUI.Controllers
 
             if (result.Succeeded)
             {
-                var roleResult = await _userManager.AddToRoleAsync(user, BusinessLayer.Security.AppRoles.RegisteredUser);
+                var roleResult = await _userManager.AddToRoleAsync(user, BusinessLayer.Security.AppRoles.Customer);
                 if (!roleResult.Succeeded) throw new InvalidOperationException("Üye rolü atanamadı.");
                 return RedirectToAction(nameof(SignIn));
             }
@@ -149,10 +149,10 @@ namespace WebUI.Controllers
         {
             if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin))
                 return RedirectToAction("UserList", "AdminUserList");
-            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.ContentManager)
-                || await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Author))
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff)
+                || await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff))
                 return RedirectToAction("Index", "AdminBlog");
-            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Moderator))
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff))
                 return RedirectToAction("Index", "AdminMessage");
             return RedirectToAction("Index", "Default");
         }

@@ -39,7 +39,7 @@ public sealed class ProfileAvatarTests
         images.Setup(x => x.StoreAsync(It.IsAny<IFormFile?>(), "avatars", It.IsAny<CancellationToken>())).ReturnsAsync(optimized);
         var text = new Mock<IStringLocalizer<SharedResource>>();
         text.Setup(x => x["ProfileUpdated"]).Returns(new LocalizedString("ProfileUpdated", "Profile updated"));
-        var context = new DefaultHttpContext { User = AuthorizationTests.Principal(AppRoles.RegisteredUser, "2") };
+        var context = new DefaultHttpContext { User = AuthorizationTests.Principal(AppRoles.Customer, "2") };
         var controller = new ProfileController(users.Object, signIn.Object, Mock.Of<ISender>(), images.Object, text.Object)
         {
             ControllerContext = new ControllerContext { HttpContext = context },

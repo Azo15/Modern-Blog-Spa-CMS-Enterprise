@@ -12,7 +12,7 @@ public class CurrentUserServiceTests
     public void IdAndEmailOnlyComeFromAuthenticatedIdentity(bool authenticated)
     {
         var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext {
-            User = AuthorizationTests.Principal(AppRoles.Author, "7", authenticated) } };
+            User = AuthorizationTests.Principal(AppRoles.Staff, "7", authenticated) } };
         var service = new CurrentUserService(accessor);
         Assert.Equal(authenticated ? "7" : null, service.UserId);
         Assert.Equal(authenticated ? "test@example.com" : null, service.Email);

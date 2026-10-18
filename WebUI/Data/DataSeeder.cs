@@ -34,10 +34,10 @@ namespace WebUI.Data
             await SeedRolesAsync(serviceProvider);
             var accounts = new[] {
                 ("admin@spa.com", BusinessLayer.Security.AppRoles.Admin),
-                ("editor@spa.com", BusinessLayer.Security.AppRoles.ContentManager),
-                ("author@spa.com", BusinessLayer.Security.AppRoles.Author),
-                ("moderator@spa.com", BusinessLayer.Security.AppRoles.Moderator),
-                ("user@spa.com", BusinessLayer.Security.AppRoles.RegisteredUser)
+                ("editor@spa.com", BusinessLayer.Security.AppRoles.Staff),
+                ("author@spa.com", BusinessLayer.Security.AppRoles.Staff),
+                ("moderator@spa.com", BusinessLayer.Security.AppRoles.Staff),
+                ("user@spa.com", BusinessLayer.Security.AppRoles.Customer)
             };
             foreach (var (email, role) in accounts)
             {

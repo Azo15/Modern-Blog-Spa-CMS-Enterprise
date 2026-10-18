@@ -20,9 +20,9 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
     public const string Password = "P@ssword123!";
     public static readonly (int Id, string Email, string Role)[] Accounts =
     [
-        (1, "admin@acceptance.test", AppRoles.Admin), (2, "editor@acceptance.test", AppRoles.ContentManager),
-        (3, "author@acceptance.test", AppRoles.Author), (4, "moderator@acceptance.test", AppRoles.Moderator),
-        (5, "user@acceptance.test", AppRoles.RegisteredUser), (6, "other-author@acceptance.test", AppRoles.Author)
+        (1, "admin@acceptance.test", AppRoles.Admin), (2, "editor@acceptance.test", AppRoles.Staff),
+        (3, "author@acceptance.test", AppRoles.Staff), (4, "moderator@acceptance.test", AppRoles.Staff),
+        (5, "user@acceptance.test", AppRoles.Customer), (6, "other-author@acceptance.test", AppRoles.Staff)
     ];
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

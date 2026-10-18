@@ -9,10 +9,10 @@ public class NotificationHubTests
 {
     [Theory]
     [InlineData(null, false)]
-    [InlineData(AppRoles.RegisteredUser, false)]
-    [InlineData(AppRoles.Author, false)]
-    [InlineData(AppRoles.Moderator, true)]
-    [InlineData(AppRoles.ContentManager, true)]
+    [InlineData(AppRoles.Customer, false)]
+    [InlineData(AppRoles.Staff, false)]
+    [InlineData(AppRoles.Staff, true)]
+    [InlineData(AppRoles.Staff, true)]
     [InlineData(AppRoles.Admin, true)]
     public async Task HubPolicyRejectsAnonymousAndUnauthorizedRoles(string? role, bool allowed)
     {
@@ -24,7 +24,7 @@ public class NotificationHubTests
     public async Task AuthorizedConnectionJoinsOnlyManagersGroup()
     {
         var groups = new Mock<IGroupManager>(); groups.Setup(g => g.AddToGroupAsync("connection-1", "Managers", It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        var context = new Mock<HubCallerContext>(); context.SetupGet(c => c.ConnectionId).Returns("connection-1"); context.SetupGet(c => c.User).Returns(AuthorizationTests.Principal(AppRoles.Moderator));
+        var context = new Mock<HubCallerContext>(); context.SetupGet(c => c.ConnectionId).Returns("connection-1"); context.SetupGet(c => c.User).Returns(AuthorizationTests.Principal(AppRoles.Staff));
         var hub = new NotificationHub { Groups = groups.Object, Context = context.Object }; await hub.OnConnectedAsync(); groups.Verify(g => g.AddToGroupAsync("connection-1", "Managers", It.IsAny<CancellationToken>()), Times.Once);
     }
 }

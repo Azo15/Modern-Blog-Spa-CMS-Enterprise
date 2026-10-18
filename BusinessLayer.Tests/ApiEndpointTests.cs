@@ -59,17 +59,17 @@ public sealed class ApiEndpointTests
 
     [Theory]
     [InlineData(AppRoles.Admin, "admin@acceptance.test", true, true, true)]
-    [InlineData(AppRoles.ContentManager, "editor@acceptance.test", true, false, true)]
-    [InlineData(AppRoles.Author, "author@acceptance.test", true, false, false)]
-    [InlineData(AppRoles.Moderator, "moderator@acceptance.test", false, true, true)]
-    [InlineData(AppRoles.RegisteredUser, "user@acceptance.test", false, false, false)]
+    [InlineData(AppRoles.Staff, "editor@acceptance.test", true, false, true)]
+    [InlineData(AppRoles.Staff, "author@acceptance.test", true, false, false)]
+    [InlineData(AppRoles.Staff, "moderator@acceptance.test", false, true, true)]
+    [InlineData(AppRoles.Customer, "user@acceptance.test", false, false, false)]
     [InlineData(null, null, false, false, false)]
     public async Task SixProfilesExerciseRealAuthenticationBlogCommentModerationAndReportBoundaries(string? role, string? email, bool canCreate, bool canModerate, bool canReport)
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
         if (email is not null) await Login(client, email);
         var aboutCards = await client.GetAsync("/AdminAboutCard");
-        Assert.Equal(role is AppRoles.Admin or AppRoles.ContentManager ? HttpStatusCode.OK : role is null ? HttpStatusCode.Redirect : HttpStatusCode.Forbidden, aboutCards.StatusCode);
+        Assert.Equal(role is AppRoles.Admin or AppRoles.Staff ? HttpStatusCode.OK : role is null ? HttpStatusCode.Redirect : HttpStatusCode.Forbidden, aboutCards.StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/blogs")).StatusCode);
         using var create = await client.PostAsJsonAsync("/api/v1/blogs", BlogBody);
         if (canCreate)
@@ -166,7 +166,7 @@ public sealed class ApiEndpointTests
             var user = (await users.FindByIdAsync("5"))!;
             if (change == "lock") { await users.SetLockoutEnabledAsync(user, true); await users.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(1)); }
             else if (change == "stamp") await users.UpdateSecurityStampAsync(user);
-            else if (change == "role") await users.AddToRoleAsync(user, AppRoles.Author);
+            else if (change == "role") await users.AddToRoleAsync(user, AppRoles.Staff);
             else { user.IsActive = false; await users.UpdateAsync(user); }
         }
         await Problem(await client.GetAsync("/api/v1/auth/me"), HttpStatusCode.Unauthorized);

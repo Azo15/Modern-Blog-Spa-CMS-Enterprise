@@ -20,7 +20,7 @@ public sealed class InteractionConcurrencyTests
     [Fact]
     public async Task ChangedReactionSurvivesConcurrentWithdrawal()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         f.Db.BlogReactions.Add(new BlogReaction { AppUserId = 2, BlogId = 1, ReactionType = ReactionType.Like });
         await f.Db.SaveChangesAsync(); f.Db.ChangeTracker.Clear();
         var intercepted = false;
@@ -40,7 +40,7 @@ public sealed class InteractionConcurrencyTests
     [Fact]
     public async Task DuplicateInsertThenWithdrawalReplaysSetIntent()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var inserted = false; var withdrawn = false;
         using var db = Context(f, async (context, ct) =>
         {
@@ -62,7 +62,7 @@ public sealed class InteractionConcurrencyTests
     [Fact]
     public async Task RepeatedReactionRacesReturnControlledConflict()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var races = 0;
         using var db = Context(f, async (context, ct) =>
         {
@@ -81,7 +81,7 @@ public sealed class InteractionConcurrencyTests
     [Fact]
     public async Task ConcurrentProfileChangeIsPreservedWhenModeratorLocksAccount()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.Moderator, 3);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Staff, 3);
         using var db = Context(f, async (_, ct) =>
         {
             await f.Db.Users.Where(u => u.Id == 2).ExecuteUpdateAsync(s => s

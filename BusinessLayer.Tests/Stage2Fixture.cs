@@ -27,7 +27,7 @@ internal sealed class Stage2Fixture : IDisposable
     public Mock<IManagerNotifier> Notifier { get; } = new();
     public sealed class TestUser : ICurrentUserService
     {
-        public ClaimsPrincipal User { get; set; } = AuthorizationTests.Principal(AppRoles.Author, "1");
+        public ClaimsPrincipal User { get; set; } = AuthorizationTests.Principal(AppRoles.Staff, "1");
         public string? UserId => User.Identity?.IsAuthenticated == true ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
         public string? Email => User.FindFirstValue(ClaimTypes.Email);
     }

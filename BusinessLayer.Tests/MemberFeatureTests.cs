@@ -31,7 +31,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task FavoriteToggleCreatesOneUtcRecordAndWithdrawsIt()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var added = await f.Sender.Send(new ToggleBlogFavoriteCommand(1));
         Assert.True(added.IsFavorite);
         var favorite = await f.Db.Set<BlogFavorite>().SingleAsync();
@@ -57,7 +57,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task ReactionReplacesPreviousTypeAndSameTypeTogglesOff()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var like = await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Like));
         Assert.Equal(ReactionType.Like, like.Reaction); Assert.Equal(1, like.LikeCount);
         var heart = await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Heart));
@@ -70,7 +70,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task ExplicitReactionWithdrawalIsIdempotent()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Clap));
         await f.Sender.Send(new SetBlogReactionCommand(1, null));
         var second = await f.Sender.Send(new SetBlogReactionCommand(1, null));
@@ -95,7 +95,7 @@ public sealed class MemberFeatureTests
     [InlineData(PublishStatus.Published, true)]
     public async Task UnpublishedOrDeletedBlogsCannotReceiveInteractions(PublishStatus status, bool deleted)
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var blog = await f.Db.Blogs.SingleAsync(); blog.PublishStatus = status; blog.IsDeleted = deleted; await f.Db.SaveChangesAsync();
         await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new ToggleBlogFavoriteCommand(1)));
         await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Like)));
@@ -107,7 +107,7 @@ public sealed class MemberFeatureTests
     [InlineData(false)]
     public async Task ExistingCookieCannotCommentOrInteractAfterDatabaseAccountBlock(bool lockout)
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var comment = await f.Sender.Send(new CreateCommentCommand(1, "Before block"));
         var user = await f.Db.Users.SingleAsync(u => u.Id == 2);
         if (lockout) { user.LockoutEnabled = true; user.LockoutEnd = DateTimeOffset.UtcNow.AddDays(1); }
@@ -124,7 +124,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task ExpiredLockoutDoesNotPreventInteractions()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         var user = await f.Db.Users.SingleAsync(u => u.Id == 2); user.LockoutEnabled = true; user.LockoutEnd = DateTimeOffset.UtcNow.AddMinutes(-1); await f.Db.SaveChangesAsync();
         Assert.True((await f.Sender.Send(new ToggleBlogFavoriteCommand(1))).IsFavorite);
     }
@@ -141,7 +141,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task FavoritesArePaginatedOwnedAndHideUnpublishedBlogs()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         f.Db.Blogs.AddRange(new Blog { Id = 2, AppUserId = 1, Title = "Draft", PublishStatus = PublishStatus.Draft },
             new Blog { Id = 3, AppUserId = 1, Title = "Third", PublishStatus = PublishStatus.Published });
         await f.Db.SaveChangesAsync();
@@ -151,13 +151,13 @@ public sealed class MemberFeatureTests
         Assert.Single(page.Items); Assert.Equal(2, page.TotalPages); Assert.True(page.HasNextPage); Assert.False(page.HasPreviousPage);
         var last = await f.Sender.Send(new GetUserFavoritesQuery(2, 1)); Assert.Single(last.Items); Assert.True(last.HasPreviousPage);
         Assert.DoesNotContain(2, page.Items.Concat(last.Items).Select(x => x.BlogId));
-        f.As(AppRoles.Moderator, 3); Assert.Single((await f.Sender.Send(new GetUserFavoritesQuery())).Items);
+        f.As(AppRoles.Staff, 3); Assert.Single((await f.Sender.Send(new GetUserFavoritesQuery())).Items);
     }
 
     [Fact]
     public async Task PublicCountsExposeNoUserIdentifiersOrIdentitySecrets()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Clap)); f.As(null);
         var counts = await f.Sender.Send(new GetBlogInteractionQuery(1));
         Assert.Equal(1, counts.ClapCount); Assert.Null(counts.Reaction); Assert.False(counts.IsFavorite);
@@ -169,18 +169,18 @@ public sealed class MemberFeatureTests
     {
         using var f = new Stage2Fixture();
         var originalStamp = (await f.Db.Users.SingleAsync(u => u.Id == 2)).SecurityStamp;
-        f.As(AppRoles.Moderator, 3); Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, true, 7)));
+        f.As(AppRoles.Staff, 3); Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, true, 7)));
         var user = await f.Db.Users.SingleAsync(u => u.Id == 2); Assert.True(user.LockoutEnabled); Assert.True(user.LockoutEnd > DateTimeOffset.UtcNow); Assert.NotEqual(originalStamp, user.SecurityStamp);
         Assert.Empty(await f.Db.UserRoles.ToListAsync());
-        f.As(AppRoles.RegisteredUser); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ToggleBlogFavoriteCommand(1)));
-        f.As(AppRoles.Moderator, 3); Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, false))); Assert.Null(user.LockoutEnd);
-        f.As(AppRoles.RegisteredUser); Assert.True((await f.Sender.Send(new ToggleBlogFavoriteCommand(1))).IsFavorite);
+        f.As(AppRoles.Customer); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ToggleBlogFavoriteCommand(1)));
+        f.As(AppRoles.Staff, 3); Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, false))); Assert.Null(user.LockoutEnd);
+        f.As(AppRoles.Customer); Assert.True((await f.Sender.Send(new ToggleBlogFavoriteCommand(1))).IsFavorite);
     }
 
     [Fact]
     public async Task ModeratorCannotLockAdminOrSelfAndHasNoRoleManagementPolicy()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.Moderator, 3);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Staff, 3);
         f.Db.Roles.Add(new IdentityRole<int>(AppRoles.Admin) { Id = 1, NormalizedName = AppRoles.Admin.ToUpperInvariant() });
         f.Db.UserRoles.Add(new IdentityUserRole<int> { UserId = 1, RoleId = 1 }); await f.Db.SaveChangesAsync();
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new SetAccountLockoutCommand(1, true)));
@@ -191,9 +191,9 @@ public sealed class MemberFeatureTests
     }
 
     [Theory]
-    [InlineData(AppRoles.ContentManager)]
-    [InlineData(AppRoles.Author)]
-    [InlineData(AppRoles.RegisteredUser)]
+    [InlineData(AppRoles.Staff)]
+    [InlineData(AppRoles.Staff)]
+    [InlineData(AppRoles.Customer)]
     [InlineData(null)]
     public async Task NonModeratorsCannotListOrLockAccounts(string? role)
     {
@@ -205,9 +205,9 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task LockedModeratorCannotApproveOrLockOtherMembers()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser); var comment = await f.Sender.Send(new CreateCommentCommand(1, "Pending"));
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer); var comment = await f.Sender.Send(new CreateCommentCommand(1, "Pending"));
         var moderator = await f.Db.Users.SingleAsync(u => u.Id == 3); moderator.LockoutEnabled = true; moderator.LockoutEnd = DateTimeOffset.UtcNow.AddDays(1); await f.Db.SaveChangesAsync();
-        f.As(AppRoles.Moderator, 3);
+        f.As(AppRoles.Staff, 3);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ApproveCommentCommand(comment)));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new SetAccountLockoutCommand(2, true)));
     }
@@ -216,7 +216,7 @@ public sealed class MemberFeatureTests
     public async Task AdministratorCanLockModeratorWithoutRemovingIdentityRoles()
     {
         using var f = new Stage2Fixture(); f.As(AppRoles.Admin, 1);
-        f.Db.Roles.Add(new IdentityRole<int>(AppRoles.Moderator) { Id = 10 });
+        f.Db.Roles.Add(new IdentityRole<int>(AppRoles.Staff) { Id = 10 });
         f.Db.UserRoles.Add(new IdentityUserRole<int> { UserId = 3, RoleId = 10 }); await f.Db.SaveChangesAsync();
         Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(3, true, 2)));
         Assert.True((await f.Db.Users.SingleAsync(u => u.Id == 3)).LockoutEnabled);
@@ -227,7 +227,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task UnlockDoesNotRequireAPositiveLockDurationAndMissingTargetReturnsFalse()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.Moderator, 3);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Staff, 3);
         await f.Sender.Send(new SetAccountLockoutCommand(2, true));
         Assert.True(await f.Sender.Send(new SetAccountLockoutCommand(2, false, 0)));
         Assert.Null((await f.Db.Users.SingleAsync(u => u.Id == 2)).LockoutEnd);
@@ -237,7 +237,7 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task SoftDeletedBlogKeepsInteractionsHiddenUntilRestore()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         await f.Sender.Send(new ToggleBlogFavoriteCommand(1));
         await f.Sender.Send(new SetBlogReactionCommand(1, ReactionType.Like));
         var blog = await f.Db.Blogs.SingleAsync(); f.Db.Remove(blog); await f.Db.SaveChangesAsync();
@@ -258,7 +258,7 @@ public sealed class MemberFeatureTests
     public async Task ActivePolicyRequiresARealAuthenticatedDatabaseUser(string? id, bool authenticated, bool expected)
     {
         using var f = new Stage2Fixture();
-        var principal = AuthorizationTests.Principal(AppRoles.RegisteredUser, id, authenticated);
+        var principal = AuthorizationTests.Principal(AppRoles.Customer, id, authenticated);
         var service = new ActiveMemberService(f.Db, f.User, Mock.Of<IStringLocalizer<SharedResource>>());
         var handler = new ActiveMemberAuthorizationHandler(service);
         var context = new AuthorizationHandlerContext([new ActiveMemberRequirement()], principal, null);
@@ -334,10 +334,10 @@ public sealed class MemberFeatureTests
     [Fact]
     public async Task ValidationRejectsInvalidReactionAndPaginationBeforePersistence()
     {
-        using var f = new Stage2Fixture(); f.As(AppRoles.RegisteredUser);
+        using var f = new Stage2Fixture(); f.As(AppRoles.Customer);
         await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new SetBlogReactionCommand(1, (ReactionType)99)));
         await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new GetUserFavoritesQuery(0, 101)));
-        f.As(AppRoles.Moderator, 3); await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new SetAccountLockoutCommand(2, true, 0)));
+        f.As(AppRoles.Staff, 3); await Assert.ThrowsAsync<ValidationException>(() => f.Sender.Send(new SetAccountLockoutCommand(2, true, 0)));
     }
 
     [Fact]

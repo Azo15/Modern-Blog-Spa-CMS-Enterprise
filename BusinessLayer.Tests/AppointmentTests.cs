@@ -216,9 +216,9 @@ public sealed class AppointmentTests
     }
 
     [Theory]
-    [InlineData(AppRoles.Admin, true)] [InlineData(AppRoles.ContentManager, true)]
-    [InlineData(AppRoles.Author, false)] [InlineData(AppRoles.Moderator, false)]
-    [InlineData(AppRoles.RegisteredUser, false)] [InlineData(null, false)]
+    [InlineData(AppRoles.Admin, true)] [InlineData(AppRoles.Staff, true)]
+    [InlineData(AppRoles.Staff, false)] [InlineData(AppRoles.Staff, false)]
+    [InlineData(AppRoles.Customer, false)] [InlineData(null, false)]
     public async Task OnlyAdminAndContentManagerCanReadOrModerateAppointments(string? role, bool allowed)
     {
         using var fixture = new Fixture();
@@ -253,7 +253,7 @@ public sealed class AppointmentTests
     {
         using var fixture = new Fixture();
         for (var index = 0; index < 5; index++) await fixture.Sender.Send(Request());
-        fixture.As(AppRoles.ContentManager);
+        fixture.As(AppRoles.Staff);
         await fixture.Sender.Send(new ChangeAppointmentStatusCommand(1, AppointmentStatus.Confirmed));
         var pending = await fixture.Sender.Send(new GetAppointmentsQuery(AppointmentStatus.Pending, 2, 2));
         Assert.Equal(4, pending.TotalCount); Assert.Equal(2, pending.Items.Count); Assert.True(pending.HasPreviousPage); Assert.False(pending.HasNextPage);

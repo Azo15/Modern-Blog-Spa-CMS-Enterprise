@@ -65,9 +65,9 @@ public class DevelopmentSeederTests
         Assert.Equal(5, await roles.Roles.CountAsync());
         Assert.False(await roles.RoleExistsAsync("Visitor"));
         foreach (var (email, role) in new[] {
-            ("admin@spa.com", AppRoles.Admin), ("editor@spa.com", AppRoles.ContentManager),
-            ("author@spa.com", AppRoles.Author), ("moderator@spa.com", AppRoles.Moderator),
-            ("user@spa.com", AppRoles.RegisteredUser) })
+            ("admin@spa.com", AppRoles.Admin), ("editor@spa.com", AppRoles.Staff),
+            ("author@spa.com", AppRoles.Staff), ("moderator@spa.com", AppRoles.Staff),
+            ("user@spa.com", AppRoles.Customer) })
         {
             var account = await users.FindByEmailAsync(email);
             Assert.NotNull(account);

@@ -226,10 +226,10 @@ public sealed class BackgroundJobTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true)]
-    [InlineData(AppRoles.ContentManager, false)]
-    [InlineData(AppRoles.Moderator, false)]
-    [InlineData(AppRoles.Author, false)]
-    [InlineData(AppRoles.RegisteredUser, false)]
+    [InlineData(AppRoles.Staff, false)]
+    [InlineData(AppRoles.Staff, false)]
+    [InlineData(AppRoles.Staff, false)]
+    [InlineData(AppRoles.Customer, false)]
     [InlineData(null, false)]
     public void HangfireDashboardAllowsOnlyAuthenticatedSystemAdmin(string? role, bool allowed)
     {

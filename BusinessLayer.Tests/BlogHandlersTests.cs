@@ -28,12 +28,12 @@ public class BlogHandlersTests
         using var f = new Stage2Fixture(); f.Db.Blogs.Add(new Blog { Id = 2, AppUserId = 6, Title = "Other author" }); await f.Db.SaveChangesAsync(); f.Db.ChangeTracker.Clear();
         var owned = await f.Sender.Send(new GetBlogsQuery()); Assert.Equal(1, Assert.Single(owned.Items).AppUserId);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new GetBlogByIdQuery(2)));
-        f.As(AppRoles.RegisteredUser); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new GetBlogsQuery()));
+        f.As(AppRoles.Customer); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new GetBlogsQuery()));
     }
     [Fact]
     public async Task CategoryChangeInvalidatesBothCategoriesAndAllListPages()
     {
-        using var f = new Stage2Fixture(true); f.As(AppRoles.ContentManager, 5);
+        using var f = new Stage2Fixture(true); f.As(AppRoles.Staff, 5);
         Assert.True(await f.Sender.Send(new UpdateBlogCommand(1, "Updated title", "Updated subtitle", "<p>Updated</p>", 2)));
         foreach (var prefix in new[] { "blogs_all", "blogs_cat_1", "blogs_cat_2", "blog_detail_1" }) f.Cache.Verify(c => c.RemoveByPrefixAsync(prefix), Times.AtLeastOnce);
         Assert.Equal(1, (await f.Db.Blogs.SingleAsync()).AppUserId);
@@ -54,7 +54,7 @@ public class BlogHandlersTests
         Assert.Equal(PublishStatus.Draft, (await f.Sender.Send(new GetBlogByIdQuery(id)))!.PublishStatus);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.Published)));
         await f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.PendingReview));
-        f.As(AppRoles.ContentManager, 5); await f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.Published)); await f.Sender.Send(new DeleteBlogCommand(id));
+        f.As(AppRoles.Staff, 5); await f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.Published)); await f.Sender.Send(new DeleteBlogCommand(id));
         Assert.Equal(id, Assert.Single((await f.Sender.Send(new GetTrashedBlogsQuery())).Items).Id);
         await f.Sender.Send(new RestoreBlogCommand(id)); Assert.Equal(PublishStatus.Draft, (await f.Sender.Send(new GetBlogByIdQuery(id)))!.PublishStatus);
         f.Cache.Verify(c => c.RemoveByPrefixAsync("blogs_all"), Times.AtLeast(5));
@@ -64,7 +64,7 @@ public class BlogHandlersTests
     {
         using var f = new Stage2Fixture(); f.As(null);
         Assert.Single((await f.Sender.Send(new GetPublicBlogsQuery())).Items);
-        f.As(AppRoles.ContentManager, 5); await f.Sender.Send(new ChangeBlogStatusCommand(1, PublishStatus.Draft));
+        f.As(AppRoles.Staff, 5); await f.Sender.Send(new ChangeBlogStatusCommand(1, PublishStatus.Draft));
         f.As(null); Assert.Empty((await f.Sender.Send(new GetPublicBlogsQuery())).Items); Assert.Null(await f.Sender.Send(new GetPublicBlogBySlugQuery("published-title")));
     }
 }

@@ -36,10 +36,10 @@ public class ApiAuthTests
 
     [Theory]
     [InlineData(AppRoles.Admin)]
-    [InlineData(AppRoles.ContentManager)]
-    [InlineData(AppRoles.Author)]
-    [InlineData(AppRoles.Moderator)]
-    [InlineData(AppRoles.RegisteredUser)]
+    [InlineData(AppRoles.Staff)]
+    [InlineData(AppRoles.Staff)]
+    [InlineData(AppRoles.Staff)]
+    [InlineData(AppRoles.Customer)]
     public async Task LoginVerifiesIdentityPasswordAndIssuesTokenWithoutCreatingCookie(string role)
     {
         var user = new AppUser { Id = 7, IsActive = true, SecurityStamp = "private-stamp" };
@@ -71,7 +71,7 @@ public class ApiAuthTests
         var users = UserManagerMock();
         users.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(reason == "missing" ? null : user);
         users.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(reason == "locked");
-        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(reason == "no-roles" ? [] : [AppRoles.Author]);
+        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(reason == "no-roles" ? [] : [AppRoles.Staff]);
         var signIn = SignInMock(users.Object);
         signIn.Setup(x => x.CheckPasswordSignInAsync(user, It.IsAny<string>(), true))
             .ReturnsAsync(reason == "password" ? SignInResult.Failed : SignInResult.Success);
@@ -107,11 +107,11 @@ public class ApiAuthTests
         var users = UserManagerMock();
         var user = new AppUser { Id = 7, FirstName = "Example", LastName = "Member", Email = "private@example.test", PasswordHash = "private-hash" };
         users.Setup(x => x.FindByIdAsync("7")).ReturnsAsync(user);
-        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync([AppRoles.RegisteredUser, "Unknown"]);
+        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync([AppRoles.Customer, "Unknown"]);
         var identity = await new GetApiIdentityQueryHandler(members.Object, users.Object).Handle(new(), CancellationToken.None);
         Assert.Equal(7, identity.UserId);
         Assert.Equal("Example Member", identity.DisplayName);
-        Assert.Equal(AppRoles.RegisteredUser, Assert.Single(identity.Roles));
+        Assert.Equal(AppRoles.Customer, Assert.Single(identity.Roles));
         var json = System.Text.Json.JsonSerializer.Serialize(identity);
         Assert.DoesNotContain("private@example", json);
         Assert.DoesNotContain("private-hash", json);
@@ -141,7 +141,7 @@ public class ApiAuthTests
     {
         var options = Settings();
         var user = new AppUser { Id = 7, Email = "private@example.test", PasswordHash = "private-hash", SecurityStamp = "private-stamp" };
-        var result = await new JwtTokenIssuer(Options.Create(options), new FixedClock()).IssueAsync(user, [AppRoles.Author, AppRoles.Author]);
+        var result = await new JwtTokenIssuer(Options.Create(options), new FixedClock()).IssueAsync(user, [AppRoles.Staff, AppRoles.Staff]);
         Assert.Equal(new FixedClock().GetUtcNow().AddMinutes(15), result.ExpiresAtUtc);
         Assert.Single(result.Roles);
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(result.AccessToken);
@@ -149,7 +149,7 @@ public class ApiAuthTests
         Assert.Equal(options.Audience, Assert.Single(jwt.Audiences));
         Assert.Equal(SecurityAlgorithms.HmacSha256, jwt.Header.Alg);
         Assert.Equal("7", jwt.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
-        Assert.Equal(AppRoles.Author, jwt.Claims.Single(x => x.Type == ClaimTypes.Role).Value);
+        Assert.Equal(AppRoles.Staff, jwt.Claims.Single(x => x.Type == ClaimTypes.Role).Value);
         var payload = jwt.Payload.SerializeToJson();
         foreach (var secret in new[] { "private@example", "private-hash", "private-stamp", "PasswordHash", "SecurityStamp" }) Assert.DoesNotContain(secret, payload);
         Assert.Equal(JwtTokenIssuer.SecurityVersion("private-stamp"), jwt.Claims.Single(x => x.Type == ApiAuthentication.SecurityVersionClaim).Value);
@@ -197,7 +197,7 @@ public class ApiAuthTests
         var users = UserManagerMock();
         users.Setup(x => x.FindByIdAsync("7")).ReturnsAsync(reason == "missing" ? null : user);
         users.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(reason == "locked");
-        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync([AppRoles.Author]);
+        users.Setup(x => x.GetRolesAsync(user)).ReturnsAsync([AppRoles.Staff]);
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["Jwt:SigningKey"] = new string('s', 64) }).Build();
         var services = new ServiceCollection().AddLogging().AddPlatformApi(configuration);
         services.AddSingleton(users.Object);
@@ -206,7 +206,7 @@ public class ApiAuthTests
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, reason == "bad-id" ? "invalid" : "7"),
-            new(ClaimTypes.Role, reason == "roles" ? AppRoles.Admin : AppRoles.Author)
+            new(ClaimTypes.Role, reason == "roles" ? AppRoles.Admin : AppRoles.Staff)
         };
         if (reason != "no-version") claims.Add(new(ApiAuthentication.SecurityVersionClaim, JwtTokenIssuer.SecurityVersion(reason == "stamp" ? "old-stamp" : "current-stamp")));
         var context = new TokenValidatedContext(new DefaultHttpContext { RequestServices = provider },

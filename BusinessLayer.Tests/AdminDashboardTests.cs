@@ -10,7 +10,7 @@ public sealed class AdminDashboardTests
     public async Task DashboardRequiresManagerAndZeroFillsFourteenDays()
     {
         using var fixture = new Stage2Fixture();
-        fixture.User.User = AuthorizationTests.Principal(AppRoles.RegisteredUser,"1");
+        fixture.User.User = AuthorizationTests.Principal(AppRoles.Customer,"1");
         await Assert.ThrowsAsync<UnauthorizedAccessException>(()=>fixture.Sender.Send(new GetAdminDashboardQuery()));
         fixture.User.User = AuthorizationTests.Principal(AppRoles.Admin,"1");
         var report = await fixture.Sender.Send(new GetAdminDashboardQuery());

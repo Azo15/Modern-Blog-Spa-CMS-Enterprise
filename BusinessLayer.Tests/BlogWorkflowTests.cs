@@ -25,7 +25,7 @@ public sealed class BlogWorkflowTests : IDisposable
 
     private sealed class TestCurrentUser : ICurrentUserService
     {
-        public ClaimsPrincipal User { get; set; } = AuthorizationTests.Principal(AppRoles.Author);
+        public ClaimsPrincipal User { get; set; } = AuthorizationTests.Principal(AppRoles.Staff);
         public string? UserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         public string? Email => User.FindFirstValue(ClaimTypes.Email);
     }
@@ -59,8 +59,8 @@ public sealed class BlogWorkflowTests : IDisposable
     }
 
     [Theory]
-    [InlineData(AppRoles.RegisteredUser)]
-    [InlineData(AppRoles.Moderator)]
+    [InlineData(AppRoles.Customer)]
+    [InlineData(AppRoles.Staff)]
     public async Task NonAuthorsCannotCreateContent(string role)
     {
         user.User = AuthorizationTests.Principal(role);
@@ -72,7 +72,7 @@ public sealed class BlogWorkflowTests : IDisposable
     public async Task AnotherAuthorCannotUpdateDeleteOrSubmit()
     {
         var id = await Create();
-        user.User = AuthorizationTests.Principal(AppRoles.Author, "2");
+        user.User = AuthorizationTests.Principal(AppRoles.Staff, "2");
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => workflow.UpdateAsync(id, "Forged", "", "", 1, null));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => workflow.DeleteAsync(id));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => workflow.ChangeStatusAsync(id, PublishStatus.PendingReview));
@@ -91,7 +91,7 @@ public sealed class BlogWorkflowTests : IDisposable
 
     [Theory]
     [InlineData(AppRoles.Admin)]
-    [InlineData(AppRoles.ContentManager)]
+    [InlineData(AppRoles.Staff)]
     public async Task ManagerCanPublishAndEditWithoutChangingOriginalAuthor(string role)
     {
         var id = await Create();
@@ -112,9 +112,9 @@ public sealed class BlogWorkflowTests : IDisposable
     public async Task AuthorEditingPublishedContentMustGetApprovalAgain()
     {
         var id = await Create();
-        user.User = AuthorizationTests.Principal(AppRoles.ContentManager, "2");
+        user.User = AuthorizationTests.Principal(AppRoles.Staff, "2");
         await workflow.ChangeStatusAsync(id, PublishStatus.Published);
-        user.User = AuthorizationTests.Principal(AppRoles.Author);
+        user.User = AuthorizationTests.Principal(AppRoles.Staff);
         await workflow.UpdateAsync(id, "Edited title", "", "Edited", 1, null);
         Assert.Equal(PublishStatus.Draft, (await db.Blogs.SingleAsync()).PublishStatus);
         Assert.False((await db.Blogs.SingleAsync()).IsPublish);
@@ -138,7 +138,7 @@ public sealed class BlogWorkflowTests : IDisposable
             Assert.True(File.Exists(image));
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() => workflow.RestoreAsync(id));
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() => workflow.GetTrashAsync());
-            user.User = AuthorizationTests.Principal(AppRoles.ContentManager, "2");
+            user.User = AuthorizationTests.Principal(AppRoles.Staff, "2");
             Assert.Single(await workflow.GetTrashAsync());
             Assert.True(await workflow.RestoreAsync(id));
             var restored = await db.Blogs.SingleAsync();
@@ -184,7 +184,7 @@ public sealed class BlogWorkflowTests : IDisposable
         var rejected = await Create();
         var deleted = await Create();
         await workflow.ChangeStatusAsync(pending, PublishStatus.PendingReview);
-        user.User = AuthorizationTests.Principal(AppRoles.ContentManager, "2");
+        user.User = AuthorizationTests.Principal(AppRoles.Staff, "2");
         await workflow.ChangeStatusAsync(published, PublishStatus.Published);
         await workflow.ChangeStatusAsync(rejected, PublishStatus.Rejected);
         await workflow.ChangeStatusAsync(deleted, PublishStatus.Published);

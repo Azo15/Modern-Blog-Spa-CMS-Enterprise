@@ -26,10 +26,10 @@ public class AuthorizationTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true, true, true, true)]
-    [InlineData(AppRoles.ContentManager, false, true, true, true)]
-    [InlineData(AppRoles.Author, false, false, false, true)]
-    [InlineData(AppRoles.Moderator, false, false, true, false)]
-    [InlineData(AppRoles.RegisteredUser, false, false, false, false)]
+    [InlineData(AppRoles.Staff, false, true, true, true)]
+    [InlineData(AppRoles.Staff, false, false, false, true)]
+    [InlineData(AppRoles.Staff, false, false, true, false)]
+    [InlineData(AppRoles.Customer, false, false, false, false)]
     [InlineData(null, false, false, false, false)]
     public async Task PoliciesEnforceRoleMatrix(string? role, bool admin, bool content, bool moderation, bool author)
     {
@@ -44,14 +44,14 @@ public class AuthorizationTests
     }
 
     [Theory]
-    [InlineData(AppRoles.Author, "1", true)]
-    [InlineData(AppRoles.Author, "2", false)]
-    [InlineData(AppRoles.Author, "invalid", false)]
-    [InlineData(AppRoles.Author, null, false)]
-    [InlineData(AppRoles.ContentManager, "2", true)]
+    [InlineData(AppRoles.Staff, "1", true)]
+    [InlineData(AppRoles.Staff, "2", false)]
+    [InlineData(AppRoles.Staff, "invalid", false)]
+    [InlineData(AppRoles.Staff, null, false)]
+    [InlineData(AppRoles.Staff, "2", true)]
     [InlineData(AppRoles.Admin, "2", true)]
-    [InlineData(AppRoles.Moderator, "1", false)]
-    [InlineData(AppRoles.RegisteredUser, "1", false)]
+    [InlineData(AppRoles.Staff, "1", false)]
+    [InlineData(AppRoles.Customer, "1", false)]
     public async Task ResourcePolicyRequiresOwnershipOrManagement(string role, string? id, bool allowed)
     {
         using var provider = Provider();
