@@ -4,6 +4,7 @@
 @{ ViewData["Title"] = Text["Profile"]; }
 <div class="container luxe-profile">
     <h1>@Text["Profile"]</h1>
+    <p><a class="luxe-button luxe-button-gold" href="/randevularim">@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "My appointments" : "Randevularım") →</a></p>
     <p class="text-muted">@Model.Email</p>
     @if (TempData["ProfileSuccess"] is string success) { <div class="alert alert-success" role="status">@success</div> }
     <div asp-validation-summary="All" class="text-danger" role="alert"></div>

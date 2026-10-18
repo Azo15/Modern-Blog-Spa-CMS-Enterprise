@@ -8,6 +8,7 @@
             <button class="luxe-modal-close" type="button" data-bs-dismiss="modal" aria-label="@(en ? "Close" : "Kapat")"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             <h2 id="vip-title">@(en ? "Your online reservation." : "Size özel online rezervasyon.")</h2>
             <p id="vip-intro">@(en ? "Choose your ritual and send your appointment request. Our team will contact you to confirm availability." : "Ritüelinizi seçin, randevu talebinizi iletin. Ekibimiz uygunluğu teyit etmek için sizinle iletişime geçsin.")</p>
+            @if (User.Identity?.IsAuthenticated != true) { <p><a href="/dashboard/giris?ReturnUrl=%2Frandevu">@(en ? "Sign in first to manage this appointment in your account." : "Randevunuzu hesabınızdan yönetmek için önce giriş yapın.") →</a></p> }
         </div>
         @if (Model.Services.Count > 0)
         {
@@ -49,9 +50,9 @@
                     <fieldset data-vip-step="2" hidden>
                         <legend tabindex="-1">@(en ? "Let us welcome you." : "Sizi tanımak isteriz.")</legend>
                         <div class="luxe-vip-fields">
-                            <div><label for="vip-name">@(en ? "Full name" : "Adınız ve soyadınız")</label><input id="vip-name" name="FullName" class="form-control" autocomplete="name" minlength="2" maxlength="120" required /></div>
-                            <div><label for="vip-phone">@(en ? "Phone number" : "Telefon numaranız")</label><input id="vip-phone" name="Phone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" pattern="\+?[0-9 \(\)\-]{10,29}" maxlength="30" required /></div>
-                            <div class="full-width"><label for="vip-email">@(en ? "Email address" : "E-posta adresiniz")</label><input id="vip-email" name="Email" class="form-control" type="email" autocomplete="email" maxlength="254" required /></div>
+                            <div><label for="vip-name">@(en ? "Full name" : "Adınız ve soyadınız")</label><input id="vip-name" name="FullName" value="@Model.FullName" class="form-control" autocomplete="name" minlength="2" maxlength="120" required /></div>
+                            <div><label for="vip-phone">@(en ? "Phone number" : "Telefon numaranız")</label><input id="vip-phone" name="Phone" value="@Model.Phone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" pattern="\+?[0-9 \(\)\-]{10,29}" maxlength="30" required /></div>
+                            <div class="full-width"><label for="vip-email">@(en ? "Email address" : "E-posta adresiniz")</label><input id="vip-email" name="Email" value="@Model.Email" class="form-control" type="email" autocomplete="email" maxlength="254" required /></div>
                             <div class="full-width"><label for="vip-gift-code">@(en ? "Gift Card / VIP Invitation Code (optional)" : "Hediye Kartı / VIP Davet Kodu (isteğe bağlı)")</label><input id="vip-gift-code" name="GiftCode" class="form-control" maxlength="40" minlength="3" pattern="[A-Za-z0-9](?:[A-Za-z0-9]|-){2,39}" autocomplete="off" aria-describedby="vip-gift-help" /><small id="vip-gift-help">@(en ? "Our team will verify your code; entering it does not apply an automatic discount." : "Kodunuz ekibimizce doğrulanır; otomatik indirim uygulanmaz.")</small></div>
                             <div class="full-width"><label for="vip-notes">@(en ? "Special requests (optional)" : "Özel istek notunuz (isteğe bağlı)")</label><small>@(en ? "Please do not share sensitive health information." : "Lütfen hassas sağlık bilgisi paylaşmayın.")</small><textarea id="vip-notes" name="Notes" class="form-control" maxlength="2000" rows="3"></textarea></div>
                         </div>
@@ -65,6 +66,7 @@
                         <h3>@(en ? "A little calm is on its way." : "Dinginliğe bir adım daha.")</h3>
                         <p>@(en ? "Your reservation reference" : "Rezervasyon kodunuz")</p>
                         <strong data-booking-reference></strong>
+                        @if (User.Identity?.IsAuthenticated == true) { <p><a href="/randevularim">@(en ? "View my appointments" : "Randevularımı görüntüle") →</a></p> }
                         <p>@(en ? "Your appointment request was received successfully. We will contact you for confirmation." : "Randevu talebiniz başarıyla alındı, onay için sizinle iletişime geçilecektir.")</p>
                         <button class="luxe-button luxe-button-gold" type="button" data-bs-dismiss="modal">@(en ? "Lovely" : "Harika")<i class="fa-solid fa-check" aria-hidden="true"></i></button>
                     </section>

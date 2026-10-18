@@ -6,7 +6,8 @@ using WebUI.Services;
 
 namespace WebUI.ViewComponents.Default;
 
-public sealed class _VipReservation(ISender sender, PublicMediaService media) : ViewComponent
+public sealed class _VipReservation(ISender sender, PublicMediaService media,
+    Microsoft.AspNetCore.Identity.UserManager<EntityLayer.Concrete.AppUser> users) : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync()
     {
@@ -23,6 +24,7 @@ public sealed class _VipReservation(ISender sender, PublicMediaService media) : 
                     photoIndex >= 0 ? media.Image(null, $"img/vip-{photoIndex + 1}.webp") :
                     media.ServiceImage(service.Title, service.Image, service.Id), service.DurationMinutes);
             }).ToArray();
-        return View(new VipReservationViewModel(options));
+        var user = HttpContext.User.Identity?.IsAuthenticated == true ? await users.GetUserAsync(HttpContext.User) : null;
+        return View(new VipReservationViewModel(options, user is null ? null : $"{user.FirstName} {user.LastName}".Trim(), user?.PhoneNumber, user?.Email));
     }
 }

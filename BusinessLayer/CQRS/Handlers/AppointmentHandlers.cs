@@ -19,12 +19,16 @@ using Microsoft.Extensions.Logging;
 namespace BusinessLayer.CQRS.Handlers;
 
 public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQueue queue,
-    IManagerNotifier notifier, ILogger<CreateAppointmentHandler> logger) : IRequestHandler<CreateAppointmentCommand, AppointmentReceiptDto>
+    IManagerNotifier notifier, ILogger<CreateAppointmentHandler> logger, ICurrentUserService currentUser) : IRequestHandler<CreateAppointmentCommand, AppointmentReceiptDto>
 {
     public async Task<AppointmentReceiptDto> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
     {
         var existing = await db.Appointments.AsNoTracking().SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, cancellationToken);
-        if (existing is not null) return Replay(existing, request);
+        if (existing is not null)
+        {
+            if (existing.CreatedBy != currentUser.UserId) throw new ValidationException("Bu talep başka bir oturumda oluşturulmuş. Yeni bir talep başlatın.");
+            return Replay(existing, request);
+        }
         var service = await db.Services.AsNoTracking().Where(x => x.Id == request.ServiceId && x.IsPublish)
             .Select(x => new { x.Id, x.Title }).SingleOrDefaultAsync(cancellationToken);
         if (service is null) throw new ValidationException([new ValidationFailure(nameof(request.ServiceId), "Bu hizmet şu anda randevuya açık değil.")]);
@@ -48,6 +52,7 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
             // The unique database index also protects simultaneous retries across application instances.
             var retry = await db.Appointments.AsNoTracking().SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, cancellationToken);
             if (retry is null) throw;
+            if (retry.CreatedBy != currentUser.UserId) throw new ValidationException("Talep kimliği başka bir oturuma ait.");
             db.Entry(appointment).State = EntityState.Detached;
             db.Entry(delivery).State = EntityState.Detached;
             return Replay(retry, request);
@@ -128,8 +133,19 @@ public sealed class AppointmentAdminHandlers(AppDbContext db, ICurrentUserServic
         AppointmentEmailDelivery? confirmation = null;
         if (request.Status == AppointmentStatus.Confirmed)
         {
-            confirmation = new AppointmentEmailDelivery { Appointment = appointment, IsConfirmation = true };
-            db.AppointmentEmailDeliveries.Add(confirmation);
+            confirmation = await db.AppointmentEmailDeliveries.SingleOrDefaultAsync(d => d.AppointmentId == appointment.Id && d.IsConfirmation, cancellationToken);
+            if (confirmation is null)
+            {
+                confirmation = new AppointmentEmailDelivery { Appointment = appointment, IsConfirmation = true };
+                db.AppointmentEmailDeliveries.Add(confirmation);
+            }
+            else
+            {
+                // Reconfirming a rescheduled booking must not collide with the unique outbox index.
+                confirmation.SentAtUtc = null; confirmation.LastEnqueuedAtUtc = null;
+                confirmation.HangfireJobId = null; confirmation.LastError = null;
+                confirmation.MessageId = $"{Guid.NewGuid():N}@xspa.local";
+            }
         }
         // Status change and delivery intent commit in the same database transaction.
         await db.SaveChangesAsync(cancellationToken);

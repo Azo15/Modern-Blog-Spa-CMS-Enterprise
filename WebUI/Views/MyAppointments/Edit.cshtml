@@ -1,0 +1,20 @@
+@model MyAppointmentEditModel
+@using BusinessLayer.ValidationRules
+@{ var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; ViewData["Title"] = en ? "Change appointment" : "Randevuyu düzenle"; }
+@section Styles { <link rel="stylesheet" href="~/css/my-appointments.css" asp-append-version="true" /> }
+<section class="luxe-section customer-bookings"><div class="container booking-editor">
+    <a href="/randevularim">← @(en ? "My appointments" : "Randevularım")</a>
+    <h1>@ViewData["Title"]</h1><p>@(en ? "Your revised request will await confirmation. Your reservation code stays the same." : "Güncel talebiniz yeniden onaya gönderilir. Rezervasyon kodunuz aynı kalır.")</p>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="booking-card">
+        <div asp-validation-summary="All" class="booking-errors" role="alert"></div>
+        <input asp-for="Id" type="hidden" /><input name="ExpectedUpdatedDate" type="hidden" value="@Model.ExpectedUpdatedDate?.ToString("O")" />
+        <div class="booking-field"><label asp-for="ServiceId">@(en ? "Ritual" : "Hizmet")</label><select asp-for="ServiceId" required>@foreach(var s in Model.Services){<option value="@s.Id">@s.Title</option>}</select></div>
+        <div class="booking-fields">
+            <div class="booking-field"><label asp-for="AppointmentDate">@(en ? "Date" : "Tarih")</label><input asp-for="AppointmentDate" type="date" min="@DateOnly.FromDateTime(AppointmentSchedule.LocalNow).ToString("yyyy-MM-dd")" max="@DateOnly.FromDateTime(AppointmentSchedule.LocalNow).AddDays(90).ToString("yyyy-MM-dd")" required /></div>
+            <div class="booking-field"><label asp-for="TimeSlot">@(en ? "Time" : "Saat")</label><select asp-for="TimeSlot">@foreach(var slot in AppointmentSchedule.TimeSlots){<option value="@slot">@slot</option>}</select></div>
+            <div class="booking-field"><label asp-for="GuestCount">@(en ? "Guests" : "Misafir sayısı")</label><input asp-for="GuestCount" type="number" min="1" max="4" required /></div>
+        </div>
+        <div class="booking-field"><label asp-for="Notes">@(en ? "Request notes (optional)" : "Talep notu (isteğe bağlı)")</label><textarea asp-for="Notes" maxlength="2000" rows="4"></textarea><small>@(en ? "Do not include sensitive health information." : "Hassas sağlık bilgisi paylaşmayın.")</small></div>
+        <button class="luxe-button luxe-button-gold" type="submit">@(en ? "Save changes" : "Değişiklikleri kaydet") →</button>
+    </form>
+</div></section>

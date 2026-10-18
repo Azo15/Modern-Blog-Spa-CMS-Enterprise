@@ -1,0 +1,36 @@
+@model BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.MyAppointmentDto>
+@using EntityLayer.Enum
+@{ var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US"; ViewData["Title"] = en ? "My appointments" : "Randevularım"; }
+@section Styles { <link rel="stylesheet" href="~/css/my-appointments.css" asp-append-version="true" /> }
+<section class="luxe-section customer-bookings"><div class="container">
+    <span class="luxe-eyebrow">XSPA · @(en ? "YOUR WELLNESS DIARY" : "SİZE ÖZEL RİTÜELLER")</span>
+    <div class="booking-heading"><h1>@ViewData["Title"]</h1><a class="luxe-button luxe-button-gold" href="/randevu">@(en ? "New appointment" : "Yeni randevu") →</a></div>
+    <p>@(en ? "View your requests and manage future appointments. Changes require confirmation by our team." : "Taleplerinizi takip edin, gelecek randevularınızı yönetin. Değişiklikler ekibimizin yeniden onayına gönderilir.")</p>
+    @if (TempData["AppointmentNotice"] is string message) { <div class="booking-notice" role="status">@message</div> }
+    @if (Model.Items.Count == 0) { <div class="booking-card"><h2>@(en ? "Your next moment of calm awaits." : "Dinginliğe ilk adımınızı planlayın.")</h2><p>@(en ? "There are no appointments created while signed in to this account." : "Bu hesapla giriş yapılarak oluşturulmuş bir randevu bulunmuyor.")</p></div> }
+    <div class="booking-list">
+    @foreach (var a in Model.Items)
+    {
+        var label = a.Status switch { AppointmentStatus.Confirmed => en ? "Confirmed" : "Onaylandı", AppointmentStatus.Cancelled => en ? "Cancelled" : "İptal edildi", _ => en ? "Awaiting confirmation" : "Onay bekliyor" };
+        <article class="booking-card">
+            <div class="booking-heading"><span class="luxe-eyebrow">@a.ReferenceCode</span><span class="booking-status booking-status-@a.Status.ToString().ToLowerInvariant()">@label</span></div>
+            <h2>@a.ServiceTitle</h2>
+            <p class="booking-meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> @a.AppointmentDate.ToString("dd.MM.yyyy") · @a.TimeSlot · @a.GuestCount @(en ? "guest(s)" : "misafir")</p>
+            @if (!string.IsNullOrWhiteSpace(a.Notes)) { <p class="booking-notes">@a.Notes</p> }
+            @if (a.CanChange)
+            {
+                <div class="booking-actions"><a class="luxe-button" href="/randevularim/@a.Id/duzenle">@(en ? "Change appointment" : "Randevuyu düzenle") →</a>
+                <button type="button" class="booking-cancel-toggle" data-bs-toggle="collapse" data-bs-target="#cancel-@a.Id" aria-expanded="false" aria-controls="cancel-@a.Id">@(en ? "Cancel appointment" : "Randevuyu iptal et")</button></div>
+                <div class="collapse booking-cancel-confirm" id="cancel-@a.Id"><p>@(en ? "Cancel this appointment? This cannot be undone. You can create a new request afterwards." : "Bu randevuyu iptal etmek istiyor musunuz? İptal geri alınamaz; daha sonra yeni talep oluşturabilirsiniz.")</p><form asp-action="Cancel" asp-route-id="@a.Id" method="post"><input name="expectedUpdatedDate" type="hidden" value="@a.UpdatedDate?.ToString("O")" /><button class="luxe-button" type="submit">@(en ? "Yes, cancel appointment" : "Evet, randevuyu iptal et")</button></form></div>
+            }
+            else { <p class="booking-help">@(en ? "This appointment is closed to changes." : "Bu randevu değişikliğe kapalıdır.")</p> }
+        </article>
+    }
+    </div>
+    <nav class="luxe-pagination" aria-label="@(en ? "Appointment pages" : "Randevu sayfaları")">
+        @if(Model.HasPreviousPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex-1)">← @(en ? "Previous" : "Önceki")</a>}
+        <span>@Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
+        @if(Model.HasNextPage){<a asp-action="Index" asp-route-page="@(Model.PageIndex+1)">@(en ? "Next" : "Sonraki") →</a>}
+    </nav>
+    <p class="booking-help">@(en ? "Booked before signing in? Contact our team with your reservation code; guest requests are not automatically linked by email." : "Giriş yapmadan mı randevu aldınız? Rezervasyon kodunuzla ekibimize ulaşın. Misafir talepleri güvenliğiniz için e-posta eşleşmesiyle otomatik bağlanmaz.") <a href="/iletisim">@(en ? "Contact us" : "İletişim") →</a></p>
+</div></section>

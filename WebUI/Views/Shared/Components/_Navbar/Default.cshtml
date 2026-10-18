@@ -1,10 +1,13 @@
 @model SiteTable
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService NavigationAuthorization
+@inject Microsoft.AspNetCore.Identity.UserManager<AppUser> NavigationUsers
 @{
     var en = System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US";
     var signedIn = User.Identity?.IsAuthenticated == true;
-    var accountName = User.Identity?.Name ?? (en ? "My account" : "Hesabım");
+    var accountUser = signedIn ? await NavigationUsers.GetUserAsync(User) : null;
+    var fullName = string.Join(" ", new[] { accountUser?.FirstName, accountUser?.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    var accountName = string.IsNullOrWhiteSpace(fullName) ? (en ? "My account" : "Hesabım") : fullName;
     string? panelController = null;
     if (signedIn)
     {
@@ -29,6 +32,7 @@
                         <ul class="dropdown-menu dropdown-menu-end luxe-account-menu" aria-labelledby="navbar-account">
                             <li><span class="luxe-account-name">@accountName</span></li>
                             <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fa-regular fa-user" aria-hidden="true"></i>@L["Profile"]</a></li>
+                            <li><a class="dropdown-item" asp-controller="MyAppointments" asp-action="Index"><i class="fa-regular fa-calendar" aria-hidden="true"></i>@(en ? "My appointments" : "Randevularım")</a></li>
                             @if (panelController is not null)
                             {
                                 <li><a class="dropdown-item luxe-admin-link" asp-controller="@panelController" asp-action="@(panelController == "AdminUserList" ? "UserList" : "Index")"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Panel</a></li>

@@ -68,7 +68,10 @@ public sealed class NavbarAccountEndpointTests
 
         var header = Header(await client.GetStringAsync("/"));
 
-        Assert.Contains($"<span class=\"luxe-account-label\">{email}</span>", header);
+        var expectedRole = PlatformWebFactory.Accounts.Single(a => a.Email == email).Role;
+        Assert.Contains($"<span class=\"luxe-account-label\">Test {expectedRole}</span>", header);
+        Assert.DoesNotContain(email, header);
+        Assert.Contains("href=\"/randevularim\"", header);
         Assert.Contains("Çıkış Yap", header);
         Assert.Contains("method=\"post\"", header);
         Assert.Contains("action=\"/dashboard\"", header);

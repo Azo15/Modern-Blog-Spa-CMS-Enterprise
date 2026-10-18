@@ -10,7 +10,7 @@ namespace WebUI.Controllers;
 
 [AllowAnonymous]
 [Route("randevu")]
-public sealed class AppointmentController(ISender sender, ILogger<AppointmentController> logger) : Controller
+public sealed class AppointmentController(ISender sender, ILogger<AppointmentController> logger, BusinessLayer.Abstract.IActiveMemberService members) : Controller
 {
     [HttpGet]
     public IActionResult Index(int? serviceId)
@@ -19,6 +19,7 @@ public sealed class AppointmentController(ISender sender, ILogger<AppointmentCon
     [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(16384)]
     public async Task<IActionResult> Create(AppointmentRequest request, CancellationToken cancellationToken)
     {
+        if (User.Identity?.IsAuthenticated == true && !await members.IsActiveAsync(User, cancellationToken)) return Forbid();
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Where(pair => pair.Value?.Errors.Count > 0)
