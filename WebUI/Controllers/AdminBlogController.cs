@@ -89,6 +89,19 @@ public sealed class AdminBlogController(ISender sender) : BaseController
     {
         if (!await sender.Send(new RestoreBlogCommand(id), ct)) return NotFound(); return RedirectToAction(nameof(Trash));
     }
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Policy=AccessPolicies.ContentManager)]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("ai-generation")]
+    [RequestSizeLimit(8192)]
+    public async Task<IActionResult> GenerateWithAi(GenerateAiBlogCommand request,CancellationToken ct)
+    {
+        Response.Headers.CacheControl="no-store";
+        if(!ModelState.IsValid)return BadRequest(new {message="Konu, kategori ve dil bilgilerini kontrol edin."});
+        try { return Json(await sender.Send(request,ct)); }
+        catch(ValidationException error){return BadRequest(new {message=error.Message});}
+        catch(AiBlogUnavailableException error){return StatusCode(503,new {message=error.Message});}
+        catch(HttpRequestException){return StatusCode(502,new {message="AI servisine bağlanılamadı. Daha sonra yeniden deneyin."});}
+        catch(OperationCanceledException) when(!ct.IsCancellationRequested){return StatusCode(504,new {message="AI üretimi zaman aşımına uğradı. Yeniden deneyin."});}
+    }
     private async Task Categories(CancellationToken ct) => ViewBag.Categories = (await sender.Send(new GetCategoryOptionsQuery(), ct)).Select(c => new SelectListItem(c.Title, c.Id.ToString())).ToList();
     private void AddErrors(ValidationException ex)
     {

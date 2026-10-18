@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authentication;
 using BusinessLayer.Abstract;
 using BusinessLayer.Security;
@@ -30,6 +31,11 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRateLimiter(options => options.AddPolicy("ai-generation", context =>
+    System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+        _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions { PermitLimit=3, Window=TimeSpan.FromMinutes(1), QueueLimit=0 })));
+
 // External authentication is registered only when both secrets are configured.
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientId"]) &&
     !string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientSecret"]))
