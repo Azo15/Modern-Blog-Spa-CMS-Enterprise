@@ -206,6 +206,11 @@ if (args.Contains("--initialize-database", StringComparer.Ordinal))
     return;
 }
 
+// Explicit opt-in for shared hosts that cannot run the deployment CLI command.
+// Disable this setting after the initial schema preparation succeeds.
+if (!testing && app.Configuration.GetValue<bool>("Deployment:InitializeDatabaseOnStartup"))
+    await DeploymentDatabaseInitializer.InitializeAsync(app.Services, app.Configuration);
+
 // Business exceptions are mapped below, inside the environment exception handler.
 
 // Yerel geliştirmede örnek verilerden önce veritabanını hazırla.
