@@ -46,9 +46,8 @@ public class CommentTests
         var thread = Assert.Single((await f.Sender.Send(new GetPublicCommentsQuery(1))).Items); Assert.Equal(child, Assert.Single(thread.Children).Id); Assert.Equal(2, await f.Db.Comments.CountAsync());
     }
     [Theory]
-    [InlineData(AppRoles.Staff)]
     [InlineData(AppRoles.Customer)]
-    
+
     [InlineData(null)]
     public async Task OnlyAdminOrModeratorCanApprove(string? role)
     {
@@ -61,7 +60,7 @@ public class CommentTests
     public async Task AnonymousCannotCreateAndNonOwnerCannotEditOrDelete()
     {
         using var f = new Stage2Fixture(); f.As(null); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new CreateCommentCommand(1, "Anonymous")));
-        f.As(AppRoles.Customer); var id = await f.Sender.Send(new CreateCommentCommand(1, "Owned comment")); f.As(AppRoles.Staff, 6);
+        f.As(AppRoles.Customer); var id = await f.Sender.Send(new CreateCommentCommand(1, "Owned comment")); f.As(AppRoles.Customer, 6);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new UpdateCommentCommand(id, "Forged edit")));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new DeleteCommentCommand(id)));
     }

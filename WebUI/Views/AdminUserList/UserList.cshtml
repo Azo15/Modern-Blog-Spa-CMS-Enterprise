@@ -1,6 +1,6 @@
 @model IEnumerable<UserListViewModel>
 @{
-    ViewData["Title"] = L["Admin Listesi"];
+    ViewData["Title"] = L["Users"];
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int sayac = 1;
 }
@@ -9,7 +9,7 @@
     <div class="justify-content-between d-flex align-items-center px-4">
         <h5 class="card-header">@ViewData["Title"]</h5>
         <a asp-controller="dashboard" asp-action="signUp" class="btn btn-outline-primary"><i
-            class="fa-solid fa-plus me-md-2"></i>Admin Ekle</a>
+            class="fa-solid fa-plus me-md-2"></i>Müşteri Ekle</a>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -58,7 +58,7 @@
             </table>
             <hr class="mt-0" />
             <div class="px-5">
-                <p><small>Tabloda</small><span class="mx-2">@ViewBag.Count</span><small>adet admin var</small></p>
+                <p><small>Tabloda</small><span class="mx-2">@ViewBag.Count</span><small>adet kullanıcı var</small></p>
             </div>
         </div>
     </div>

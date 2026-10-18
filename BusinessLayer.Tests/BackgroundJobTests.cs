@@ -226,12 +226,12 @@ public sealed class BackgroundJobTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true)]
-    [InlineData(AppRoles.Staff, false)]
-    
-    
+    [InlineData(AppRoles.Staff, true)]
+
+
     [InlineData(AppRoles.Customer, false)]
     [InlineData(null, false)]
-    public void HangfireDashboardAllowsOnlyAuthenticatedSystemAdmin(string? role, bool allowed)
+    public void HangfireDashboardAllowsOnlyAuthenticatedAdminAndStaff(string? role, bool allowed)
     {
         using var services = new ServiceCollection().BuildServiceProvider();
         var http = new DefaultHttpContext { RequestServices = services, User = AuthorizationTests.Principal(role, authenticated: role != null) };

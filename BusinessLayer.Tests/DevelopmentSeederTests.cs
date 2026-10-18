@@ -62,7 +62,7 @@ public class DevelopmentSeederTests
         Assert.Equal("XSPA Editörü", (await users.FindByEmailAsync("editor@spa.com"))!.FullName);
         Assert.Equal("Wellness Uzmanı", (await users.FindByEmailAsync("author@spa.com"))!.FullName);
         Assert.Equal(5, await users.Users.CountAsync());
-        Assert.Equal(5, await roles.Roles.CountAsync());
+        Assert.Equal(3, await roles.Roles.CountAsync());
         Assert.False(await roles.RoleExistsAsync("Visitor"));
         foreach (var (email, role) in new[] {
             ("admin@spa.com", AppRoles.Admin), ("editor@spa.com", AppRoles.Staff),
@@ -75,5 +75,27 @@ public class DevelopmentSeederTests
             Assert.True(await users.CheckPasswordAsync(account, "P@ssword123!"));
             Assert.Equal(role, Assert.Single(await users.GetRolesAsync(account)));
         }
+    }
+
+    [Fact]
+    public async Task ExistingLegacyRolesMigrateWithoutCreatingProductionDemoUsers()
+    {
+        using var connection=new SqliteConnection("Data Source=:memory:");connection.Open();
+        var services=new ServiceCollection().AddLogging();services.AddDataProtection();services.AddDbContext<AppDbContext>(o=>o.UseSqlite(connection));
+        services.AddIdentityCore<AppUser>().AddRoles<IdentityRole<int>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+        using var provider=services.BuildServiceProvider();
+        using(var scope=provider.CreateScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreatedAsync();
+            var roles=scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();var users=scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            foreach(var role in new[]{"Author","Registered User",AppRoles.Admin})Assert.True((await roles.CreateAsync(new(role))).Succeeded);
+            foreach(var pair in new[]{("legacy-staff@example.test","Author"),("legacy-customer@example.test","Registered User"),("existing-admin@example.test",AppRoles.Admin)})
+            {var user=new AppUser{UserName=pair.Item1,Email=pair.Item1};Assert.True((await users.CreateAsync(user,"OriginalPassword1!")).Succeeded);Assert.True((await users.AddToRoleAsync(user,pair.Item2)).Succeeded);if(pair.Item2=="Author")Assert.True((await users.AddToRoleAsync(user,"Registered User")).Succeeded);}
+        }
+        await DataSeeder.SeedRolesAsync(provider);await DataSeeder.SeedRolesAsync(provider);
+        using var verify=provider.CreateScope();var manager=verify.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        Assert.Equal(3,await manager.Users.CountAsync());
+        foreach(var pair in new[]{("legacy-staff@example.test",AppRoles.Staff),("legacy-customer@example.test",AppRoles.Customer),("existing-admin@example.test",AppRoles.Admin)})
+        {var user=(await manager.FindByEmailAsync(pair.Item1))!;Assert.Equal(pair.Item2,Assert.Single(await manager.GetRolesAsync(user)));Assert.True(await manager.CheckPasswordAsync(user,"OriginalPassword1!"));}
     }
 }

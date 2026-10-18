@@ -33,6 +33,16 @@ namespace WebUI.Data
                 }
                 Ensure(await manager.DeleteAsync(retired));
             }
+            // A legacy account with several memberships keeps the highest of the three levels.
+            foreach (var level in new[] { BusinessLayer.Security.AppRoles.Admin, BusinessLayer.Security.AppRoles.Staff })
+                foreach (var user in await users.GetUsersInRoleAsync(level))
+                {
+                    var redundant = (await users.GetRolesAsync(user)).Where(role => role != level &&
+                        (role == BusinessLayer.Security.AppRoles.Customer || level == BusinessLayer.Security.AppRoles.Admin && role == BusinessLayer.Security.AppRoles.Staff)).ToArray();
+                    if (redundant.Length == 0) continue;
+                    Ensure(await users.RemoveFromRolesAsync(user, redundant));
+                    Ensure(await users.UpdateSecurityStampAsync(user));
+                }
             // Visitor is an anonymous access profile, never an Identity role.
             var visitor = await manager.FindByNameAsync("Visitor");
             if (visitor != null) Ensure(await manager.DeleteAsync(visitor));

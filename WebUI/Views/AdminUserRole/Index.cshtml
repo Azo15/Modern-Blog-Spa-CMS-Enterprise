@@ -63,7 +63,7 @@
                                         "Customer" => "bg-success",
                                         _ => "bg-secondary"
                                     };
-                                    <span class="badge @badgeClass me-1">@role</span>
+                                    <span class="badge @badgeClass me-1">@(role switch {"System Admin"=>"Sistem Yöneticisi","Staff"=>"Personel","Customer"=>"Müşteri",_=>role})</span>
                                 }
                             }
                             else

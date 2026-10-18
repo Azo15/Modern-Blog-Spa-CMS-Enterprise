@@ -8,12 +8,8 @@
     string? panelController = null;
     if (signedIn)
     {
-        if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Admin)).Succeeded)
-            panelController = "AdminUserList";
-        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.BlogAuthor)).Succeeded)
-            panelController = "AdminBlog";
-        else if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
-            panelController = "AdminComment";
+        if ((await NavigationAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.ContentManager)).Succeeded)
+            panelController = "AdminDashboard";
     }
 }
 <header class="luxe-header" id="site-header">

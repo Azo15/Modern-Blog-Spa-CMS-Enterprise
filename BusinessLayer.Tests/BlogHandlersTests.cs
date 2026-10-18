@@ -23,11 +23,11 @@ public class BlogHandlersTests
         f.Cache.Verify(c => c.SetAsync(It.Is<string>(k => k.StartsWith("blogs_all:")), It.IsAny<BusinessLayer.Dtos.PaginatedList<BusinessLayer.Dtos.BlogListDto>>(), It.IsAny<TimeSpan?>()), Times.Once);
     }
     [Fact]
-    public async Task AuthorQueriesOnlyOwnedBlogsAndOtherIdIsForbidden()
+    public async Task StaffQueriesAllAuthorsWhileCustomersCannotAccessManagement()
     {
         using var f = new Stage2Fixture(); f.Db.Blogs.Add(new Blog { Id = 2, AppUserId = 6, Title = "Other author" }); await f.Db.SaveChangesAsync(); f.Db.ChangeTracker.Clear();
-        var owned = await f.Sender.Send(new GetBlogsQuery()); Assert.Equal(1, Assert.Single(owned.Items).AppUserId);
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new GetBlogByIdQuery(2)));
+        var owned = await f.Sender.Send(new GetBlogsQuery()); Assert.Equal(2, owned.Items.Count);
+        Assert.NotNull(await f.Sender.Send(new GetBlogByIdQuery(2)));
         f.As(AppRoles.Customer); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new GetBlogsQuery()));
     }
     [Fact]
@@ -52,7 +52,9 @@ public class BlogHandlersTests
         using var f = new Stage2Fixture(true);
         var id = await f.Sender.Send(new CreateBlogCommand("New blog title", "A valid subtitle", "<p>Content</p>", 1));
         Assert.Equal(PublishStatus.Draft, (await f.Sender.Send(new GetBlogByIdQuery(id)))!.PublishStatus);
+        f.As(AppRoles.Customer);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.Published)));
+        f.As(AppRoles.Staff);
         await f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.PendingReview));
         f.As(AppRoles.Staff, 5); await f.Sender.Send(new ChangeBlogStatusCommand(id, PublishStatus.Published)); await f.Sender.Send(new DeleteBlogCommand(id));
         Assert.Equal(id, Assert.Single((await f.Sender.Send(new GetTrashedBlogsQuery())).Items).Id);

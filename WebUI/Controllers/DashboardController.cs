@@ -158,7 +158,7 @@ namespace WebUI.Controllers
         private async Task<IActionResult> LandingPage(AppUser user)
         {
             if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin))
-                return RedirectToAction("UserList", "AdminUserList");
+                return RedirectToAction("Index", "AdminDashboard");
             if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff))
                 return RedirectToAction("Index", "AdminDashboard");
             return RedirectToAction("Index", "Default");

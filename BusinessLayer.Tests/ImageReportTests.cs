@@ -169,9 +169,9 @@ public sealed class ImageReportTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true, true)]
-    [InlineData(AppRoles.Staff, true, false)]
-    
-    [InlineData(AppRoles.Staff, false, false)]
+    [InlineData(AppRoles.Staff, true, true)]
+
+
     [InlineData(AppRoles.Customer, false, false)]
     [InlineData(null, false, false)]
     public async Task ReportServiceEnforcesRoleMatrixBeforeDataExport(string? role, bool contacts, bool system)
@@ -270,7 +270,7 @@ public sealed class ImageReportTests
         var response = await reports.Contacts(); Assert.IsType<FileContentResult>(response); Assert.Equal("no-store", reports.Response.Headers.CacheControl);
         Assert.Equal(AccessPolicies.Moderator, typeof(ReportsController).GetMethod(nameof(ReportsController.Contacts))!.GetCustomAttributes<AuthorizeAttribute>().Single().Policy);
         foreach (var action in new[] { nameof(ReportsController.Blogs), nameof(ReportsController.Users), nameof(ReportsController.Interactions) })
-            Assert.Equal(AccessPolicies.Admin, typeof(ReportsController).GetMethod(action)!.GetCustomAttributes<AuthorizeAttribute>().Single().Policy);
+            Assert.Equal(AccessPolicies.ContentManager, typeof(ReportsController).GetMethod(action)!.GetCustomAttributes<AuthorizeAttribute>().Single().Policy);
     }
 
     [Fact]

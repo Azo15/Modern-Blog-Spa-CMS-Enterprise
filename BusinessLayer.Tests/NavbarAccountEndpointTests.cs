@@ -56,10 +56,10 @@ public sealed class NavbarAccountEndpointTests
     }
 
     [Theory]
-    [InlineData("admin@acceptance.test", "/AdminUserList/UserList")]
-    [InlineData("editor@acceptance.test", "/AdminBlog")]
-    [InlineData("author@acceptance.test", "/AdminBlog")]
-    [InlineData("moderator@acceptance.test", "/AdminComment")]
+    [InlineData("admin@acceptance.test", "/AdminDashboard")]
+    [InlineData("editor@acceptance.test", "/AdminDashboard")]
+    [InlineData("author@acceptance.test", "/AdminDashboard")]
+    [InlineData("moderator@acceptance.test", "/AdminDashboard")]
     [InlineData("user@acceptance.test", null)]
     public async Task CookieSessionShowsAccountNameAndOnlyAuthorizedPanelAndCsrfProtectedLogout(string email, string? panel)
     {

@@ -167,7 +167,7 @@ public sealed class AppointmentEndpointTests
 
     [Theory]
     [InlineData("admin@acceptance.test", true)] [InlineData("editor@acceptance.test", true)]
-    [InlineData("moderator@acceptance.test", false)] [InlineData("author@acceptance.test", false)]
+    [InlineData("moderator@acceptance.test", true)] [InlineData("author@acceptance.test", true)]
     [InlineData("user@acceptance.test", false)] [InlineData(null, false)]
     public async Task ReservationAdminRoutesEnforcePoliciesAndCsrf(string? email, bool allowed)
     {

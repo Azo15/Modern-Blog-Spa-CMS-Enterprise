@@ -59,12 +59,12 @@ public sealed class ApiEndpointTests
 
     [Theory]
     [InlineData(AppRoles.Admin, "admin@acceptance.test", true, true, true)]
-    [InlineData(AppRoles.Staff, "editor@acceptance.test", true, false, true)]
-    [InlineData(AppRoles.Staff, "author@acceptance.test", true, false, false)]
-    [InlineData(AppRoles.Staff, "moderator@acceptance.test", false, true, true)]
+    [InlineData(AppRoles.Staff, "editor@acceptance.test", true, true, true)]
+    [InlineData(AppRoles.Staff, "author@acceptance.test", true, true, true)]
+    [InlineData(AppRoles.Staff, "moderator@acceptance.test", true, true, true)]
     [InlineData(AppRoles.Customer, "user@acceptance.test", false, false, false)]
     [InlineData(null, null, false, false, false)]
-    public async Task SixProfilesExerciseRealAuthenticationBlogCommentModerationAndReportBoundaries(string? role, string? email, bool canCreate, bool canModerate, bool canReport)
+    public async Task ThreeRolesExerciseRealAuthenticationBlogCommentModerationAndReportBoundaries(string? role, string? email, bool canCreate, bool canModerate, bool canReport)
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
         if (email is not null) await Login(client, email);
@@ -90,12 +90,12 @@ public sealed class ApiEndpointTests
     }
 
     [Fact]
-    public async Task AuthorOwnershipAndOriginalAuthorAreEnforcedAcrossPutDeleteAndCreate()
+    public async Task StaffCanManageBlogsAcrossAuthorsAndPreservesOriginalAuthor()
     {
         using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = Client(factory);
         await Login(client, "author@acceptance.test");
-        await Problem(await client.PutAsJsonAsync("/api/v1/blogs/3", BlogBody), HttpStatusCode.Forbidden);
-        await Problem(await client.DeleteAsync("/api/v1/blogs/3"), HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync("/api/v1/blogs/3", BlogBody)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.DeleteAsync("/api/v1/blogs/3")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync("/api/v1/blogs/1", BlogBody)).StatusCode);
         await Login(client, "editor@acceptance.test");
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync("/api/v1/blogs/1", BlogBody)).StatusCode);

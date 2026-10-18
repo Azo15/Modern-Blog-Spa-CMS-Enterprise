@@ -88,10 +88,12 @@
 @await Html.PartialAsync("_AiBlogModal")
 @section Scripts {
     <script src="~/js/ai-blog.js" asp-append-version="true"></script>
-    
+
     <script>
         tinymce.init({
             selector: '#tinymce',
+            base_url: '/admin/vendor/tinymce',
+            suffix: '.min',
             height: 400,
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
             toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',

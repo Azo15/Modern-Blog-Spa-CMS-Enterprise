@@ -39,10 +39,10 @@
                                     <input type="hidden" asp-for="@Model[i].RoleId" />
                                     <input type="hidden" asp-for="@Model[i].RoleName" />
                                     <strong class="form-check-label" for="role_@i">
-                                        @Model[i].RoleName
+                                        @(Model[i].RoleName switch {"System Admin"=>"Sistem Yöneticisi","Staff"=>"Personel","Customer"=>"Müşteri",_=>Model[i].RoleName})
                                     </strong>
                                 </div>
-                                <span class="badge @roleBadge">@Model[i].RoleName</span>
+                                <span class="badge @roleBadge">@(Model[i].RoleName switch {"System Admin"=>"Sistem Yöneticisi","Staff"=>"Personel","Customer"=>"Müşteri",_=>Model[i].RoleName})</span>
                             </label>
                         }
                     </div>
@@ -58,3 +58,5 @@
         </div>
     </div>
 </div>
+
+@section Scripts {<script>document.querySelectorAll('input[type=checkbox][name$=".RoleExist"]').forEach(input=>input.addEventListener('change',()=>{if(input.checked)document.querySelectorAll('input[type=checkbox][name$=".RoleExist"]').forEach(other=>{if(other!==input)other.checked=false;});}));</script>}

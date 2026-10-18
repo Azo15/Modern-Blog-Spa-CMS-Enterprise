@@ -27,8 +27,8 @@ public sealed class LegalAdminEndpointTests
         Assert.Contains(title,html); Assert.Contains("href=\"/kvkk\"",html); Assert.Contains("name=\"description\"",html);
     }
     [Theory]
-    [InlineData("author@acceptance.test")] [InlineData("editor@acceptance.test")]
-    public async Task NonAdminsCannotManageSmtp(string email)
+    [InlineData("user@acceptance.test")]
+    public async Task CustomersCannotManageSmtp(string email)
     {
         using var f=new PlatformWebFactory(); await f.InitializeAsync(); using var c=Client(f); await Login(c,email);
         using var response=await c.GetAsync("/AdminSettings/Smtp");

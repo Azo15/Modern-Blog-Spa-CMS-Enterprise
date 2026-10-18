@@ -217,7 +217,7 @@ public sealed class AppointmentTests
 
     [Theory]
     [InlineData(AppRoles.Admin, true)] [InlineData(AppRoles.Staff, true)]
-    [InlineData(AppRoles.Staff, false)] 
+
     [InlineData(AppRoles.Customer, false)] [InlineData(null, false)]
     public async Task OnlyAdminAndContentManagerCanReadOrModerateAppointments(string? role, bool allowed)
     {
