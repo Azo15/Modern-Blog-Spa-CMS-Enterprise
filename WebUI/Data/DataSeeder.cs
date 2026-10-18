@@ -17,6 +17,22 @@ namespace WebUI.Data
             var manager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
             foreach (var role in BusinessLayer.Security.AppRoles.All)
                 if (!await manager.RoleExistsAsync(role)) Ensure(await manager.CreateAsync(new IdentityRole<int>(role)));
+            // Migrate existing memberships before removing retired roles. Never create demo accounts in production.
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            foreach (var legacy in new[] { "Content Manager", "Author", "Moderator", "Registered User" })
+            {
+                var retired = await manager.FindByNameAsync(legacy);
+                if (retired is null) continue;
+                foreach (var user in await users.GetUsersInRoleAsync(legacy))
+                {
+                    var target = legacy == "Registered User" ? BusinessLayer.Security.AppRoles.Customer : BusinessLayer.Security.AppRoles.Staff;
+                    if (!await users.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin) && !await users.IsInRoleAsync(user, target))
+                        Ensure(await users.AddToRoleAsync(user, target));
+                    Ensure(await users.RemoveFromRoleAsync(user, legacy));
+                    Ensure(await users.UpdateSecurityStampAsync(user));
+                }
+                Ensure(await manager.DeleteAsync(retired));
+            }
             // Visitor is an anonymous access profile, never an Identity role.
             var visitor = await manager.FindByNameAsync("Visitor");
             if (visitor != null) Ensure(await manager.DeleteAsync(visitor));
