@@ -41,12 +41,28 @@
         const galleryFilters = document.querySelector('[data-gallery-filters]');
         if (galleryFilters) {
             const items = [...document.querySelectorAll('.luxe-gallery-grid [data-category]')];
+            const filterAnimations = new WeakMap();
+            galleryFilters.querySelectorAll('button').forEach(button => {
+                const badge = button.querySelector('[data-filter-count]');
+                if (badge) badge.textContent = String(items.filter(item => button.dataset.galleryFilter === 'all' || item.dataset.category === button.dataset.galleryFilter).length);
+            });
             const applyGalleryFilter = category => {
+                const previous = new Map(items.filter(item => !item.hidden).map(item => [item, item.getBoundingClientRect()]));
                 let count = 0;
                 items.forEach(item => {
                     item.hidden = category !== 'all' && item.dataset.category !== category;
                     item.dataset.fancybox = item.hidden ? 'gallery-filtered-out' : 'spa-gallery';
                     if (!item.hidden) count++;
+                });
+                let sequence = 0;
+                items.forEach(item => {
+                    filterAnimations.get(item)?.cancel();
+                    if (item.hidden || reduced.matches || typeof item.animate !== 'function') return;
+                    const before = previous.get(item), after = item.getBoundingClientRect();
+                    const from = before ? `translate(${before.left - after.left}px, ${before.top - after.top}px)` : 'translateY(18px) scale(.97)';
+                    const animation = item.animate([{ opacity: before ? 1 : 0, transform: from }, { opacity: 1, transform: 'none' }],
+                        { duration: 420, delay: Math.min(sequence++ * 35, 140), easing: 'cubic-bezier(.22,1,.36,1)' });
+                    filterAnimations.set(item, animation);
                 });
                 galleryFilters.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.galleryFilter === category)));
                 const status = document.querySelector('[data-gallery-count]');

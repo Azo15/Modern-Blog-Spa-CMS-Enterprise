@@ -4,6 +4,7 @@
 <head>
     @await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
     @await RenderSectionAsync("Styles", required: false)
+<link rel="stylesheet" href="~/css/interactions.css" asp-append-version="true" />
 </head>
 <body class="luxe-body @(home ? "is-home" : "is-inner")">
     <div class="luxe-preloader" aria-hidden="true"><img src="~/img/brand-mark.svg" width="70" height="70" alt="" /><span>XSPA</span></div>
@@ -15,5 +16,6 @@
     <a class="luxe-whatsapp" href="https://wa.me/905388787000" target="_blank" rel="noopener noreferrer" aria-label="@(en ? "Book on WhatsApp" : "Hızlı WhatsApp iletişim")"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>@(en ? "Let's talk" : "Bir mesaj uzağınızdayız")</span></a>
     @await Html.PartialAsync("/Views/LayoutPartial/_Script.cshtml")
     @await RenderSectionAsync("Scripts", required: false)
+<script src="~/js/interactions.js" asp-append-version="true"></script>
 </body>
 </html>
