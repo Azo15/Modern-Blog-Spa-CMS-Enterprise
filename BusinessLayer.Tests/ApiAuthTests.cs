@@ -37,8 +37,8 @@ public class ApiAuthTests
     [Theory]
     [InlineData(AppRoles.Admin)]
     [InlineData(AppRoles.Staff)]
-    [InlineData(AppRoles.Staff)]
-    [InlineData(AppRoles.Staff)]
+    
+    
     [InlineData(AppRoles.Customer)]
     public async Task LoginVerifiesIdentityPasswordAndIssuesTokenWithoutCreatingCookie(string role)
     {

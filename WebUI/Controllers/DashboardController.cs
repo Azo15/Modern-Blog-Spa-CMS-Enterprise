@@ -34,7 +34,7 @@ namespace WebUI.Controllers
         [AllowAnonymous]
         [HttpPost("giris")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignIn(SignInViewModel model)
+        public async Task<IActionResult> SignIn(SignInViewModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrEmpty(model.Password))
                 return View(model);
@@ -75,6 +75,7 @@ namespace WebUI.Controllers
                     user.FailedLoginCount = 0;
                     user.LastFailedLogin = null;
                     await _userManager.UpdateAsync(user);
+                    if (Url.IsLocalUrl(returnUrl)) return LocalRedirect(returnUrl!);
                     return await LandingPage(user);
                 }
 
@@ -122,13 +123,13 @@ namespace WebUI.Controllers
 
             var user = new AppUser
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
+                FirstName = model.FirstName.Trim(),
+                LastName = model.LastName.Trim(),
+                Email = model.Email.Trim(),
                 PhoneNumber = model.Phone.Trim(),
                 PrivacyAcknowledgedAtUtc = DateTime.UtcNow,
                 PrivacyNoticeVersion = "2026-10-18",
-                UserName = model.Email
+                UserName = model.Email.Trim()
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);

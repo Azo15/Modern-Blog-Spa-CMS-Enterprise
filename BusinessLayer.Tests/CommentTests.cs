@@ -48,7 +48,7 @@ public class CommentTests
     [Theory]
     [InlineData(AppRoles.Staff)]
     [InlineData(AppRoles.Customer)]
-    [InlineData(AppRoles.Staff)]
+    
     [InlineData(null)]
     public async Task OnlyAdminOrModeratorCanApprove(string? role)
     {

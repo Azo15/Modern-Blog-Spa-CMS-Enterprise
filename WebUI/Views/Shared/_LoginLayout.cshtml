@@ -39,11 +39,10 @@
                 btn.disabled = true;
                 btn.textContent = @Html.Raw(Json.Serialize(L["SigningIn"].Value));
 
-                if (rememberCheckbox?.checked) {
-                    localStorage.setItem('rememberedEmail', emailInput.value);
-                } else {
-                    localStorage.removeItem('rememberedEmail');
-                }
+                try {
+                    if (rememberCheckbox?.checked) localStorage.setItem('rememberedEmail', emailInput.value);
+                    else localStorage.removeItem('rememberedEmail');
+                } catch { }
             });
 
         function togglePassword(id, icon) {

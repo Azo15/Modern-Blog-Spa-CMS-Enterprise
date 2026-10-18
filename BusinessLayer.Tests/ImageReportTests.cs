@@ -170,7 +170,7 @@ public sealed class ImageReportTests
     [Theory]
     [InlineData(AppRoles.Admin, true, true)]
     [InlineData(AppRoles.Staff, true, false)]
-    [InlineData(AppRoles.Staff, true, false)]
+    
     [InlineData(AppRoles.Staff, false, false)]
     [InlineData(AppRoles.Customer, false, false)]
     [InlineData(null, false, false)]

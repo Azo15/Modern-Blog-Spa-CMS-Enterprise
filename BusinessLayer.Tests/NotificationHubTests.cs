@@ -12,7 +12,7 @@ public class NotificationHubTests
     [InlineData(AppRoles.Customer, false)]
     [InlineData(AppRoles.Staff, false)]
     [InlineData(AppRoles.Staff, true)]
-    [InlineData(AppRoles.Staff, true)]
+    
     [InlineData(AppRoles.Admin, true)]
     public async Task HubPolicyRejectsAnonymousAndUnauthorizedRoles(string? role, bool allowed)
     {

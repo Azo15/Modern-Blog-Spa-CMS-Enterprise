@@ -192,7 +192,7 @@ public sealed class MemberFeatureTests
 
     [Theory]
     [InlineData(AppRoles.Staff)]
-    [InlineData(AppRoles.Staff)]
+    
     [InlineData(AppRoles.Customer)]
     [InlineData(null)]
     public async Task NonModeratorsCannotListOrLockAccounts(string? role)

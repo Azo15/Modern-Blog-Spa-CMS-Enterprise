@@ -59,10 +59,8 @@
                                     string badgeClass = role switch
                                     {
                                         "System Admin" => "bg-danger",
-                                        "Content Manager" => "bg-primary",
-                                        "Author" => "bg-info",
-                                        "Moderator" => "bg-warning text-dark",
-                                        "Registered User" => "bg-success",
+                                        "Staff" => "bg-primary",
+                                        "Customer" => "bg-success",
                                         _ => "bg-secondary"
                                     };
                                     <span class="badge @badgeClass me-1">@role</span>
