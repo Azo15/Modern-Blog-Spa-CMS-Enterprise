@@ -16,6 +16,7 @@ namespace BusinessLayer.Container
     {
         public static void ContainerDependencies(this IServiceCollection services)
         {
+            services.AddHttpClient<IAiBlogService, AiBlogService>(client => { client.Timeout = TimeSpan.FromSeconds(90); client.MaxResponseContentBufferSize = 1024 * 1024; });
             services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddScoped<IActiveMemberService, ActiveMemberService>();
             services.AddScoped<IAuthorizationHandler, ActiveMemberAuthorizationHandler>();
