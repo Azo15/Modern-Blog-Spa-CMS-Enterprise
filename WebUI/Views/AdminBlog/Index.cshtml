@@ -157,3 +157,5 @@
 <span>@L["Page"] @Model.PageIndex / @Math.Max(1,Model.TotalPages)</span>
 @if (Model.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.PageIndex+1)" asp-route-categoryId="@ViewBag.SelectedCategory">@L["Next"]</a> }
 </nav>
+
+@await Html.PartialAsync("_AiBlogModal")
