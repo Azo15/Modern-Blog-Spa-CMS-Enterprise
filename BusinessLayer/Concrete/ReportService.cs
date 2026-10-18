@@ -20,7 +20,7 @@ public sealed class ReportService(AppDbContext db, ICurrentUserService currentUs
 
     public async Task<ReportFile> GenerateAsync(ReportKind kind, ReportFormat format, ReportFilter filter, CancellationToken cancellationToken = default)
     {
-        var policy = kind == ReportKind.Contacts ? AccessPolicies.Moderator : AccessPolicies.Admin;
+        var policy = kind == ReportKind.Contacts ? AccessPolicies.Moderator : AccessPolicies.ContentManager;
         if (!(await authorization.AuthorizeAsync(currentUser.User, policy)).Succeeded) throw new UnauthorizedAccessException();
         Validate(kind, format, filter);
         var culture = CultureInfo.CurrentUICulture;

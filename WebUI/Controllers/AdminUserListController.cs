@@ -11,7 +11,7 @@ using Microsoft.Extensions.Localization;
 
 namespace WebUI.Controllers
 {
-    [Authorize(Policy = "RequireAdmin")]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminUserListController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;
@@ -76,6 +76,12 @@ namespace WebUI.Controllers
             {
                 SetToastMessage("Kullanıcı bulunamadı", "error");
                 return RedirectToAction(nameof(UserList));
+            }
+
+            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin))
+            {
+                if (!await _userManager.IsInRoleAsync(currentUser, BusinessLayer.Security.AppRoles.Admin) || (await _userManager.GetUsersInRoleAsync(BusinessLayer.Security.AppRoles.Admin)).Count <= 1)
+                    return Forbid();
             }
 
             // Inspect all history, including hidden comments and interactions on trashed blogs,

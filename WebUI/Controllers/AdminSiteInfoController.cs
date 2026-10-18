@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebUI.Controllers
 {
-    [Authorize(Policy = "RequireAdmin")]
+    [Authorize(Policy = "RequireContentManager")]
     public class AdminSiteInfoController : BaseController
     {
         private readonly ISiteTableService _siteTableService;

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Models;
 namespace WebUI.Controllers;
-[Authorize(Policy = "RequireAdmin")]
+[Authorize(Policy = "RequireContentManager")]
 public class AdminSettingsController(ISiteTableService settings, IDataProtectionProvider protection, IConfiguration configuration, UserManager<AppUser> users, IMemoryCache cache, ILogger<AdminSettingsController> logger) : Controller
 {
     [HttpGet]
