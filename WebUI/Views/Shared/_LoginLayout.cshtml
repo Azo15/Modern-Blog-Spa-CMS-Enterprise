@@ -8,6 +8,7 @@
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+<link href="~/css/auth-premium.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
 
@@ -26,7 +27,7 @@
             const emailInput = document.getElementById('Email');
 
             window.addEventListener('load', () => {
-                const rememberedEmail = localStorage.getItem('rememberedEmail');
+                let rememberedEmail; try { rememberedEmail = localStorage.getItem('rememberedEmail'); } catch { }
                 if (rememberedEmail && emailInput && rememberCheckbox) {
                     emailInput.value = rememberedEmail;
                     rememberCheckbox.checked = true;
@@ -38,7 +39,7 @@
                 btn.disabled = true;
                 btn.textContent = @Html.Raw(Json.Serialize(L["SigningIn"].Value));
 
-                if (rememberCheckbox.checked) {
+                if (rememberCheckbox?.checked) {
                     localStorage.setItem('rememberedEmail', emailInput.value);
                 } else {
                     localStorage.removeItem('rememberedEmail');

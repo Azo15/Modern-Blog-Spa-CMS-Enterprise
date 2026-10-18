@@ -1,59 +1,11 @@
 @model SignUpViewModel
-
-@{
-    ViewData["Title"] = L["SignUp"];
-    Layout = "~/Views/Shared/_LoginLayout.cshtml";
-}
-
-<div class="d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%;">
-        <h3 class="text-center mb-4">@L["SignUp"]</h3>
-        <form asp-action="SignUp" method="post" id="registerForm" novalidate>
-
-            <div asp-validation-summary="All" class="text-danger"></div>
-
-            <div class="mb-3">
-                <input asp-for="FirstName" class="form-control" placeholder="@L["FirstName"]" />
-                <span asp-validation-for="FirstName" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <input asp-for="LastName" class="form-control" placeholder="@L["LastName"]" />
-                <span asp-validation-for="LastName" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <input asp-for="Phone" type="tel" class="form-control"/>
-                <span asp-validation-for="Phone" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <input asp-for="Email" type="email" class="form-control" placeholder="@L["Email"]" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-
-            <div class="mb-3 position-relative">
-                <input asp-for="Password" type="password" class="form-control" placeholder="@L["Password"]" id="passwordInput" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-                <i class="fa fa-eye password-toggle cursor-pointer"
-                   onclick="togglePassword('passwordInput', this)"></i>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="@L["ConfirmPassword"]" id="confirmPasswordInput" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                <i class="fa fa-eye password-toggle cursor-pointer"
-                   onclick="togglePassword('confirmPasswordInput', this)"></i>
-            </div>
-
-            <label><input asp-for="KvkkAccepted" /> <a href="/kvkk" target="_blank" rel="noopener noreferrer">KVKK aydınlatma metnini</a> okudum.</label>
-            <button type="submit" class="btn btn-primary w-100 mt-3">@L["SignUp"]</button>
-            <div class="d-flex">
-                <a asp-controller="AdminUserList" asp-action="UserList" class="exitSignUp">
-                    <i class="fa-solid fa-arrow-left me-2"></i>@L["Back"]
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+@{ ViewData["Title"]=L["SignUp"]; Layout="~/Views/Shared/_LoginLayout.cshtml";var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US"; }
+<section class="xspa-auth-card"><span class="auth-eyebrow">XSPA · YOUR WELLNESS JOURNEY</span><nav class="auth-tabs" aria-label="@(en ? "Account" : "Hesap")"><a href="/dashboard/giris">@(en ? "Sign In" : "Giriş Yap")</a><a href="/dashboard/kayit" aria-current="page">@(en ? "Register" : "Kayıt Ol")</a></nav><h1>@(en ? "A little more time for you." : "Size ayrılan bir başlangıç.")</h1><p>@(en ? "Create your customer account and keep your favourite rituals close." : "Müşteri hesabınızı oluşturun, sevdiğiniz ritüelleri yanınızda tutun.")</p>
+<form asp-action="SignUp" method="post" id="registerForm"><div asp-validation-summary="All" role="alert"></div><div class="auth-fields">
+<div><label asp-for="FirstName">@(en ? "First name" : "Ad")</label><input asp-for="FirstName" type="text" class="form-control" autocomplete="given-name" required /><span asp-validation-for="FirstName"></span></div>
+<div><label asp-for="LastName">@(en ? "Last name" : "Soyad")</label><input asp-for="LastName" type="text" class="form-control" autocomplete="family-name" required /><span asp-validation-for="LastName"></span></div>
+<div><label asp-for="Email">@(en ? "Email" : "E-posta")</label><input asp-for="Email" type="email" class="form-control" autocomplete="email" required /><span asp-validation-for="Email"></span></div>
+<div><label asp-for="Phone">@(en ? "Phone" : "Telefon")</label><input asp-for="Phone" type="tel" class="form-control" autocomplete="tel" required /><span asp-validation-for="Phone"></span></div>
+<div><label asp-for="Password">@(en ? "Password" : "Parola")</label><input asp-for="Password" type="password" class="form-control" autocomplete="new-password" required /><span asp-validation-for="Password"></span></div>
+<div><label asp-for="ConfirmPassword">@(en ? "Confirm password" : "Parola tekrarı")</label><input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" required /><span asp-validation-for="ConfirmPassword"></span></div>
+</div><label class="auth-check"><input asp-for="KvkkAccepted" required /> <span><a href="/kvkk" target="_blank" rel="noopener noreferrer">@(en ? "I have read the personal data notice." : "KVKK aydınlatma metnini okudum.")</a></span></label><span asp-validation-for="KvkkAccepted"></span><button type="submit" class="auth-submit">@(en ? "Create My Account" : "Hesabımı Oluştur") →</button></form><!-- google-auth --><a class="auth-home" href="/">← @(en ? "Return to XSPA" : "XSPA’ya dön")</a></section>

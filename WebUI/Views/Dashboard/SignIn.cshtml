@@ -1,125 +1,17 @@
 @model SignInViewModel
-
-@{
-    ViewData["Title"] = L["Login"];
-    Layout = "~/Views/Shared/_LoginLayout.cshtml";
-}
-
-<!-- Geri Sayım Overlay -->
-<!-- Geri Sayım Overlay - Modernize edilmiş -->
-<div id="lockOverlay" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: #ff000085; backdrop-filter: blur(4px);">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-        <!-- Modern Spinner -->
-        <div class="modern-spinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-        </div>
-
-        <!-- Büyük Saniye Gösterimi -->
-        <div class="countdown-container">
-            <p class="modelErrorText">@L["InvalidCredentials"]</p>
-            <div class="countdown-number" id="countdownText">0</div>
-            <div class="countdown-label">@L["RetrySeconds"]</div>
-        </div>
-    </div>
-</div>
-
-<div class="d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%;">
-        <h3 class="text-center mb-4">@L["Login"]</h3>
-
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <li>@error.ErrorMessage</li>
-                    }
-                </ul>
-            </div>
-        }
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-        }
-
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-        }
-
-        <form method="post" id="loginForm">
-            @Html.AntiForgeryToken()
-
-            <div class="mb-3">
-                <input type="email" asp-for="Email" class="form-control" placeholder="@L["Email"]" />
-                <span asp-validation-for="Email" class="field-validation-error"></span>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <input type="password" asp-for="Password" class="form-control" id="passwordInput" placeholder="@L["Password"]" />
-                <i class="fa fa-eye password-toggle cursor-pointer" onclick="togglePassword('passwordInput', this)"></i>
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="form-check">
-                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
-                    <label class="form-check-label" asp-for="RememberMe">@L["RememberMe"]</label>
-                </div>
-            </div>
-
-            <button type="submit" id="loginBtn" class="btn btn-primary w-100">@L["Login"]</button>
-        </form>
-    </div>
-</div>
-
+@{ ViewData["Title"] = L["Login"]; Layout = "~/Views/Shared/_LoginLayout.cshtml"; var en=System.Globalization.CultureInfo.CurrentUICulture.Name=="en-US"; }
+<section class="xspa-auth-card"><span class="auth-eyebrow">XSPA · PRIVATE WELLNESS</span><nav class="auth-tabs" aria-label="@(en ? "Account" : "Hesap")"><a href="/dashboard/giris" aria-current="page">@(en ? "Sign In" : "Giriş Yap")</a><a href="/dashboard/kayit">@(en ? "Register" : "Kayıt Ol")</a></nav>
+<h1>@(en ? "Welcome back." : "Kendinize hoş geldiniz.")</h1><p>@(en ? "Your rituals and favourites, all in one place." : "Ritüelleriniz ve favorileriniz, size özel bir yerde.")</p>
+@if(TempData["AccountSuccess"] is string success){<p class="auth-success" role="status">@success</p>}
+@if(TempData["ErrorMessage"] is string error){<p role="alert">@error</p>}
+<form method="post" id="loginForm"><div asp-validation-summary="All" role="alert"></div><input type="hidden" name="returnUrl" value="@Context.Request.Query["ReturnUrl"]" />
+<label asp-for="Email">@L["Email"]</label><input asp-for="Email" type="email" class="form-control" autocomplete="username" required /><span asp-validation-for="Email"></span>
+<label asp-for="Password">@L["Password"]</label><input asp-for="Password" type="password" class="form-control" autocomplete="current-password" required /><span asp-validation-for="Password"></span>
+<label class="auth-check"><input asp-for="RememberMe" /> @L["RememberMe"]</label><button type="submit" id="loginBtn" class="auth-submit">@(en ? "Sign In" : "Giriş Yap") →</button>
+@if(TempData["RemainingSeconds"] is int seconds){<p class="auth-wait" role="status">@(en ? "Please wait before trying again:" : "Yeniden denemeden önce bekleyin:") <span id="auth-wait" data-seconds="@seconds">@seconds</span> @(en ? "seconds" : "saniye")</p>}
+</form><!-- google-auth --><a class="auth-home" href="/">← @(en ? "Return to XSPA" : "XSPA’ya dön")</a></section>
 @section Scripts {
-    @if (TempData["RemainingSeconds"] != null)
-    {
-        <text>
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    let remaining = parseInt('@Html.Raw(TempData["RemainingSeconds"])');
-
-                    const overlay = document.getElementById("lockOverlay");
-                    const countdownText = document.getElementById("countdownText");
-                    const loginBtn = document.getElementById("loginBtn");
-                    const formInputs = document.querySelectorAll("#loginForm input");
-                    const formLinks = document.querySelectorAll("a");
-
-                    loginBtn.disabled = true;
-                    formInputs.forEach(input => input.disabled = true);
-                    formLinks.forEach(link => {
-                        link.style.pointerEvents = "none";
-                        link.style.opacity = "0.5";
-                    });
-
-                    overlay.style.display = "block";
-
-                    const interval = setInterval(() => {
-                        countdownText.innerText = remaining;
-
-                        if (remaining <= 0) {
-                            clearInterval(interval);
-                            overlay.style.display = "none";
-
-                            loginBtn.disabled = false;
-                            formInputs.forEach(input => input.disabled = false);
-                            formLinks.forEach(link => {
-                                link.style.pointerEvents = "auto";
-                                link.style.opacity = "1";
-                            });
-                        }
-
-                        remaining--;
-                    }, 1000);
-                });
-            </script>
-        </text>
-    }
+<script>
+const wait=document.getElementById('auth-wait');if(wait){let seconds=Number(wait.dataset.seconds);const button=document.getElementById('loginBtn');button.disabled=seconds>0;const timer=setInterval(()=>{seconds=Math.max(0,seconds-1);wait.textContent=String(seconds);if(seconds===0){clearInterval(timer);button.disabled=false;}},1000);}
+</script>
 }
