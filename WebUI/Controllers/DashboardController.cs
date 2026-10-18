@@ -125,6 +125,9 @@ namespace WebUI.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
+                PhoneNumber = model.Phone.Trim(),
+                PrivacyAcknowledgedAtUtc = DateTime.UtcNow,
+                PrivacyNoticeVersion = "2026-10-18",
                 UserName = model.Email
             };
 
@@ -133,7 +136,13 @@ namespace WebUI.Controllers
             if (result.Succeeded)
             {
                 var roleResult = await _userManager.AddToRoleAsync(user, BusinessLayer.Security.AppRoles.Customer);
-                if (!roleResult.Succeeded) throw new InvalidOperationException("Üye rolü atanamadı.");
+                if (!roleResult.Succeeded)
+                {
+                    await _userManager.DeleteAsync(user);
+                    ModelState.AddModelError("", "Hesap kaydı tamamlanamadı. Lütfen yeniden deneyin.");
+                    return View(model);
+                }
+                TempData["AccountSuccess"] = "XSPA’ya hoş geldiniz. Müşteri hesabınız hazır; giriş yapabilirsiniz.";
                 return RedirectToAction(nameof(SignIn));
             }
 
@@ -149,11 +158,8 @@ namespace WebUI.Controllers
         {
             if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Admin))
                 return RedirectToAction("UserList", "AdminUserList");
-            if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff)
-                || await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff))
-                return RedirectToAction("Index", "AdminBlog");
             if (await _userManager.IsInRoleAsync(user, BusinessLayer.Security.AppRoles.Staff))
-                return RedirectToAction("Index", "AdminMessage");
+                return RedirectToAction("Index", "AdminDashboard");
             return RedirectToAction("Index", "Default");
         }
 

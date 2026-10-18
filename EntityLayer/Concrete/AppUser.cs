@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer.Concrete
@@ -19,6 +19,9 @@ namespace EntityLayer.Concrete
 
         [Display(Name = "Aktiflik Durumu")]
         public bool IsActive { get; set; } = true;
+
+        public DateTime? PrivacyAcknowledgedAtUtc { get; set; }
+        [MaxLength(30)] public string? PrivacyNoticeVersion { get; set; }
 
         public int FailedLoginCount { get; set; }
 

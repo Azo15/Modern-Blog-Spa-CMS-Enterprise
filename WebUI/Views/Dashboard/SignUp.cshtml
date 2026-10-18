@@ -23,8 +23,8 @@
             </div>
 
             <div class="mb-3">
-                <input asp-for="BirthDate" type="date" class="form-control"/>
-                <span asp-validation-for="BirthDate" class="text-danger small"></span>
+                <input asp-for="Phone" type="tel" class="form-control"/>
+                <span asp-validation-for="Phone" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
@@ -47,6 +47,7 @@
                    onclick="togglePassword('confirmPasswordInput', this)"></i>
             </div>
 
+            <label><input asp-for="KvkkAccepted" /> <a href="/kvkk" target="_blank" rel="noopener noreferrer">KVKK aydınlatma metnini</a> okudum.</label>
             <button type="submit" class="btn btn-primary w-100 mt-3">@L["SignUp"]</button>
             <div class="d-flex">
                 <a asp-controller="AdminUserList" asp-action="UserList" class="exitSignUp">

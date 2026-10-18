@@ -186,6 +186,13 @@ namespace DataAccesLayer.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("PrivacyAcknowledgedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PrivacyNoticeVersion")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
