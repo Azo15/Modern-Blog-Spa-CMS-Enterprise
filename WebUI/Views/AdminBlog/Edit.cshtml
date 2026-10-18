@@ -91,7 +91,8 @@
 
 @await Html.PartialAsync("_AiBlogModal")
 @section Scripts {
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="~/js/ai-blog.js" asp-append-version="true"></script>
+    
     <script>
         tinymce.init({
             selector: '#tinymce',
