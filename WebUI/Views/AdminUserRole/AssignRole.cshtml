@@ -17,7 +17,7 @@
                 </a>
             </div>
             <div class="card-body">
-                <p class="text-muted">Kullanıcıya atanmasını istediğiniz rollerin kutularını işaretleyin ve değişiklikleri kaydedin.</p>
+                <p class="text-muted">Yalnızca sistem yöneticileri rol atayabilir. Bir temel rol seçin: Sistem Yöneticisi, Personel veya Müşteri.</p>
                 <form asp-action="AssignRole" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="userId" value="@ViewBag.UserId" />
@@ -28,10 +28,8 @@
                             string roleBadge = Model[i].RoleName switch
                             {
                                 "System Admin" => "bg-danger",
-                                "Content Manager" => "bg-primary",
-                                "Author" => "bg-info",
-                                "Moderator" => "bg-warning text-dark",
-                                "Registered User" => "bg-success",
+                                "Staff" => "bg-primary",
+                                "Customer" => "bg-success",
                                 _ => "bg-secondary"
                             };
 

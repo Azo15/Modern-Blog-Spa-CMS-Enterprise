@@ -10,7 +10,7 @@ using FluentValidation;
 
 namespace WebUI.Controllers
 {
-    [Authorize(Policy = "RequireAdmin")]
+    [Authorize(Policy = BusinessLayer.Security.AccessPolicies.Admin)]
     public class AdminUserRoleController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;
@@ -62,7 +62,8 @@ namespace WebUI.Controllers
             ViewBag.UserName = $"{user.FirstName} {user.LastName}";
             ViewBag.UserId = user.Id;
 
-            var roles = await _roleManager.Roles.ToListAsync();
+            var allowed = BusinessLayer.Security.AppRoles.All;
+            var roles = await _roleManager.Roles.Where(x => allowed.Contains(x.Name!)).ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var roleAssignList = new List<UserRoleAssignViewModel>();
@@ -91,23 +92,21 @@ namespace WebUI.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            foreach (var item in model)
+            var selected = model.Where(x => x.RoleExist).ToList();
+            if (selected.Count != 1 || !BusinessLayer.Security.AppRoles.All.Contains(selected[0].RoleName)) return BadRequest("Bir temel rol seçin.");
+            var target = await _roleManager.FindByIdAsync(selected[0].RoleId.ToString());
+            if (target?.Name != selected[0].RoleName) return BadRequest();
+            var previous = await _userManager.GetRolesAsync(user);
+            if (previous.Contains(BusinessLayer.Security.AppRoles.Admin) && target.Name != BusinessLayer.Security.AppRoles.Admin && (await _userManager.GetUsersInRoleAsync(BusinessLayer.Security.AppRoles.Admin)).Count <= 1)
+                return BadRequest("Son sistem yöneticisinin rolü kaldırılamaz.");
+            if (!previous.Contains(target.Name))
             {
-                if (item.RoleExist)
-                {
-                    if (!await _userManager.IsInRoleAsync(user, item.RoleName))
-                    {
-                        await _userManager.AddToRoleAsync(user, item.RoleName);
-                    }
-                }
-                else
-                {
-                    if (await _userManager.IsInRoleAsync(user, item.RoleName))
-                    {
-                        await _userManager.RemoveFromRoleAsync(user, item.RoleName);
-                    }
-                }
+                var assigned = await _userManager.AddToRoleAsync(user, target.Name);
+                if (!assigned.Succeeded) return BadRequest("Rol atanamadı.");
             }
+            var removed = await _userManager.RemoveFromRolesAsync(user, previous.Where(x => x != target.Name));
+            if (!removed.Succeeded) return BadRequest("Önceki roller kaldırılamadı.");
+            await _userManager.UpdateSecurityStampAsync(user);
 
             SetToastMessage("Kullanıcı roller başarıyla güncellendi.", "success");
             return RedirectToAction(nameof(Index));
