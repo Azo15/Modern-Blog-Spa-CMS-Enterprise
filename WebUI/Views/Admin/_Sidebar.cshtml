@@ -2,7 +2,7 @@
 @using BusinessLayer.Security
 @inject IAuthorizationService Authorization
 @{var admin=(await Authorization.AuthorizeAsync(User,AccessPolicies.Admin)).Succeeded;var staff=(await Authorization.AuthorizeAsync(User,AccessPolicies.ContentManager)).Succeeded;}
-<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme"><div class="app-brand"><a asp-controller="Default" asp-action="Index" class="app-brand-link"><span class="app-brand-text">XSPA</span></a></div><a asp-controller="Profile" asp-action="Index" class="menu-link sidebar-account">Profilim</a>
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme"><div class="app-brand"><a asp-controller="Default" asp-action="Index" class="app-brand-link"><span class="app-brand-text">XSPA</span></a></div><a asp-controller="Profile" asp-action="Index" class="menu-link sidebar-account"><i class="fa-solid fa-circle-user" aria-hidden="true"></i>Profilim</a>
 @if(staff){<div class="menu-inner" data-sidebar-groups>
 @await Html.PartialAsync("_SidebarGroup",new WebUI.Models.SidebarGroupModel("overview","PANEL & ÖZET","fa-gauge-high",new[]{new WebUI.Models.SidebarLink("AdminDashboard","Index","İşletme Özeti")}))
 @await Html.PartialAsync("_SidebarGroup",new WebUI.Models.SidebarGroupModel("reservations","REZERVASYON & CONCIERGE","fa-calendar-check",new[]{new WebUI.Models.SidebarLink("AdminAppointment","Index","Randevu Yönetimi")}))
@@ -12,6 +12,6 @@
 var systemLinks=new List<WebUI.Models.SidebarLink>{new("AdminUserList","UserList","Kullanıcılar"),new("AdminAccount","Index","Hesap Engelleme"),new("AdminSettings","Smtp","SMTP Ayarları"),new("AdminSiteInfo","Index","Site Ayarları")};
 if(admin){systemLinks.Add(new("AdminUserRole","Index","Rol Yönetimi"));}
 @await Html.PartialAsync("_SidebarGroup",new WebUI.Models.SidebarGroupModel("system","SİSTEM & AYARLAR","fa-gears",systemLinks))
-<a href="/hangfire" class="menu-link">Arka Plan İşleri</a><a asp-controller="Reports" asp-action="Users" asp-route-format="Excel" class="menu-link">Kullanıcı Raporu · Excel</a>
+<a href="/hangfire" class="menu-link"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>Arka Plan İşleri</a><a asp-controller="Reports" asp-action="Users" asp-route-format="Excel" class="menu-link"><i class="fa-solid fa-file-excel" aria-hidden="true"></i>Kullanıcı Raporu · Excel</a>
 </div>}
 </aside>
