@@ -67,4 +67,7 @@
     <None Include="Views\Shared\_UILayout.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Branding/Hangfire.css" LogicalName="WebUI.Branding.Hangfire.css" />
+  </ItemGroup>
 </Project>

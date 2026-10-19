@@ -270,12 +270,18 @@ app.UseAuthentication(); // [Authorize] için gerekli
 app.UseRateLimiter();
 app.UseAuthorization();
 if (!testing)
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = [new HangfireCustomAuthorizationFilter()],
-    IgnoreAntiforgeryToken = false,
-    AppPath = "/AdminBlog"
+    Hangfire.Dashboard.DashboardRoutes.AddStylesheet(typeof(Program).Assembly, "WebUI.Branding.Hangfire.css");
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangfireCustomAuthorizationFilter()],
+        IgnoreAntiforgeryToken = false,
+        AppPath = "/AdminDashboard",
+        DashboardTitle = "XSPA · Arka Plan İşleri",
+        FaviconPath = "/favicon.ico",
+        DarkModeEnabled = false
 });
+}
 
 // 12. Route ayarları
 app.MapControllers();

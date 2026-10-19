@@ -1,0 +1,33 @@
+/* Embedded through Hangfire's stylesheet extension; native actions and CSRF stay intact. */
+:root{--x-bg:#091e17;--x-panel:#112c22;--x-raised:#19392d;--x-text:#f3eee1;--x-muted:#b8c7bc;--x-gold:#e2c57e;--x-line:#d6b66c40}
+body{background:var(--x-bg)!important;color:var(--x-text)!important;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark}
+a{color:var(--x-gold)}a:hover,a:focus{color:#f4dca4}
+h1,h2,h3,h4{color:var(--x-text);font-weight:500}h1{font-family:Georgia,serif;color:var(--x-gold)}
+.navbar-default{background:var(--x-panel)!important;border-bottom:1px solid var(--x-line);box-shadow:0 4px 24px #0003}
+.navbar-default .navbar-brand{color:var(--x-gold)!important;font-family:Georgia,serif;font-size:21px;padding-left:62px;background:url('/img/brand-mark.svg') 16px center/34px no-repeat}
+.navbar-default .navbar-nav>li>a{color:var(--x-muted)}
+.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus{color:var(--x-gold);background:var(--x-raised)}
+.navbar-default .navbar-toggle{border-color:var(--x-line)}.navbar-default .navbar-toggle .icon-bar{background:var(--x-gold)}
+.panel,.list-group-item,.dropdown-menu,.modal-content,.well,.highlight,.metric{background:var(--x-panel)!important;color:var(--x-text)!important;border-color:var(--x-line)!important;border-radius:12px}
+.panel-heading,.panel-footer,.modal-header,.modal-footer{background:var(--x-raised)!important;color:var(--x-text)!important;border-color:var(--x-line)!important}
+.list-group-item.active,.list-group-item.active:hover,.list-group-item:hover,.dropdown-menu>li>a:hover{background:var(--x-raised)!important;color:var(--x-gold)!important;border-color:var(--x-line)!important}
+.dropdown-menu>li>a{color:var(--x-text)}
+.table{color:var(--x-text)}.table>thead>tr>th,.table>tbody>tr>td,.table>tbody>tr>th{border-color:var(--x-line);padding:14px 12px}.table>thead>tr>th{color:var(--x-gold);background:var(--x-panel)}.table-striped>tbody>tr:nth-of-type(odd),.table-hover>tbody>tr:hover{background:var(--x-raised)!important}
+.btn,.pagination>li>a,.pagination>li>span{background:var(--x-raised);color:var(--x-gold);border:1px solid var(--x-line);border-radius:10px;transition:transform .22s ease,box-shadow .22s ease,background .22s ease;min-height:34px}
+.btn-primary,.btn-success,.pagination>.active>a{background:linear-gradient(110deg,#bd984c,#edd797);color:#10271d;border-color:#d6b66c}
+.btn-danger{background:#60302a;color:#ffbeb1;border-color:#d58e7b}
+.btn:focus-visible,a:focus-visible{outline:3px solid var(--x-gold);outline-offset:3px}
+.btn:disabled,.btn.disabled{opacity:.5;transform:none!important;box-shadow:none!important}
+.form-control,input,select,textarea{background:var(--x-bg)!important;color:var(--x-text)!important;border:1px solid var(--x-line);border-radius:8px}
+.form-control:focus{border-color:var(--x-gold);box-shadow:0 0 0 3px #d6b66c22}input[type=checkbox]{accent-color:#d6b66c}
+.text-muted,.help-block,#footer{color:var(--x-muted)!important}#footer{background:var(--x-panel)!important;border-top:1px solid var(--x-line)}
+.page-header,hr,.nav-tabs{border-color:var(--x-line)}.nav-tabs>li.active>a{background:var(--x-panel);color:var(--x-gold);border-color:var(--x-line)}
+pre,code,.job-snippet,.stack-trace{background:var(--x-bg)!important;color:var(--x-text)!important;border-color:var(--x-line);white-space:pre-wrap;overflow-wrap:anywhere}
+.alert{border-radius:12px}.alert-info{background:#19392d;color:#d7e8dd;border-color:var(--x-line)}.alert-warning{background:#493f23;color:#ffe4a2;border-color:#b99d51}.alert-danger{background:#512e29;color:#ffc3b9;border-color:#c28072}
+.badge{background:#d6b66c;color:#10271d}.label-danger{background:#a64b3f}.label-success{background:#2d7254}
+.flot-text{color:var(--x-muted)!important}.metric .metric-value{color:var(--x-gold)}
+@media(hover:hover) and (pointer:fine){.btn:not(:disabled):not(.disabled):hover{color:var(--x-text);border-color:var(--x-gold);transform:translateY(-2px);box-shadow:0 8px 20px #0004}.btn-primary:hover,.btn-success:hover{color:#10271d;background:#eddaaa}}
+@media(max-width:767px){.navbar-default .navbar-brand{font-size:17px}.table-responsive{border-color:var(--x-line)}.container{padding-inline:16px}.btn{margin-bottom:4px}}
+@media(prefers-reduced-motion:reduce){.btn{transition:none;transform:none!important}}
+.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background:linear-gradient(110deg,#bd984c,#edd797)!important;color:#10271d!important;border-color:#d6b66c!important}
+.metric.metric-success{border-color:var(--x-line);color:var(--x-gold)}

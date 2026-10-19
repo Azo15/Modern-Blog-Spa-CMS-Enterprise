@@ -6,7 +6,8 @@
 
 <script>
     // Sayfa yüklenmeden önce temayı uygula
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    let savedTheme = 'dark';
+    try { savedTheme = localStorage.getItem('xspa-admin-theme') === 'light' ? 'light' : 'dark'; } catch { }
     document.documentElement.setAttribute('data-bs-theme', savedTheme);
 </script>
 

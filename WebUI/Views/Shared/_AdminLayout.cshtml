@@ -7,9 +7,10 @@
     @await RenderSectionAsync("Styles", required: false)
 <link rel="stylesheet" href="~/css/admin-sidebar.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/interactions.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/admin-theme.css" asp-append-version="true" />
 </head>
 
-<body>
+<body class="xspa-admin">
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             @await Html.PartialAsync("~/Views/Admin/_Sidebar.cshtml")

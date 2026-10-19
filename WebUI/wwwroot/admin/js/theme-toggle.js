@@ -1,9 +1,10 @@
-﻿// theme-toggle.js
+// theme-toggle.js
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1️ İlk önce sayfa açıldığında temayı uygula
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    let savedTheme = 'dark';
+    try { savedTheme = localStorage.getItem('xspa-admin-theme') === 'light' ? 'light' : 'dark'; } catch { }
     document.documentElement.setAttribute('data-bs-theme', savedTheme);
 
     // 2️ Şimdi TinyMCE'yi başlat
@@ -12,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initTinyMCE() {
+        if (typeof tinymce === 'undefined' || !document.getElementById('tinymce')) return;
+        tinymce.triggerSave();
         // Mevcut editörleri kaldır (yeniden başlatma için önemli)
         tinymce.remove('#tinymce'); // Selector'ünüzü burada da belirtmek daha güvenli
 
@@ -28,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             skin: isDarkMode ? 'oxide-dark' : 'oxide',
             content_css: isDarkMode ? 'dark' : 'default',
+            content_style: isDarkMode ? 'body { background: #091e17; color: #f3eee1; } a { color: #e2c57e; }' : 'body { background: #fffdf7; color: #16382b; } a { color: #775b20; }',
 
             // İsteğe bağlı: Menü çubuğunun ve araç çubuklarının yapışkan olmasını isterseniz
             //menubar: 'file edit view insert format tools table help',
@@ -60,19 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
         document.documentElement.setAttribute('data-bs-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+        try { localStorage.setItem('xspa-admin-theme', newTheme); } catch { }
         updateThemeIcon(newTheme);
         initTinyMCE(); // Tema değiştiğinde TinyMCE'yi yeniden başlat
     });
 
-    // Sistem değişimi dinleme
-    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-    prefersDarkMode.addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) { // Sadece kullanıcı elle tema seçmemişse sistem temasını uygula
-            const newSystemTheme = e.matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-bs-theme', newSystemTheme);
-            updateThemeIcon(newSystemTheme);
-            initTinyMCE(); // Sistem teması değiştiğinde TinyMCE'yi yeniden başlat
-        }
-    });
 });

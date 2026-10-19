@@ -1,0 +1,47 @@
+/* XSPA administration: one palette for forms, tables, dialogs and navigation. */
+html[data-bs-theme] body.xspa-admin{--xa-bg:#091e17;--xa-surface:#112c22;--xa-raised:#19392d;--xa-text:#f3eee1;--xa-muted:#b8c7bc;--xa-gold:#e2c57e;--xa-border:#d6b66c40;--bs-primary:#d6b66c;--bs-primary-rgb:214,182,108;--bs-body-bg:var(--xa-bg);--bs-body-color:var(--xa-text);--bs-border-color:var(--xa-border);background:var(--xa-bg);color:var(--xa-text);color-scheme:dark}
+html[data-bs-theme=light] body.xspa-admin{--xa-bg:#f4f1e8;--xa-surface:#fffdf7;--xa-raised:#eee8d8;--xa-text:#16382b;--xa-muted:#52665b;--xa-gold:#775b20;--xa-border:#94733955;color-scheme:light}
+.xspa-admin :is(.layout-wrapper,.layout-container,.layout-page,.content-wrapper,.content-backdrop){background:transparent!important}
+.xspa-admin :is(.card,.modal-content,.dropdown-menu,.list-group-item,.accordion-item,.offcanvas,.popover,.bg-navbar-theme){background:var(--xa-surface)!important;color:var(--xa-text)!important;border:1px solid var(--xa-border);box-shadow:0 10px 32px #00000014;border-radius:16px}
+.xspa-admin :is(.card-header,.card-footer,.modal-header,.modal-footer,.accordion-button,.dropdown-header){background:transparent;color:var(--xa-text);border-color:var(--xa-border)}
+.xspa-admin :is(h1,h2,h3,h4,h5,h6,.card-title,.form-label,label,.dropdown-item,.nav-link){color:var(--xa-text)}
+.xspa-admin :is(.text-muted,.text-body-secondary,small,.content-footer,.form-text){color:var(--xa-muted)!important}
+.xspa-admin a{color:var(--xa-gold)}
+.xspa-admin :is(.table,.table th,.table td){--bs-table-bg:transparent;--bs-table-color:var(--xa-text);--bs-table-border-color:var(--xa-border);color:var(--xa-text);border-color:var(--xa-border);background-color:transparent}
+.xspa-admin .table thead th{background:var(--xa-raised);color:var(--xa-gold);font-size:.75rem;letter-spacing:.055em;padding:18px 20px}
+.xspa-admin .table td{padding:18px 20px;vertical-align:middle}
+.xspa-admin .table tbody tr:hover{background:var(--xa-raised)}
+.xspa-admin .table-responsive{border-radius:12px;scrollbar-color:#a68a4b var(--xa-bg)}
+.xspa-admin :is(.form-control,.form-select,.input-group-text,.select2-selection,.select2-dropdown){background-color:var(--xa-bg)!important;color:var(--xa-text)!important;border-color:var(--xa-border);border-radius:10px;min-height:44px}
+.xspa-admin :is(.form-control,.form-select)::placeholder{color:var(--xa-muted);opacity:1}
+.xspa-admin :is(.form-control,.form-select):focus{border-color:#d6b66c;box-shadow:0 0 0 3px #d6b66c25}
+.xspa-admin :is(.form-control,.form-select):disabled{opacity:.65}
+.xspa-admin :is(input[type=checkbox],input[type=radio]){accent-color:#d6b66c}
+.xspa-admin .form-check-input:checked{background-color:#b89a52;border-color:#d6b66c}
+.xspa-admin :is(.btn,.page-link){--bs-btn-color:var(--xa-gold);--bs-btn-border-color:var(--xa-border);--bs-btn-hover-color:var(--xa-text);--bs-btn-hover-bg:var(--xa-raised);--bs-btn-hover-border-color:#d6b66c;--bs-btn-active-bg:var(--xa-raised);--bs-btn-active-color:var(--xa-text);border:1px solid var(--xa-border);background:var(--xa-raised);color:var(--xa-text);box-shadow:none;min-height:40px;font-weight:600;transition:transform .22s ease,box-shadow .22s ease,background-position .4s ease,border-color .2s ease}
+.xspa-admin :is(.btn-primary,.btn-gold,.btn-success,.page-item.active .page-link,.nav-pills .nav-link.active){background:linear-gradient(110deg,#bd984c,#edd797,#c3a357)!important;background-size:200% 100%!important;border-color:#d6b66c!important;color:#10271d!important;box-shadow:0 4px 14px #0002}
+.xspa-admin :is(.btn-outline-primary,.btn-outline-success,.btn-outline-secondary,.btn-outline-info,.btn-outline-warning,.btn-info,.btn-warning){background:transparent!important;color:var(--xa-gold)!important;border-color:var(--xa-border)!important}
+.xspa-admin :is(.btn-danger,.btn-outline-danger){color:#ffbbb0!important;background:#6c2f2a66!important;border-color:#dc938466!important}
+html[data-bs-theme=light] .xspa-admin :is(.btn-danger,.btn-outline-danger){color:#8f3025!important;background:#fff0ed!important}
+.xspa-admin .btn-link{background:transparent;border-color:transparent}
+.xspa-admin :is(.btn,.page-link):focus-visible{outline:3px solid #e2c57e;outline-offset:3px}
+.xspa-admin :is(.btn,.page-link):is(:disabled,[aria-disabled=true],.disabled){opacity:.5;transform:none!important;box-shadow:none!important;cursor:not-allowed}
+.xspa-admin :is(.dropdown-item:hover,.dropdown-item:focus,.accordion-button:not(.collapsed)){background:var(--xa-raised);color:var(--xa-gold)}
+.xspa-admin :is(.nav-tabs,.dropdown-divider,hr){border-color:var(--xa-border)}
+.xspa-admin .nav-tabs .nav-link.active{color:var(--xa-gold);background:var(--xa-surface);border-color:var(--xa-border)}
+.xspa-admin :is(.alert,.badge){border:1px solid var(--xa-border)}
+.xspa-admin :is(.alert-warning,.bg-label-warning){background:#d6b66c20!important;color:var(--xa-gold)!important}
+.xspa-admin :is(.alert-success,.bg-label-success){background:#2c805833!important;color:#b0e4c5!important}
+.xspa-admin :is(.alert-danger,.bg-label-danger){background:#a3433430!important;color:#ffb7aa!important}
+.xspa-admin :is(.alert-info,.bg-label-info,.bg-label-primary){background:#6c9c8a25!important;color:var(--xa-text)!important}
+html[data-bs-theme=light] .xspa-admin :is(.alert-success,.bg-label-success){color:#226141!important}
+html[data-bs-theme=light] .xspa-admin :is(.alert-danger,.bg-label-danger){color:#8f3025!important}
+.xspa-admin .content-footer{background:transparent!important;border-top:1px solid var(--xa-border)}
+.xspa-admin :is(.tox-tinymce,.tox .tox-toolbar,.tox .tox-menubar,.tox .tox-statusbar){border-color:var(--xa-border)!important}
+.xspa-admin .btn-close{filter:invert(1)}
+html[data-bs-theme=light] .xspa-admin .btn-close{filter:none}
+.xspa-admin #layout-navbar{min-height:72px;margin-top:18px}
+.xspa-admin .app-brand-link{gap:12px}
+@media(hover:hover) and (pointer:fine){.xspa-admin .btn:not(:disabled):not(.disabled):not([aria-disabled=true]):hover{background-position:100% 0!important;transform:translateY(-2px);border-color:#e2c57e!important;box-shadow:0 8px 20px #0003}.xspa-admin .btn-danger:hover{box-shadow:0 8px 20px #8e3d3333}}
+@media(max-width:767px){.xspa-admin .content-wrapper{padding-inline:8px!important}.xspa-admin .container-p-y{padding:20px 8px}.xspa-admin .card{border-radius:12px}.xspa-admin .table td,.xspa-admin .table th{padding:14px 12px}.xspa-admin .modal-dialog{margin:12px}.xspa-admin .card-header{gap:12px;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.xspa-admin .btn,.xspa-admin .page-link{transition:none!important;transform:none!important}}
