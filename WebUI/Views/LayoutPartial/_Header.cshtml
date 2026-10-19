@@ -7,7 +7,7 @@
 </script>
 <title>@ViewData["Title"] · XSPA — Spa &amp; Wellness</title>
 <meta name="description" content="@(ViewData["Description"] ?? (en ? "An unhurried spa experience. Discover massage, traditional hammam and wellbeing in Kırklareli." : "Kırklareli'de dingin bir spa deneyimi. Masaj, geleneksel hamam ve kendinize ayırdığınız özel anları keşfedin."))" />
-<link rel="icon" href="~/img/brand-mark.svg" type="image/svg+xml" />
+@await Html.PartialAsync("_BrandIcons")
 <link rel="stylesheet" href="~/fonts/fonts.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />

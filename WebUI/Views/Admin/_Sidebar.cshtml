@@ -2,7 +2,7 @@
 @using BusinessLayer.Security
 @inject IAuthorizationService Authorization
 @{var admin=(await Authorization.AuthorizeAsync(User,AccessPolicies.Admin)).Succeeded;var staff=(await Authorization.AuthorizeAsync(User,AccessPolicies.ContentManager)).Succeeded;}
-<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme"><div class="app-brand"><a asp-controller="Default" asp-action="Index" class="app-brand-link"><span class="app-brand-text">XSPA</span></a></div><a asp-controller="Profile" asp-action="Index" class="menu-link sidebar-account"><i class="fa-solid fa-circle-user" aria-hidden="true"></i>Profilim</a>
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme"><div class="app-brand"><a asp-controller="Default" asp-action="Index" class="app-brand-link"><img src="/img/brand-mark.svg" width="40" height="40" alt="" /><span class="app-brand-text">XSPA</span></a></div><a asp-controller="Profile" asp-action="Index" class="menu-link sidebar-account"><i class="fa-solid fa-circle-user" aria-hidden="true"></i>Profilim</a>
 @if(staff){<div class="menu-inner" data-sidebar-groups>
 @await Html.PartialAsync("_SidebarGroup",new WebUI.Models.SidebarGroupModel("overview","PANEL & ÖZET","fa-gauge-high",new[]{new WebUI.Models.SidebarLink("AdminDashboard","Index","İşletme Özeti")}))
 @await Html.PartialAsync("_SidebarGroup",new WebUI.Models.SidebarGroupModel("reservations","REZERVASYON & CONCIERGE","fa-calendar-check",new[]{new WebUI.Models.SidebarLink("AdminAppointment","Index","Randevu Yönetimi")}))
