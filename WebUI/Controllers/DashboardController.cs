@@ -39,7 +39,7 @@ namespace WebUI.Controllers
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrEmpty(model.Password))
                 return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email.Trim());
             if (user != null)
             {
                 if (!user.IsActive || await _userManager.IsLockedOutAsync(user))
@@ -114,7 +114,7 @@ namespace WebUI.Controllers
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrEmpty(model.Password))
                 return View(model);
 
-            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            var existingUser = await _userManager.FindByEmailAsync(model.Email.Trim());
             if (existingUser != null)
             {
                 ModelState.AddModelError("", _text["EmailAlreadyRegistered"]);
