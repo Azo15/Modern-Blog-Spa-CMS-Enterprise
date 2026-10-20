@@ -102,6 +102,7 @@ namespace WebUI.Data
 
             // Test accounts and sample content are development-only.
             await SeedRolesAsync(serviceProvider);
+            await SyncServiceCatalogAsync(context);
             var accounts = new[] {
                 ("admin@spa.com", BusinessLayer.Security.AppRoles.Admin),
                 ("editor@spa.com", BusinessLayer.Security.AppRoles.Staff),
