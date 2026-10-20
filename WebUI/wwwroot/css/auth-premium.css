@@ -8,3 +8,7 @@ body{background:radial-gradient(ellipse at top,#234737,#081810 75%);font-family:
 .xspa-auth-card{animation:auth-enter .28s ease-out}
 @keyframes auth-enter{from{opacity:.5;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.auth-tabs a{transition:none}.xspa-auth-card{animation:none}}
+.auth-google svg{flex-shrink:0;transition:transform .22s ease}
+.auth-google:focus-visible{outline:3px solid #d6b66c;outline-offset:4px}
+@media(hover:hover){.auth-google:hover svg{transform:rotate(-6deg) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.auth-google,.auth-google svg{transition:none;transform:none!important}}
