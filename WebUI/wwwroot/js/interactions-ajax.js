@@ -15,7 +15,10 @@
         const response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } });
         const data = response.headers.get('content-type')?.includes('json') ? await response.json() : null;
-        if (!response.ok || !data?.success) throw new Error(data?.message || text('İşlem tamamlanamadı. Lütfen tekrar deneyin.', 'Please try again.'));
+        if (!response.ok || !data?.success) {
+            const error = new Error(data?.message || text('İşlem tamamlanamadı. Lütfen tekrar deneyin.', 'Please try again.'));
+            error.errors = data?.errors; error.status = response.status; throw error;
+        }
         return data;
     }
     window.XspaInteractions = { send, toast, text };

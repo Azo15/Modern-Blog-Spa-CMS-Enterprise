@@ -189,6 +189,47 @@ public sealed class ContactFlowTests
         Assert.Empty(await scope.ServiceProvider.GetRequiredService<AppDbContext>().ContactForms.ToListAsync());
     }
 
+    [Theory]
+    [InlineData("Accept", "application/json")]
+    [InlineData("X-Requested-With", "XMLHttpRequest")]
+    public async Task AsyncContactAcknowledgesPersistenceThenReturnsRateLimit(string header, string value)
+    {
+        using var fixture = new Fixture("Development"); fixture.Controller.Request.Headers[header] = value;
+        var response = Assert.IsType<JsonResult>(await fixture.Controller.SendMessage(Message()));
+        Assert.True(JsonSerializer.SerializeToElement(response.Value).GetProperty("success").GetBoolean());
+        var retry = Assert.IsType<ObjectResult>(await fixture.Controller.SendMessage(Message()));
+        Assert.Equal(429, retry.StatusCode);
+        fixture.Submission.Verify(s => s.SubmitAsync(It.IsAny<ContactForm>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AsyncContactReturnsFieldErrorsAndPreservesCaptchaAndSaveFailureProtection()
+    {
+        using var invalid = new Fixture("Development"); invalid.Controller.Request.Headers.Accept = "application/json";
+        invalid.Controller.ModelState.AddModelError("ContactForm.Email", "Invalid email");
+        var validation = Assert.IsType<ObjectResult>(await invalid.Controller.SendMessage(Message()));
+        Assert.Equal(400, validation.StatusCode);
+        Assert.Equal("Invalid email", JsonSerializer.SerializeToElement(validation.Value).GetProperty("errors").GetProperty("ContactForm.Email")[0].GetString());
+        invalid.Submission.VerifyNoOtherCalls();
+        using var captcha = new Fixture("Production"); captcha.Controller.Request.Headers.Accept = "application/json";
+        Assert.Equal(400, Assert.IsType<ObjectResult>(await captcha.Controller.SendMessage(Message())).StatusCode); captcha.Submission.VerifyNoOtherCalls();
+        using var failed = new Fixture("Development"); failed.Controller.Request.Headers.Accept = "application/json";
+        failed.Submission.Setup(s => s.SubmitAsync(It.IsAny<ContactForm>(), It.IsAny<CancellationToken>())).ThrowsAsync(new IOException("private database detail"));
+        var failure = Assert.IsType<ObjectResult>(await failed.Controller.SendMessage(Message())); Assert.Equal(503, failure.StatusCode);
+        Assert.DoesNotContain("private database detail", JsonSerializer.Serialize(failure.Value));
+    }
+
+    [Fact]
+    public async Task JsonContactEndpointRequiresCsrfAndReturnsFieldValidationErrors()
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var client = AjaxInteractionEndpointTests.Client(factory);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsync("/iletisim", new FormUrlEncodedContent(new Dictionary<string, string>()))).StatusCode);
+        var response = await client.PostAsync("/iletisim", new FormUrlEncodedContent(new Dictionary<string, string> { ["__RequestVerificationToken"] = await Csrf(client), ["ContactForm.Email"] = "invalid" }));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var data = await response.Content.ReadFromJsonAsync<JsonElement>(); Assert.False(data.GetProperty("success").GetBoolean()); Assert.NotEmpty(data.GetProperty("errors").EnumerateObject());
+    }
+
     private static async Task<string> Csrf(HttpClient client)
     {
         var page = await client.GetStringAsync("/iletisim");

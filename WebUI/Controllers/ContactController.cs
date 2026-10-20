@@ -12,6 +12,7 @@ using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
+using WebUI.Infrastructure;
 
 namespace WebUI.Controllers
 {
@@ -54,6 +55,7 @@ namespace WebUI.Controllers
         {
             if (!ModelState.IsValid || model.ContactForm == null)
             {
+                if (IsAjaxRequest) return ContactFailure(_localizer["Contact.ValidationRequired"]);
                 SetSweetAlertMessage(_localizer["Contact.ErrorTitle"], _localizer["Contact.ValidationRequired"], "error");
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
@@ -64,6 +66,7 @@ namespace WebUI.Controllers
 
             if (IsIpOnCooldown(ip))
             {
+                if (IsAjaxRequest) { Response.Headers.RetryAfter = "60"; return ContactFailure(_localizer["Contact.RateLimit"], StatusCodes.Status429TooManyRequests); }
                 _logger.LogWarning("Spam engellendi - IP: {IP}", ip);
                 SetSweetAlertMessage(_localizer["Contact.RateLimitTitle"], _localizer["Contact.RateLimit"], "warning");
                 var vm = await BuildViewModel();
@@ -74,6 +77,7 @@ namespace WebUI.Controllers
             var recaptchaToken = Request.Form["g-recaptcha-response"];
             if (RequiresCaptcha && !await _captcha.VerifyAsync(recaptchaToken, ip, HttpContext.RequestAborted))
             {
+                if (IsAjaxRequest) return ContactFailure(_localizer["Contact.CaptchaRequired"]);
                 SetSweetAlertMessage(_localizer["Contact.CaptchaTitle"], _localizer["Contact.CaptchaRequired"], "info");
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
@@ -87,12 +91,14 @@ namespace WebUI.Controllers
 
                 await NotifyManagersAsync(model.ContactForm);
                 _logger.LogInformation("Contact message persisted for background email delivery.");
+                if (IsAjaxRequest) return Json(new { success = true, message = _localizer["Contact.Success"].Value });
                 SetSweetAlertMessage(_localizer["Contact.SuccessTitle"], _localizer["Contact.Success"], "success");
             }
             catch (FluentValidation.ValidationException validation)
             {
                 foreach (var error in validation.Errors)
                     ModelState.AddModelError($"ContactForm.{error.PropertyName}", error.ErrorMessage);
+                if (IsAjaxRequest) return ContactFailure(_localizer["Contact.ValidationRequired"]);
                 var vm = await BuildViewModel();
                 vm.ContactForm = model.ContactForm;
                 return View("Index", vm);
@@ -100,6 +106,7 @@ namespace WebUI.Controllers
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "İletişim mesajı kaydedilirken hata oluştu.");
+                if (IsAjaxRequest) return ContactFailure(_localizer["Contact.SaveFailed"], StatusCodes.Status503ServiceUnavailable);
                 SetSweetAlertMessage(_localizer["Contact.ErrorTitle"], _localizer["Contact.SaveFailed"], "error");
             }
 
@@ -114,7 +121,7 @@ namespace WebUI.Controllers
             if (string.IsNullOrWhiteSpace(normalizedEmail) || normalizedEmail.Length > 254 || !new EmailAddressAttribute().IsValid(normalizedEmail))
             {
                 if (IsAjaxRequest)
-                    return BadRequest(new { success = false, message = en ? "Please enter a valid email address." : "Lütfen geçerli bir e-posta adresi girin." });
+                    return BadRequest(new { success = false, message = en ? "Please enter a valid email address." : "Lütfen geçerli bir e-posta adresi girin.", errors = new Dictionary<string, string[]> { ["email"] = [en ? "Please enter a valid email address." : "Geçerli bir e-posta adresi girin."] } });
                 ModelState.AddModelError("ContactForm.Email", _localizer["Contact.ValidationRequired"]);
                 return View("Index", await BuildViewModel());
             }
@@ -157,7 +164,12 @@ namespace WebUI.Controllers
             !string.IsNullOrWhiteSpace(_configuration["GoogleReCaptcha:SiteKey"]) &&
             !string.IsNullOrWhiteSpace(_configuration["GoogleReCaptcha:SecretKey"]);
 
-        private bool IsAjaxRequest => string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        private bool IsAjaxRequest => Request.WantsJson();
+
+        private ObjectResult ContactFailure(string message, int status = StatusCodes.Status400BadRequest)
+            => StatusCode(status, new { success = false, message,
+                errors = ModelState.Where(entry => entry.Value?.Errors.Count > 0).ToDictionary(entry => entry.Key,
+                    entry => entry.Value!.Errors.Select(error => string.IsNullOrEmpty(error.ErrorMessage) ? message : error.ErrorMessage).ToArray()) });
 
         private IActionResult NewsletterResponse(bool success, string message, int statusCode = StatusCodes.Status200OK)
         {

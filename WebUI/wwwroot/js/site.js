@@ -196,32 +196,6 @@
                 }
         });
 
-        document.querySelectorAll('[data-newsletter-form]').forEach(form => {
-            const status = form.querySelector('[data-newsletter-status]');
-            const button = form.querySelector('[type="submit"]');
-            form.addEventListener('submit', async event => {
-                event.preventDefault();
-                if (!form.reportValidity() || form.dataset.busy === 'true') return;
-                form.dataset.busy = 'true';
-                form.setAttribute('aria-busy', 'true');
-                if (button) button.disabled = true;
-                if (status) { status.textContent = text('Kaydınız alınıyor…', 'Saving your request…'); status.dataset.state = 'pending'; }
-                try {
-                    const response = await fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } });
-                    const json = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null;
-                    if (!response.ok || !json?.success) throw new Error(json?.message || text('Kaydınız alınamadı. Lütfen yeniden deneyin.', 'We could not save your request. Please try again.'));
-                    if (status) { status.textContent = json.message; status.dataset.state = 'success'; }
-                    form.reset();
-                } catch (error) {
-                    if (status) { status.textContent = error instanceof Error ? error.message : text('Bağlantınızı kontrol edip yeniden deneyin.', 'Check your connection and try again.'); status.dataset.state = 'error'; }
-                } finally {
-                    delete form.dataset.busy;
-                    form.removeAttribute('aria-busy');
-                    if (button) button.disabled = false;
-                }
-            });
-        });
-
         const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
         document.querySelectorAll('.luxe-service-card, .luxe-blog-card, .luxe-gallery-item').forEach(card => {
             let frame = 0;
