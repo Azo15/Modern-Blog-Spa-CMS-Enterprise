@@ -12,7 +12,7 @@
     var canReport = (await Authorization.AuthorizeAsync(User, AccessPolicies.Admin)).Succeeded;
 }
 
-<div class="mb-4"><button type="button" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#ai-blog-modal"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI ile Blog Yazısı Üret</button></div>
+<div class="mb-4"><button type="button" class="btn btn-gold ai-generate-trigger" aria-controls="ai-blog-modal" aria-haspopup="dialog" data-bs-toggle="modal" data-bs-target="#ai-blog-modal"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI ile Blog Yazısı Üret</button></div>
 <div class="card">
     @if (canReport)
     {

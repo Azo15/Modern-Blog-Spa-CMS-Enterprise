@@ -8,3 +8,7 @@
 #layout-menu{scrollbar-color:#a68a4b #111a16;overscroll-behavior:contain}
 #layout-menu .menu-link{min-height:44px}.sidebar-group-title{min-height:48px}
 @media(prefers-reduced-motion:reduce){#layout-menu .menu-link:hover{transform:none}.sidebar-group-title{transition:none}}
+.ai-generate-trigger{background-size:200% 100%;transition:background-position .4s ease,transform .22s ease,box-shadow .22s ease}
+@media(hover:hover){.ai-generate-trigger:hover{background-position:100% 0;box-shadow:0 0 24px #d6b66c44}.ai-generate-trigger:hover i{animation:ai-wand-glow .8s ease-in-out}}
+@keyframes ai-wand-glow{50%{transform:rotate(-12deg) scale(1.15);filter:drop-shadow(0 0 4px #fff1bb)}}
+@media(prefers-reduced-motion:reduce){.ai-generate-trigger:hover i{animation:none}.ai-generate-trigger{transition:none}}
