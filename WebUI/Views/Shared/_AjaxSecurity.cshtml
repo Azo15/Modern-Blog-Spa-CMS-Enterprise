@@ -1,0 +1,6 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery AjaxAntiforgery
+@inject Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Antiforgery.AntiforgeryOptions> AjaxAntiforgeryOptions
+<meta name="xspa-csrf" content="@AjaxAntiforgery.GetAndStoreTokens(Context).RequestToken" />
+<meta name="xspa-csrf-header" content="@AjaxAntiforgeryOptions.Value.HeaderName" />
+<link rel="stylesheet" href="~/css/ajax-interactions.css" asp-append-version="true" />
+<script src="~/js/xspa-ajax.js" asp-append-version="true"></script>

@@ -3,6 +3,7 @@
       data-template="vertical-menu-template-free">
 
 <head>
+    @await Html.PartialAsync("_AjaxSecurity")
     @await Html.PartialAsync("~/Views/Admin/_Head.cshtml")
     @await RenderSectionAsync("Styles", required: false)
 <link rel="stylesheet" href="~/css/admin-sidebar.css" asp-append-version="true" />

@@ -4,5 +4,6 @@
 .xspa-enter{animation:xspa-appear .35s ease}.xspa-leave{opacity:0;transform:translateY(-8px);transition:opacity .25s,transform .25s}
 form[aria-busy="true"] button[type="submit"]::after{content:"";display:inline-block;width:15px;height:15px;margin-inline-start:10px;border:2px solid #d4b86c55;border-top-color:#d4b86c;border-radius:50%;animation:xspa-spin .75s linear infinite}
 .xspa-pending-comment,.xspa-empty-favorites{padding:22px;margin:16px 0;border:1px solid #c5a66a66;border-radius:12px;background:#c5a66a0d}
+.xspa-auth-prompt{background:#102c22!important;color:#f3e5bd!important;border:1px solid #d4b86c;border-radius:18px!important}.xspa-auth-confirm{background:#d4b86c!important;color:#102c22!important;border-radius:30px!important}
 @keyframes xspa-pulse{50%{transform:scale(1.25);filter:drop-shadow(0 0 5px #d4b86c)}}@keyframes xspa-appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes xspa-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.xspa-pulse i,.xspa-enter,.xspa-toast,form[aria-busy="true"] button[type="submit"]::after{animation:none}.xspa-leave{transition:none}}

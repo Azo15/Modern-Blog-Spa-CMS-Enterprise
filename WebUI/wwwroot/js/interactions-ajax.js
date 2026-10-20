@@ -12,14 +12,7 @@
         item.textContent = message; region.append(item); setTimeout(() => item.remove(), 6000);
     }
     async function send(form, body = new FormData(form)) {
-        const response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } });
-        const data = response.headers.get('content-type')?.includes('json') ? await response.json() : null;
-        if (!response.ok || !data?.success) {
-            const error = new Error(data?.message || text('İşlem tamamlanamadı. Lütfen tekrar deneyin.', 'Please try again.'));
-            error.errors = data?.errors; error.status = response.status; throw error;
-        }
-        return data;
+        return window.XspaAjax.postForm(form, body);
     }
     window.XspaInteractions = { send, toast, text };
     document.addEventListener('submit', async event => {

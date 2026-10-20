@@ -5,7 +5,7 @@
     @await Html.PartialAsync("/Views/LayoutPartial/_Header.cshtml")
     @await RenderSectionAsync("Styles", required: false)
 <link rel="stylesheet" href="~/css/interactions.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/ajax-interactions.css" asp-append-version="true" />
+@await Html.PartialAsync("_AjaxSecurity")
 </head>
 <body class="luxe-body @(home ? "is-home" : "is-inner")">
     <div class="luxe-preloader" aria-hidden="true"><img src="~/img/brand-mark.svg" width="70" height="70" alt="" /><span>XSPA</span></div>
@@ -22,5 +22,6 @@
 <script src="~/js/comments-ajax.js" asp-append-version="true"></script>
 <script src="~/js/profile-ajax.js" asp-append-version="true"></script>
 <script src="~/js/contact-ajax.js" asp-append-version="true"></script>
+<script src="~/js/appointments-ajax.js" asp-append-version="true"></script>
 </body>
 </html>

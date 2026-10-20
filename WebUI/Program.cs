@@ -198,12 +198,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Events.OnRedirectToAccessDenied = context =>
     {
         if (ApiProblemResponses.IsApi(context.HttpContext)) return ApiProblemResponses.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden);
+        if (context.Request.WantsJson())
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return context.Response.WriteAsJsonAsync(new { success = false, message = "Bu işlem için erişim izniniz yok." });
+        }
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
         return Task.CompletedTask;
     };
     options.Events.OnRedirectToLogin = context =>
     {
         if (ApiProblemResponses.IsApi(context.HttpContext)) return ApiProblemResponses.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized);
+        if (context.Request.WantsJson())
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return context.Response.WriteAsJsonAsync(new { success = false, message = "Oturumunuz sona erdi. Lütfen yeniden giriş yapın." });
+        }
         context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };

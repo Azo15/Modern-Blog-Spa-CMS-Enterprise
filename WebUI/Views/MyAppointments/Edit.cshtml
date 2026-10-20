@@ -5,7 +5,7 @@
 <section class="luxe-section customer-bookings"><div class="container booking-editor">
     <a href="/randevularim">← @(en ? "My appointments" : "Randevularım")</a>
     <h1>@ViewData["Title"]</h1><p>@(en ? "Your revised request will await confirmation. Your reservation code stays the same." : "Güncel talebiniz yeniden onaya gönderilir. Rezervasyon kodunuz aynı kalır.")</p>
-    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="booking-card">
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="booking-card" data-edit-appointment>
         <div asp-validation-summary="All" class="booking-errors" role="alert"></div>
         <input asp-for="Id" type="hidden" /><input name="ExpectedUpdatedDate" type="hidden" value="@Model.ExpectedUpdatedDate?.ToString("O")" />
         <div class="booking-field"><label asp-for="ServiceId">@(en ? "Ritual" : "Hizmet")</label><select asp-for="ServiceId" required>@foreach(var s in Model.Services){<option value="@s.Id">@s.Title</option>}</select></div>

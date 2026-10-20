@@ -21,7 +21,7 @@
             {
                 <div class="booking-actions"><a class="luxe-button" href="/randevularim/@a.Id/duzenle">@(en ? "Change appointment" : "Randevuyu düzenle") →</a>
                 <button type="button" class="booking-cancel-toggle" data-bs-toggle="collapse" data-bs-target="#cancel-@a.Id" aria-expanded="false" aria-controls="cancel-@a.Id">@(en ? "Cancel appointment" : "Randevuyu iptal et")</button></div>
-                <div class="collapse booking-cancel-confirm" id="cancel-@a.Id"><p>@(en ? "Cancel this appointment? This cannot be undone. You can create a new request afterwards." : "Bu randevuyu iptal etmek istiyor musunuz? İptal geri alınamaz; daha sonra yeni talep oluşturabilirsiniz.")</p><form asp-action="Cancel" asp-route-id="@a.Id" method="post"><input name="expectedUpdatedDate" type="hidden" value="@a.UpdatedDate?.ToString("O")" /><button class="luxe-button" type="submit">@(en ? "Yes, cancel appointment" : "Evet, randevuyu iptal et")</button></form></div>
+                <div class="collapse booking-cancel-confirm" id="cancel-@a.Id"><p>@(en ? "Cancel this appointment? This cannot be undone. You can create a new request afterwards." : "Bu randevuyu iptal etmek istiyor musunuz? İptal geri alınamaz; daha sonra yeni talep oluşturabilirsiniz.")</p><form asp-action="Cancel" asp-route-id="@a.Id" method="post" data-cancel-appointment><input name="expectedUpdatedDate" type="hidden" value="@a.UpdatedDate?.ToString("O")" /><button class="luxe-button" type="submit">@(en ? "Yes, cancel appointment" : "Evet, randevuyu iptal et")</button></form></div>
             }
             else { <p class="booking-help">@(en ? "This appointment is closed to changes." : "Bu randevu değişikliğe kapalıdır.")</p> }
         </article>

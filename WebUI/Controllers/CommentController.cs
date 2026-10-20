@@ -35,7 +35,8 @@ public sealed class CommentController(ISender sender, Microsoft.Extensions.Local
     public async Task<IActionResult> Delete(int id, string slug, CancellationToken ct)
     {
         if (!await sender.Send(new DeleteCommentCommand(id), ct)) return NotFound();
-        if (Request.WantsJson()) return Json(new { success = true, id, message = text["CommentUpdated"].Value });
+        if (Request.WantsJson()) return Json(new { success = true, id,
+            message = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "Comment deleted." : "Yorum silindi." });
         return RedirectToAction("Post", "Blog", new { slug });
     }
 }

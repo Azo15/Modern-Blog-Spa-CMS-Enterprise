@@ -35,6 +35,38 @@ public sealed class MyAppointmentEndpointTests
         => new(){["Id"]=id.ToString(),["ServiceId"]="1",["AppointmentDate"]=DateOnly.FromDateTime(AppointmentSchedule.LocalNow).AddDays(3).ToString("yyyy-MM-dd"),["TimeSlot"]="16:30",["GuestCount"]="2",["Notes"]="Changed by owner",["ExpectedUpdatedDate"]=updated?.ToString("O",CultureInfo.InvariantCulture)??"",["__RequestVerificationToken"]=await Token(c)};
 
     [Fact]
+    public async Task AjaxRescheduleAndCancelUseHeaderCsrfAndRejectStaleChanges()
+    {
+        using var f = new PlatformWebFactory(); await Init(f); using var c = Client(f); await Login(c); var id = await Create(f, c);
+        c.DefaultRequestHeaders.Add("Accept", "application/json");
+        c.DefaultRequestHeaders.Add("RequestVerificationToken", await Token(c));
+        var fields = await EditValues(c, id); fields.Remove("__RequestVerificationToken");
+        var edit = await c.PostAsync($"/randevularim/{id}/duzenle", new FormUrlEncodedContent(fields)); Assert.Equal(HttpStatusCode.OK, edit.StatusCode);
+        var state = System.Text.Json.JsonDocument.Parse(await edit.Content.ReadAsStringAsync());
+        Assert.True(state.RootElement.GetProperty("success").GetBoolean());
+        var updated = state.RootElement.GetProperty("updatedDate").GetString(); Assert.False(string.IsNullOrWhiteSpace(updated));
+        var stale = await c.PostAsync($"/randevularim/{id}/iptal", new FormUrlEncodedContent(new Dictionary<string, string>()));
+        Assert.Equal(HttpStatusCode.BadRequest, stale.StatusCode); Assert.Equal(AppointmentStatus.Pending, (await Read(f, id)).Status);
+        var cancel = await c.PostAsync($"/randevularim/{id}/iptal", new FormUrlEncodedContent(new Dictionary<string, string> { ["expectedUpdatedDate"] = updated! }));
+        Assert.Equal(HttpStatusCode.OK, cancel.StatusCode); Assert.Contains("\"status\":\"cancelled\"", await cancel.Content.ReadAsStringAsync());
+        Assert.Equal(AppointmentStatus.Cancelled, (await Read(f, id)).Status);
+    }
+
+    [Theory]
+    [InlineData("/Profile/RemoveFavorite")]
+    [InlineData("/Comment/Create")]
+    [InlineData("/BlogInteraction/Favorite")]
+    [InlineData("/randevularim/1/iptal")]
+    public async Task AnonymousAjaxMutationGets401WithoutHtmlRedirect(string path)
+    {
+        using var f = new PlatformWebFactory(); await Init(f); using var c = Client(f);
+        c.DefaultRequestHeaders.Add("Accept", "application/json");
+        var response = await c.PostAsync(path, new FormUrlEncodedContent(new Dictionary<string, string> { ["__RequestVerificationToken"] = await Token(c) }));
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode); Assert.Null(response.Headers.Location);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
     public async Task OwnerCanListRescheduleAndCancelWithAuditAndStableReference()
     {
         using var f=new PlatformWebFactory();await Init(f);using var c=Client(f);await Login(c);var id=await Create(f,c);var original=await Read(f,id);
