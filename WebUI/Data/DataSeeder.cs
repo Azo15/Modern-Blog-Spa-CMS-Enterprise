@@ -11,6 +11,22 @@ namespace WebUI.Data
             if (!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
         }
 
+        public static IReadOnlyList<Service> CreateServiceCatalog() =>
+        [
+            new Service { Title = "Klasik İsveç Masajı", Content = "60 dk — 650 ₺", Details = "Kas gerginliğini gideren, kan dolaşımını artıran rahatlatıcı masaj. Aromaterapi yağları ile uygulanır.", Image = "img/service-isvec.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Türk Hamamı Ritüeli", Content = "90 dk — 850 ₺", Details = "Geleneksel kese ve köpük masajı ile derin temizlik. Cildiniz ipek gibi olacak.", Image = "img/service-hamam.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Altın Yüz Maskesi", Content = "45 dk — 950 ₺", Details = "24 ayar altın özlü maske ile cilt tonu eşitlemesi ve anti-aging etkisi.", Image = "img/service-altinmaske.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Derin Doku Masajı", Content = "75 dk — 750 ₺", Details = "Kronik kas ağrıları ve spazm için profesyonel derin doku tekniği.", Image = "img/service-derindoku.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Aromaterapi Masajı", Content = "60 dk — 700 ₺", Details = "Doğal esansiyel yağlarla stres gidericiden uyku düzenleyiciye tüm ihtiyaçlar için.", Image = "img/service-aromaterapi.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Çiftler Masajı", Content = "90 dk — 1.400 ₺", Details = "Özel VIP odamızda sevdiğinizle birlikte masaj keyfi. Şampanya ikram edilir.", Image = "img/service-ciftler.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Refleksoloji", Content = "45 dk — 550 ₺", Details = "Ayak basınç noktalarından vücudun denge merkezini uyarma tekniği.", Image = "img/service-refleksoloji.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Sauna & Buhar Odası", Content = "60 dk — 400 ₺", Details = "Finlandiya tipi kuru sauna + Türk buhar odası kombinasyonu.", Image = "img/service-sauna.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Keratin Saç Bakımı", Content = "120 dk — 1.200 ₺", Details = "Profesyonel keratin tedavisi ile pürüzsüz, parlak ve frizden arındırılmış saçlar.", Image = "img/service-keratin.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Yosun Peeling", Content = "50 dk — 600 ₺", Details = "Yosun içerikli bakım ile nazik peeling ve cilt bakım ritüeli.", Image = "img/service-peeling.webp", Prominence = true, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Bebek Masajı Kursu", Content = "45 dk — 350 ₺", Details = "Ebeveynlere bebek masajı teknikleri öğretilir.", Image = "img/service-bebek.webp", Prominence = false, IsPublish = true, CreatedDate = DateTime.UtcNow },
+            new Service { Title = "Hamilelik Masajı", Content = "60 dk — 700 ₺", Details = "2. trimesterden itibaren uygulanan, anneye özel prenatal masaj.", Image = "img/service-hamilelik.webp", Prominence = false, IsPublish = true, CreatedDate = DateTime.UtcNow }
+        ];
+
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
@@ -198,25 +214,10 @@ namespace WebUI.Data
                 await context.SaveChangesAsync();
             }
 
-            // ──────────────────── HİZMETLER ────────────────────
+            // The same twelve-service catalog is used for local and production synchronization.
             if (!context.Services.Any())
             {
-                context.Services.AddRange(
-                    // Öne çıkanlar (Prominence = true)
-                    new Service { Title = "Klasik İsveç Masajı", Content = "60 dk — 650 ₺", Details = "Kas gerginliğini gideren, kan dolaşımını artıran rahatlatıcı masaj. Aromaterapi yağları ile uygulanır.", Image = "service/isvec-masaj.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Türk Hamamı Ritüeli", Content = "90 dk — 850 ₺", Details = "Geleneksel kese ve köpük masajı ile derin temizlik. Cildiniz ipek gibi olacak.", Image = "service/hamam.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Altın Yüz Maskesi", Content = "45 dk — 950 ₺", Details = "24 ayar altın özlü maske ile cilt tonu eşitlemesi ve anti-aging etkisi.", Image = "service/altin-maske.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Derin Doku Masajı", Content = "75 dk — 750 ₺", Details = "Kronik kas ağrıları ve spazm için profesyonel derin doku tekniği.", Image = "service/derin-doku.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Aromaterapi Masajı", Content = "60 dk — 700 ₺", Details = "Doğal esansiyel yağlarla stres gidericiden uyku düzenleyiciye tüm ihtiyaçlar için.", Image = "service/aromaterapi.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Çiftler Masajı", Content = "90 dk — 1.400 ₺", Details = "Özel VIP odamızda sevdiğinizle birlikte masaj keyfi. Şampanya ikram edilir.", Image = "service/ciftler-masaj.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Refleksoloji", Content = "45 dk — 550 ₺", Details = "Ayak basınç noktalarından vücudun denge merkezini uyarma tekniği.", Image = "service/refleksoloji.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Sauna & Buhar Odası", Content = "60 dk — 400 ₺", Details = "Finlandiya tipi kuru sauna + Türk buhar odası kombinasyonu.", Image = "service/sauna.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Keratin Saç Bakımı", Content = "120 dk — 1.200 ₺", Details = "Profesyonel keratin tedavisi ile pürüzsüz, parlak ve frizden arındırılmış saçlar.", Image = "service/keratin.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Cilt Peeling Seansı", Content = "50 dk — 600 ₺", Details = "Kimyasal peeling ile ölü deri temizleme, cilt yenileme ve ton eşitleme.", Image = "service/peeling.jpg", Prominence = true, IsPublish = true, CreatedDate = DateTime.Now },
-                    // Diğerleri
-                    new Service { Title = "Bebek Masajı Kursu", Content = "45 dk — 350 ₺", Details = "Ebeveynlere bebek masajı teknikleri öğretilir.", Image = "service/bebek-masaj.jpg", Prominence = false, IsPublish = true, CreatedDate = DateTime.Now },
-                    new Service { Title = "Hamilelik Masajı", Content = "60 dk — 700 ₺", Details = "2. trimesterden itibaren uygulanan, anneye özel prenatal masaj.", Image = "service/hamilelik-masaj.jpg", Prominence = false, IsPublish = true, CreatedDate = DateTime.Now }
-                );
+                context.Services.AddRange(CreateServiceCatalog());
                 await context.SaveChangesAsync();
             }
 
