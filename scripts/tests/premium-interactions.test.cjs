@@ -17,7 +17,7 @@ function boot(now = '2026-10-16T06:00:00Z', reduced = false) {
     const document = { readyState: 'complete', body, documentElement: { lang: 'tr-TR', dataset: { theme: 'light' }, classList: makeClasses() },
         querySelectorAll: selector => selector === '[data-business-status]' ? [badge] : [],
         getElementById: () => null, querySelector: () => null,
-        addEventListener: (event, handler) => { listeners[event] = handler; } };
+        addEventListener: (event, handler) => { (listeners[event] ||= []).push(handler); } };
     const window = { matchMedia: () => ({ matches: reduced, addEventListener() {} }), scrollY: 0,
         addEventListener: (event, handler) => { windowListeners[event] = handler; },
         location: { href: 'http://localhost:5157/ana-sayfa', origin: 'http://localhost:5157', assign: href => navigations.push(href) } };
@@ -28,7 +28,7 @@ function boot(now = '2026-10-16T06:00:00Z', reduced = false) {
         const link = { href: new URL(href, window.location.href).href, target: attributes.includes('blank') ? '_blank' : '',
             hasAttribute: name => attributes.includes(name), getAttribute: () => href };
         let prevented = false;
-        listeners.click({ target: { closest: () => link }, button: 0, defaultPrevented: false,
+        for (const handler of listeners.click) handler({ target: { closest: selector => selector === '[data-reply-toggle]' ? null : link }, button: 0, defaultPrevented: false,
             preventDefault: () => { prevented = true; }, ...modifiers });
         return prevented;
     };

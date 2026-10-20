@@ -5,8 +5,8 @@
     var canComment = (await CommentAuthorization.AuthorizeAsync(User, null, AccessPolicies.ActiveMember)).Succeeded;
     var en = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
 }
-<section id="comments" class="luxe-comments">
-    <h2>@L["Comments"] (@Model.Comments.TotalCount @L["RootComments"])</h2>
+<section id="comments" class="luxe-comments" data-comments-url="@Url.Action("Comments", "Blog", new { slug = Model.Blog.Slug, commentPage = Model.Comments.PageIndex })">
+    <h2>@L["Comments"] (<span data-comment-count>@Model.Comments.TotalCount</span> @L["RootComments"])</h2>
     @if (TempData["CommentError"] is string error)
     {
         <p class="luxe-interaction-notice is-error" role="alert">@error</p>
@@ -75,7 +75,7 @@
         </form>
         @if (Model.OwnComments.Any())
         {
-            <h3 class="mt-4">@L["MyRecentComments"]</h3>
+            <h3 class="mt-4">@L["MyRecentComments"] · @(en ? "Pending approval" : "Onay bekleyen") <span data-pending-count>@Model.OwnComments.Count(c => !c.IsApproved)</span></h3>
             @foreach (var own in Model.OwnComments)
             {
                 <div class="luxe-own-comment">

@@ -33,6 +33,17 @@ public sealed class BlogController(ISender sender, IAuthorizationService authori
         ViewBag.ReadingTime = BlogUtils.CalculateReadingTime(blog.Content);
         return View(new BlogPostViewModel(blog, comments, own));
     }
+    [HttpGet("{slug}/yorumlar")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> Comments(string slug, int commentPage = 1, CancellationToken ct = default)
+    {
+        var blog = await sender.Send(new GetPublicBlogBySlugQuery(slug), ct);
+        if (blog is null) return NotFound();
+        var comments = await sender.Send(new GetPublicCommentsQuery(blog.Id, Math.Max(1, commentPage)), ct);
+        var own = (await authorization.AuthorizeAsync(User, AccessPolicies.ActiveMember)).Succeeded
+            ? await sender.Send(new GetMyCommentsQuery(blog.Id), ct) : [];
+        return PartialView("_Comments", new BlogPostViewModel(blog, comments, own));
+    }
     public static class BlogUtils
     {
         public static int CalculateReadingTime(string? content) => string.IsNullOrWhiteSpace(content) ? 0 : (int)Math.Ceiling(content.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length / 200.0);

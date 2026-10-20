@@ -178,10 +178,11 @@
                 } else if (window.confirm(message)) window.location.assign(url.href);
             });
         });
-        document.querySelectorAll('[data-reply-toggle]').forEach(button => {
+        document.addEventListener('click', event => {
+            const button = event.target.closest('[data-reply-toggle]');
+            if (!button) return;
             const panel = document.getElementById(button.getAttribute('aria-controls'));
             if (!panel) return;
-            button.addEventListener('click', () => {
                 const open = button.getAttribute('aria-expanded') !== 'true';
                 button.setAttribute('aria-expanded', String(open));
                 panel.hidden = false;
@@ -193,7 +194,6 @@
                     if (reduced.matches) panel.hidden = true;
                     else panel.addEventListener('transitionend', () => { if (button.getAttribute('aria-expanded') !== 'true') panel.hidden = true; }, { once: true });
                 }
-            });
         });
 
         document.querySelectorAll('[data-newsletter-form]').forEach(form => {
