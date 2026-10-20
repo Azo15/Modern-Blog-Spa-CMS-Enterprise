@@ -7,7 +7,7 @@ public static class AppRoles
     public const string Admin = "System Admin";
     public const string Staff = "Staff";
     public const string Customer = "Customer";
-    public static readonly string[] All = [Admin, Staff, Customer];
+    public static IReadOnlyList<string> All { get; } = Array.AsReadOnly(new[] { Admin, Staff, Customer });
 }
 
 public static class AccessPolicies
