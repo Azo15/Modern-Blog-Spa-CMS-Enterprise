@@ -1,6 +1,7 @@
 using DataAccesLayer.Concrete;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebUI.Data
 {
@@ -26,6 +27,24 @@ namespace WebUI.Data
             new Service { Title = "Bebek Masajı Kursu", Content = "45 dk — 350 ₺", Details = "Ebeveynlere bebek masajı teknikleri öğretilir.", Image = "img/service-bebek.webp", Prominence = false, IsPublish = true, CreatedDate = DateTime.UtcNow },
             new Service { Title = "Hamilelik Masajı", Content = "60 dk — 700 ₺", Details = "2. trimesterden itibaren uygulanan, anneye özel prenatal masaj.", Image = "img/service-hamilelik.webp", Prominence = false, IsPublish = true, CreatedDate = DateTime.UtcNow }
         ];
+
+        // Only fill missing catalog entries. Never overwrite prices, publication state or soft deletions.
+        public static async Task<int> SyncServiceCatalogAsync(AppDbContext db, CancellationToken ct = default)
+        {
+            var strategy = db.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, ct);
+                var titles = await db.Services.IgnoreQueryFilters().Select(x => x.Title).ToListAsync(ct);
+                var existing = new HashSet<string>(titles.Where(x => x != null).Select(x => x!.Trim()), StringComparer.OrdinalIgnoreCase);
+                var missing = CreateServiceCatalog().Where(x => !existing.Contains(x.Title!) &&
+                    !(x.Title == "Yosun Peeling" && existing.Contains("Cilt Peeling Seansı"))).ToArray();
+                db.Services.AddRange(missing);
+                await db.SaveChangesAsync(ct);
+                await transaction.CommitAsync(ct);
+                return missing.Length;
+            });
+        }
 
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
@@ -211,13 +230,6 @@ namespace WebUI.Data
                     new Slider { Title = "Doğanın Saf Enerjisiyle Buluşun", Content = "Organik ürünler ve geleneksel tekniklerle hazırlanmış ritüellerimizle bedeninizi arındırın.", Image = "slider/slider2.jpg", IsPublish = true, CreatedDate = DateTime.Now },
                     new Slider { Title = "Lüksü Kolunuzun Altına Alın", Content = "5 yıldızlı spa deneyimini yaşayın. Rezervasyonunuzu hemen oluşturun, özel indirimlerden yararlanın.", Image = "slider/slider3.jpg", IsPublish = true, CreatedDate = DateTime.Now }
                 );
-                await context.SaveChangesAsync();
-            }
-
-            // The same twelve-service catalog is used for local and production synchronization.
-            if (!context.Services.Any())
-            {
-                context.Services.AddRange(CreateServiceCatalog());
                 await context.SaveChangesAsync();
             }
 

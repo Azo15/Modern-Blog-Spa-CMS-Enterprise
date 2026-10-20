@@ -223,6 +223,11 @@ if (app.Environment.IsDevelopment())
 
 // Roles are safe to provision in all environments; demo users/content are development-only.
 if (!testing) await DataSeeder.SeedRolesAsync(app.Services);
+if (!testing)
+{
+    using var catalogScope = app.Services.CreateScope();
+    await DataSeeder.SyncServiceCatalogAsync(catalogScope.ServiceProvider.GetRequiredService<AppDbContext>());
+}
 if (app.Environment.IsDevelopment())
     await DataSeeder.SeedAsync(app.Services);
 
