@@ -14,7 +14,7 @@ using Moq;
 
 namespace BusinessLayer.Tests;
 
-internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQueries = false) : WebApplicationFactory<Program>
+internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQueries = false, bool googleEnabled = false) : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection connection = new("Data Source=:memory:");
     public const string Password = "P@ssword123!";
@@ -29,8 +29,15 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
     {
         connection.Open();
         builder.UseEnvironment("Testing");
+        if (googleEnabled)
+        {
+            builder.UseSetting("Authentication:Google:ClientId", "google-client-for-tests");
+            builder.UseSetting("Authentication:Google:ClientSecret", "test-only-secret-never-deployed");
+        }
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
+            ["Authentication:Google:ClientId"] = googleEnabled ? "google-client-for-tests" : null,
+            ["Authentication:Google:ClientSecret"] = googleEnabled ? "test-only-secret-never-deployed" : null,
             ["Jwt:SigningKey"] = "acceptance-test-key-only-32-bytes-never-used-for-deployment",
             ["Swagger:Enabled"] = "true", ["ApiRateLimit:PermitLimit"] = permitLimit.ToString(),
             ["ApiRateLimit:WindowSeconds"] = "60", ["Moderation:BlockedWords:0"] = "yasak"

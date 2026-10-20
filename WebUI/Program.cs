@@ -136,7 +136,7 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:Clie
         options.SaveTokens = false;
         options.CorrelationCookie.SameSite = SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "verified_email", System.Security.Claims.ClaimValueTypes.Boolean);
+        options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "email_verified", System.Security.Claims.ClaimValueTypes.Boolean);
         options.Events.OnRemoteFailure = WebUI.Infrastructure.GoogleLoginFailureHandler.HandleAsync;
     });
 }
