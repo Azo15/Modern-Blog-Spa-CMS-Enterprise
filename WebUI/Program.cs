@@ -137,13 +137,7 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:Clie
         options.CorrelationCookie.SameSite = SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "verified_email", System.Security.Claims.ClaimValueTypes.Boolean);
-        options.Events.OnRemoteFailure = context =>
-        {
-            var message = context.Failure?.Message ?? "Google ile giriş doğrulanamadı.";
-            context.Response.Redirect("/dashboard/giris?error=" + Uri.EscapeDataString(message));
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
+        options.Events.OnRemoteFailure = WebUI.Infrastructure.GoogleLoginFailureHandler.HandleAsync;
     });
 }
 builder.Services.ConfigureExternalCookie(options =>
