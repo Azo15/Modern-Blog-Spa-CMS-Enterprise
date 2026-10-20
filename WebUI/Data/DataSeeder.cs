@@ -40,9 +40,18 @@ namespace WebUI.Data
                 var missing = CreateServiceCatalog().Where(x => !existing.Contains(x.Title!) &&
                     !(x.Title == "Yosun Peeling" && existing.Contains("Cilt Peeling Seansı"))).ToArray();
                 db.Services.AddRange(missing);
-                await db.SaveChangesAsync(ct);
-                await transaction.CommitAsync(ct);
-                return missing.Length;
+                try
+                {
+                    await db.SaveChangesAsync(ct);
+                    await transaction.CommitAsync(ct);
+                    return missing.Length;
+                }
+                catch
+                {
+                    // A transient SQL retry must not retain failed Added entities from this attempt.
+                    foreach (var service in missing) db.Entry(service).State = EntityState.Detached;
+                    throw;
+                }
             });
         }
 

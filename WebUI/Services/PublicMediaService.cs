@@ -12,7 +12,7 @@ public sealed class PublicMediaService(IWebHostEnvironment environment)
         ("Altın Yüz Maskesi", "service-altinmaske"), ("Derin Doku Masajı", "service-derindoku"),
         ("Aromaterapi Masajı", "service-aromaterapi"), ("Çiftler Masajı", "service-ciftler"),
         ("Refleksoloji", "service-refleksoloji"), ("Sauna & Buhar Odası", "service-sauna"),
-        ("Keratin Saç Bakımı", "service-keratin"), ("Cilt Peeling Seansı", "service-peeling"),
+        ("Keratin Saç Bakımı", "service-keratin"), ("Cilt Peeling Seansı", "service-peeling"), ("Yosun Peeling", "service-peeling"),
         ("Bebek Masajı Kursu", "service-bebek"), ("Hamilelik Masajı", "service-hamilelik"));
 
     private static readonly IReadOnlyDictionary<string, string> Blogs = Map(
