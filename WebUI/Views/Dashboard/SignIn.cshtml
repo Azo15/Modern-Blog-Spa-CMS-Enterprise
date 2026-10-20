@@ -4,6 +4,7 @@
 <h1>@(en ? "Welcome back." : "Kendinize hoş geldiniz.")</h1><p>@(en ? "Your rituals and favourites, all in one place." : "Ritüelleriniz ve favorileriniz, size özel bir yerde.")</p>
 @if(TempData["AccountSuccess"] is string success){<p class="auth-success" role="status">@success</p>}
 @if(TempData["ErrorMessage"] is string error){<p role="alert">@error</p>}
+@if(Context.Request.Query["error"].ToString() is { Length: > 0 } queryError){<p role="alert" class="auth-error">@queryError</p>}
 <form method="post" id="loginForm"><div asp-validation-summary="All" role="alert"></div><input type="hidden" name="returnUrl" value="@Context.Request.Query["ReturnUrl"]" />
 <label asp-for="Email">@L["Email"]</label><input asp-for="Email" type="email" class="form-control" autocomplete="username" required /><span asp-validation-for="Email"></span>
 <label asp-for="Password">@L["Password"]</label><input asp-for="Password" type="password" class="form-control" autocomplete="current-password" required /><span asp-validation-for="Password"></span>
