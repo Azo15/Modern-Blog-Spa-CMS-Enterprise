@@ -36,17 +36,7 @@ builder.Services.AddRateLimiter(options => options.AddPolicy("ai-generation", co
         context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
         _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions { PermitLimit=3, Window=TimeSpan.FromMinutes(1), QueueLimit=0 })));
 
-// External authentication is registered only when both secrets are configured.
-if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientId"]) &&
-    !string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientSecret"]))
-    builder.Services.AddAuthentication().AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-        options.SignInScheme = IdentityConstants.ExternalScheme;
-        options.SaveTokens = false;
-        options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "verified_email", System.Security.Claims.ClaimValueTypes.Boolean);
-    });
+
 
 
 // 📌 SignalR Canlı Bildirim Servisi
@@ -133,6 +123,34 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<AppDbContext>() // EF Core kullanımı
 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
 .AddDefaultTokenProviders(); // Şifre yenileme vb. için gerekli token sağlayıcılar
+
+// 4.1. Harici oturum açma (Google OAuth)
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientId"]) &&
+    !string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientSecret"]))
+{
+    builder.Services.AddAuthentication().AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = false;
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ClaimActions.MapJsonKey("urn:xspa:email_verified", "verified_email", System.Security.Claims.ClaimValueTypes.Boolean);
+        options.Events.OnRemoteFailure = context =>
+        {
+            var message = context.Failure?.Message ?? "Google ile giriş doğrulanamadı.";
+            context.Response.Redirect("/dashboard/giris?error=" + Uri.EscapeDataString(message));
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
+    });
+}
+builder.Services.ConfigureExternalCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 builder.Services.AddPlatformApi(builder.Configuration);
 builder.Services.AddPlatformRateLimiting(builder.Configuration);
 
@@ -141,13 +159,16 @@ var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Mo
 if (!string.IsNullOrWhiteSpace(keysPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(keysPath)));
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
     var proxies = (builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [])
         .Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => value.Trim()).ToArray();
-    if (proxies.Length == 0) return;
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.ForwardLimit = 1;
-    options.KnownNetworks.Clear(); options.KnownProxies.Clear();
-    foreach (var proxy in proxies) options.KnownProxies.Add(System.Net.IPAddress.Parse(proxy));
+    foreach (var proxy in proxies)
+    {
+        if (System.Net.IPAddress.TryParse(proxy, out var ip))
+            options.KnownProxies.Add(ip);
+    }
 });
 
 // 5. Razor runtime compilation ve FluentValidation
