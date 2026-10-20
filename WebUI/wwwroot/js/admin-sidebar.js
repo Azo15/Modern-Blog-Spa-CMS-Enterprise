@@ -17,6 +17,17 @@ const ready=()=>{
   button.setAttribute('aria-expanded',String(open)); panel.style.gridTemplateRows=open?'1fr':'0fr';panel.inert=!open;panel.setAttribute('aria-hidden',String(!open));
  };
  const initial=active?.closest('.sidebar-group') || groups[0];
+ const toggles=groups.map(group=>group.querySelector('.sidebar-group-title'));
+ root.addEventListener('keydown',event=>{
+  const index=toggles.indexOf(event.target);if(index<0)return;
+  let next;
+  if(event.key==='ArrowDown')next=(index+1)%toggles.length;
+  else if(event.key==='ArrowUp')next=(index-1+toggles.length)%toggles.length;
+  else if(event.key==='Home')next=0;
+  else if(event.key==='End')next=toggles.length-1;
+  else return;
+  event.preventDefault();toggles[next].focus();
+ });
  groups.forEach(group=>{
   setOpen(group,group===initial);
   group.querySelector('.sidebar-group-title').addEventListener('click',()=>{
