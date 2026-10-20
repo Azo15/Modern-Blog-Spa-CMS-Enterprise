@@ -28,15 +28,15 @@
             </form>
         </div>
     </div>
-    <h2 class="mt-5">@Text["Favorites"]</h2>
-    @if (Model.Favorites.Items.Count == 0) { <p>@Text["NoFavorites"]</p> }
-    else
-    {
-        <ul class="list-group mb-3">
+    <h2 class="mt-5">@Text["Favorites"] · <span data-favorites-total>@Model.Favorites.TotalCount</span></h2>
+    <div class="xspa-empty-favorites" data-favorites-empty hidden="@(Model.Favorites.Items.Count > 0)">
+        <p data-favorites-empty-label>@Text["NoFavorites"]</p>
+        <a asp-action="Index" data-favorites-first-page hidden>@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "View remaining favorites" : "Diğer favorilerimi göster") →</a>
+    </div>
+        <ul class="list-group mb-3" data-favorites-list>
         @foreach (var blog in Model.Favorites.Items)
-        { <li class="list-group-item d-flex justify-content-between align-items-center"><a asp-controller="Blog" asp-action="Post" asp-route-slug="@blog.Slug">@blog.Title</a><form asp-controller="BlogInteraction" asp-action="Favorite" method="post"><input type="hidden" name="blogId" value="@blog.BlogId" /><input type="hidden" name="slug" value="@blog.Slug" /><button class="btn btn-sm btn-outline-secondary" type="submit">@Text["RemoveFavorite"]</button></form></li> }
+        { <li class="list-group-item d-flex justify-content-between align-items-center" data-favorite-card><a asp-controller="Blog" asp-action="Post" asp-route-slug="@blog.Slug">@blog.Title</a><form asp-action="RemoveFavorite" method="post" data-remove-favorite><input type="hidden" name="blogId" value="@blog.BlogId" /><button class="btn btn-sm btn-outline-secondary" type="submit">@Text["RemoveFavorite"]</button></form></li> }
         </ul>
-    }
     @if (Model.Favorites.HasPreviousPage) { <a asp-action="Index" asp-route-page="@(Model.Favorites.PageIndex - 1)" class="btn btn-outline-secondary">@Text["Previous"]</a> }
     @if (Model.Favorites.HasNextPage) { <a asp-action="Index" asp-route-page="@(Model.Favorites.PageIndex + 1)" class="btn btn-outline-secondary">@Text["Next"]</a> }
 </div>

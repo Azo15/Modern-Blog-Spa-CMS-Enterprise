@@ -55,7 +55,7 @@ public sealed class MemberInteractionHandlers(AppDbContext db, IActiveMemberServ
             try { await db.SaveChangesAsync(ct); }
             catch (DbUpdateConcurrencyException) { db.Entry(existing).State = EntityState.Detached; }
         }
-        else
+        else if (!r.RemoveOnly)
         {
             var favorite = new BlogFavorite { AppUserId = id, BlogId = r.BlogId, CreatedDate = DateTime.UtcNow };
             db.Add(favorite);

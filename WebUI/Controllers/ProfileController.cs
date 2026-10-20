@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using WebUI.Models;
+using WebUI.Infrastructure;
+using BusinessLayer.CQRS.Commands;
 
 namespace WebUI.Controllers;
 
@@ -30,6 +32,27 @@ public sealed class ProfileController(UserManager<AppUser> users, SignInManager<
         var user = await Current();
         if (user is null) return Forbid();
         return View(await Build(user, null, ct, Math.Max(1, page)));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveFavorite(int blogId, CancellationToken ct)
+    {
+        try
+        {
+            var state = await sender.Send(new ToggleBlogFavoriteCommand(blogId, RemoveOnly: true), ct);
+            if (Request.WantsJson()) return Json(new { success = true, state.IsFavorite,
+                remainingCount = (await sender.Send(new GetUserFavoritesQuery(1), ct)).TotalCount,
+                message = text["InteractionUpdated"].Value });
+        }
+        catch (ValidationException ex)
+        {
+            if (Request.WantsJson()) return BadRequest(new { success = false, message = ex.Message });
+            ModelState.AddModelError("", ex.Message);
+            var user = await Current();
+            if (user is null) return Forbid();
+            return View("Index", await Build(user, null, ct));
+        }
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
