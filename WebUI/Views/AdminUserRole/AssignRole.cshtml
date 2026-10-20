@@ -17,7 +17,7 @@
                 </a>
             </div>
             <div class="card-body">
-                <p class="text-muted">Yalnızca sistem yöneticileri rol atayabilir. Bir temel rol seçin: Sistem Yöneticisi, Personel veya Müşteri.</p>
+                <p class="text-muted">Yalnızca sistem yöneticileri rol atayabilir. Bir temel rol seçin: Sistem Yöneticisi, Personel veya Müşteri. Personel rol atayamaz; müşteri yalnızca kendi hesabını ve randevularını yönetir. Son sistem yöneticisinin rolü kaldırılamaz.</p>
                 <form asp-action="AssignRole" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="userId" value="@ViewBag.UserId" />
