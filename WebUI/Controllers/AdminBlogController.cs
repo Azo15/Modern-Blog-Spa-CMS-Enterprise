@@ -95,7 +95,7 @@ public sealed class AdminBlogController(ISender sender) : BaseController
     public async Task<IActionResult> GenerateWithAi(GenerateAiBlogCommand request,CancellationToken ct)
     {
         Response.Headers.CacheControl="no-store";
-        if(!ModelState.IsValid)return BadRequest(new {message="Konu, kategori ve dil bilgilerini kontrol edin."});
+        if(!ModelState.IsValid)return BadRequest(new {message="Konu, kategori, dil ve okuma süresini kontrol edin."});
         try { return Json(await sender.Send(request,ct)); }
         catch(ValidationException error){return BadRequest(new {message=error.Message});}
         catch(AiBlogUnavailableException error){return StatusCode(503,new {message=error.Message});}

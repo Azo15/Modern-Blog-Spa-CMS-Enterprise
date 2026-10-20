@@ -5,6 +5,7 @@ public sealed class GenerateAiBlogValidator : AbstractValidator<GenerateAiBlogCo
 {
     public GenerateAiBlogValidator()
     {
+        RuleFor(x=>x.ReadingMinutes).InclusiveBetween(2,8);
         RuleFor(x=>x.Topic).NotEmpty().Length(5,200);
         RuleFor(x=>x.CategoryId).GreaterThan(0);
         RuleFor(x=>x.Language).Must(x=>x is "tr-TR" or "en-US");

@@ -16,6 +16,6 @@ public sealed class GenerateAiBlogHandler(IAiBlogService ai,AppDbContext db,ICur
         if(!(await authorization.AuthorizeAsync(current.User,AccessPolicies.ContentManager)).Succeeded)throw new UnauthorizedAccessException();
         var category=await db.Catagories.AsNoTracking().Where(x=>x.Id==request.CategoryId && x.IsPublish).Select(x=>x.Title).SingleOrDefaultAsync(token);
         if(string.IsNullOrWhiteSpace(category))throw new ValidationException("Yayında bir kategori seçin.");
-        return await ai.GenerateAsync(new(request.Topic.Trim(),category,request.Language,request.Tone),token);
+        return await ai.GenerateAsync(new(request.Topic.Trim(),category,request.Language,request.Tone,request.ReadingMinutes),token);
     }
 }
