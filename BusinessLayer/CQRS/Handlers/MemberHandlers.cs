@@ -27,7 +27,8 @@ internal static class InteractionProjection
         return new(userId.HasValue && await db.Set<BlogFavorite>().AnyAsync(f => f.BlogId == blogId && f.AppUserId == userId, ct), own,
             reactions.Where(r => r.Type == ReactionType.Like).Sum(r => r.Count),
             reactions.Where(r => r.Type == ReactionType.Heart).Sum(r => r.Count),
-            reactions.Where(r => r.Type == ReactionType.Clap).Sum(r => r.Count));
+            reactions.Where(r => r.Type == ReactionType.Clap).Sum(r => r.Count),
+            await db.Set<BlogFavorite>().CountAsync(f => f.BlogId == blogId, ct));
     }
     public static Task<bool> IsPublished(AppDbContext db, int id, CancellationToken ct)
         => db.Blogs.AnyAsync(b => b.Id == id && !b.IsDeleted && b.PublishStatus == PublishStatus.Published, ct);

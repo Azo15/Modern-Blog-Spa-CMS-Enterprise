@@ -25,12 +25,12 @@
     <div class="luxe-interaction-actions">
         @if (Model.CanInteract)
         {
-            <form asp-controller="BlogInteraction" asp-action="Favorite" method="post" class="luxe-interaction-form">
+            <form asp-controller="BlogInteraction" asp-action="Favorite" method="post" class="luxe-interaction-form" data-blog-interaction>
                 <input type="hidden" name="blogId" value="@Model.BlogId" />
                 <input type="hidden" name="slug" value="@Model.Slug" />
                 <button type="submit" class="luxe-interaction-button luxe-favorite-button @(Model.Interaction.IsFavorite ? "is-selected" : "")" aria-pressed="@(Model.Interaction.IsFavorite ? "true" : "false")">
                     <i class="@(Model.Interaction.IsFavorite ? "fa-solid" : "fa-regular") fa-bookmark" aria-hidden="true"></i>
-                    <span>@(Model.Interaction.IsFavorite ? Text["RemoveFavorite"] : Text["Favorite"])</span>
+                    <span data-favorite-label data-add="@Text["Favorite"]" data-remove="@Text["RemoveFavorite"]">@(Model.Interaction.IsFavorite ? Text["RemoveFavorite"] : Text["Favorite"])</span><span data-favorite-count>@Model.Interaction.FavoriteCount</span>
                 </button>
             </form>
         }
@@ -49,7 +49,7 @@
             var icon = reaction switch { ReactionType.Like => "fa-thumbs-up", ReactionType.Heart => "fa-heart", _ => "fa-hands-clapping" };
             @if (Model.CanInteract)
             {
-                <form asp-controller="BlogInteraction" asp-action="Reaction" method="post" class="luxe-interaction-form">
+                <form asp-controller="BlogInteraction" asp-action="Reaction" method="post" class="luxe-interaction-form" data-blog-interaction>
                     <input type="hidden" name="blogId" value="@Model.BlogId" />
                     <input type="hidden" name="slug" value="@Model.Slug" />
                     <input type="hidden" name="reactionType" value="@((int)reaction)" />
