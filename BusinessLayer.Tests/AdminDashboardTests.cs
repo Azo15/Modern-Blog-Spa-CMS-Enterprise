@@ -7,6 +7,28 @@ namespace BusinessLayer.Tests;
 public sealed class AdminDashboardTests
 {
     [Fact]
+    public async Task VisitorMetricsZeroFillDaysAvoidDoubleCountingAndRespectSoftDeletedMessages()
+    {
+        using var f = new Stage2Fixture(); f.As(AppRoles.Staff);
+        var today = DateOnly.FromDateTime(AppointmentSchedule.LocalNow);
+        f.Db.DailyVisitorStats.Add(new DailyVisitorStat { Date = today.AddDays(-1), UniqueVisitors = 1, TotalPageViews = 4, DesktopVisits = 4 });
+        f.Db.VisitorLogs.AddRange(
+            new VisitorLog { Date = today.AddDays(-1), VisitorHash = "yesterday", Path = "/ana-sayfa" },
+            new VisitorLog { Date = today, VisitorHash = "one", Path = "/hizmetler", IsMobile = true },
+            new VisitorLog { Date = today, VisitorHash = "one", Path = "/hizmetler", IsMobile = true },
+            new VisitorLog { Date = today, VisitorHash = "two", Path = "/ana-sayfa" });
+        var removed = new ContactForm { Email = "removed@example.test", IsReplied = true };
+        f.Db.ContactForms.AddRange(new ContactForm { IsReplied = true }, new ContactForm(), removed);
+        await f.Db.SaveChangesAsync(); f.Db.ContactForms.Remove(removed); await f.Db.SaveChangesAsync();
+        var report = (await f.Sender.Send(new GetAdminDashboardQuery())).Analytics;
+        Assert.Equal(2, report.TodayUniqueVisitors); Assert.Equal(1, report.YesterdayUniqueVisitors); Assert.Equal(100m, report.UniqueVisitorChangePercent);
+        Assert.Equal(7, report.TotalPageViews); Assert.Equal(3, report.TodayPageViews); Assert.Equal(66.7m, report.MobilePercent);
+        Assert.Equal(33.3m, report.DesktopPercent); Assert.Equal(50m, report.MessageReplyRate); Assert.Equal(2, report.TotalMessages);
+        Assert.Equal(14, report.Trend.Count); Assert.Equal(2, report.Trend[^1].Count); Assert.Equal(0m, report.AppointmentConversionRate);
+        Assert.Contains(report.TopPages, x => x.Path == "/hizmetler" && x.Count == 2);
+    }
+
+    [Fact]
     public async Task DashboardRequiresManagerAndZeroFillsFourteenDays()
     {
         using var fixture = new Stage2Fixture();

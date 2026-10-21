@@ -10,13 +10,17 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 namespace BusinessLayer.CQRS.Handlers;
-public sealed class AdminDashboardHandler(AppDbContext db, ICurrentUserService current, IAuthorizationService authorization, IConfiguration configuration)
+public sealed class AdminDashboardHandler(AppDbContext db, ICurrentUserService current, IAuthorizationService authorization, IConfiguration configuration,
+    IVisitorAnalytics visitorAnalytics, IActiveMemberService members)
     : IRequestHandler<GetAdminDashboardQuery, AdminDashboardDto>
 {
     public async Task<AdminDashboardDto> Handle(GetAdminDashboardQuery request, CancellationToken token)
     {
         if (!(await authorization.AuthorizeAsync(current.User, AccessPolicies.ContentManager)).Succeeded) throw new UnauthorizedAccessException();
+        await members.RequireAsync(token);
         var today = DateOnly.FromDateTime(AppointmentSchedule.LocalNow); var yesterday = today.AddDays(-1);
         var month = new DateOnly(today.Year, today.Month, 1); var nextMonth = month.AddMonths(1); var start = today.AddDays(-13);
         var active = db.Appointments.AsNoTracking().Where(x => x.Status != AppointmentStatus.Cancelled);
@@ -45,6 +49,37 @@ public sealed class AdminDashboardHandler(AppDbContext db, ICurrentUserService c
         var smtp = await db.SiteTables.AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(token);
         bool Present(string key, string? fallback) => !string.IsNullOrWhiteSpace(configuration[key] ?? fallback);
         var configured = Present("Smtp:Host",smtp?.Host) && Present("Smtp:Username",smtp?.SmtpUsername ?? smtp?.Mail) && Present("Smtp:Password",smtp?.Password) && Present("Smtp:SenderEmail",smtp?.Mail) && int.TryParse(configuration["Smtp:Port"] ?? smtp?.Port,out var port) && port is 465 or 587;
-        return new(todayCount,yesterdayCount,pending,customers,guests,services,revenue,unread,configured,trend,distribution,recent);
+        return new(todayCount,yesterdayCount,pending,customers,guests,services,revenue,unread,configured,trend,distribution,recent)
+        { Analytics = await BuildAnalytics(today, token) };
+    }
+    private async Task<VisitorDashboardDto> BuildAnalytics(DateOnly today, CancellationToken ct)
+    {
+        var current = await visitorAnalytics.GetDayAsync(today, ct);
+        var previous = await visitorAnalytics.GetDayAsync(today.AddDays(-1), ct);
+        var trend = new List<DashboardDay>(); var start = today.AddDays(-13);
+        for (var i = 0; i < 14; i++)
+        {
+            var day = start.AddDays(i); var snapshot = await visitorAnalytics.GetDayAsync(day, ct);
+            trend.Add(new(day.ToString("dd.MM", CultureInfo.InvariantCulture), snapshot.UniqueVisitors));
+        }
+        var archivedViews = await db.DailyVisitorStats.Where(x => x.Date <= today).SumAsync(x => (long?)x.TotalPageViews, ct) ?? 0;
+        var unarchivedViews = await db.VisitorLogs.Where(x => x.Date <= today && !db.DailyVisitorStats.Any(s => s.Date == x.Date)).LongCountAsync(ct);
+        var top = await db.VisitorLogs.Where(x => x.Date >= start && x.Date <= today).GroupBy(x => x.Path)
+            .Select(g => new { Path = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count).ThenBy(x => x.Path).Take(5).ToListAsync(ct);
+        var messages = await db.ContactForms.CountAsync(ct); var replied = await db.ContactForms.CountAsync(x => x.IsReplied, ct);
+        var from = VisitorAnalyticsCalendar.StartUtc(today); var until = VisitorAnalyticsCalendar.StartUtc(today.AddDays(1));
+        var requests = await db.Appointments.CountAsync(x => x.CreatedDate >= from && x.CreatedDate < until, ct);
+        static decimal Rate(long value, long total) => total == 0 ? 0 : Math.Round(value * 100m / total, 1);
+        return new()
+        {
+            TodayUniqueVisitors = current.UniqueVisitors, YesterdayUniqueVisitors = previous.UniqueVisitors,
+            UniqueVisitorChangePercent = previous.UniqueVisitors == 0 ? current.UniqueVisitors == 0 ? 0 : null : Math.Round((current.UniqueVisitors - previous.UniqueVisitors) * 100m / previous.UniqueVisitors, 1),
+            TodayPageViews = current.TotalPageViews, TotalPageViews = archivedViews + unarchivedViews,
+            MobileVisits = current.MobileVisits, DesktopVisits = current.DesktopVisits,
+            MobilePercent = Rate(current.MobileVisits, current.TotalPageViews), DesktopPercent = Rate(current.DesktopVisits, current.TotalPageViews),
+            TotalMessages = messages, RepliedMessages = replied, MessageReplyRate = Rate(replied, messages),
+            TodayAppointmentRequests = requests, AppointmentConversionRate = Rate(requests, current.UniqueVisitors),
+            Trend = trend, TopPages = top.Select(x => new VisitedPageCount(x.Path, x.Count)).ToList()
+        };
     }
 }
