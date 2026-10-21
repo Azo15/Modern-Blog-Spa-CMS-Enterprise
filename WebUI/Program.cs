@@ -267,6 +267,8 @@ using (var scope = app.Services.CreateScope())
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
     jobs.AddOrUpdate<ContactReplyRecoveryJob>("recover-contact-replies", job => job.RunAsync(CancellationToken.None),
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
+    jobs.AddOrUpdate<DailyVisitorAggregationJob>("daily-visitor-aggregation", job => job.RunAsync(CancellationToken.None),
+        Cron.Daily(0, 5), new RecurringJobOptions { TimeZone = timeZone });
     jobs.AddOrUpdate<AppointmentEmailRecoveryJob>("recover-appointment-emails", job => job.RecoverAsync(CancellationToken.None),
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
 }
@@ -301,6 +303,7 @@ app.UseRouting();
 app.UseAuthentication(); // [Authorize] için gerekli
 app.UseRateLimiter();
 app.UseAuthorization();
+app.UseMiddleware<VisitorTrackingMiddleware>();
 if (!testing)
 {
     Hangfire.Dashboard.DashboardRoutes.AddStylesheet(typeof(Program).Assembly, "WebUI.Branding.Hangfire.css");

@@ -28,6 +28,9 @@ namespace BusinessLayer.Container
             services.AddScoped<IContactReplyMailService, ContactReplyMailService>();
             services.AddScoped<ContactReplyEmailJob>();
             services.AddScoped<ContactReplyRecoveryJob>();
+            services.AddMemoryCache();
+            services.AddScoped<IVisitorAnalytics, VisitorAnalytics>();
+            services.AddScoped<DailyVisitorAggregationJob>();
             services.AddScoped<IAppointmentEmailQueue, HangfireAppointmentEmailQueue>();
             services.AddScoped<IAppointmentMailService, AppointmentMailService>();
             services.AddScoped<AppointmentEmailJob>();
