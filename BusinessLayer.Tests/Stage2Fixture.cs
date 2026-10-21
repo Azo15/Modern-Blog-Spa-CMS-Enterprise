@@ -25,6 +25,7 @@ internal sealed class Stage2Fixture : IDisposable
     public TestUser User { get; } = new();
     public Mock<ICacheService> Cache { get; } = new();
     public Mock<IManagerNotifier> Notifier { get; } = new();
+    public Mock<IContactReplyQueue> ReplyQueue { get; } = new();
     public sealed class TestUser : ICurrentUserService
     {
         public ClaimsPrincipal User { get; set; } = AuthorizationTests.Principal(AppRoles.Staff, "1");
@@ -42,6 +43,8 @@ internal sealed class Stage2Fixture : IDisposable
         services.AddScoped<IBlogImageStorage>(_ => Mock.Of<IBlogImageStorage>());
         Notifier.Setup(n => n.NotifyAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         services.AddSingleton(Notifier.Object);
+        ReplyQueue.Setup(q => q.Enqueue(It.IsAny<int>())).Returns("test-reply-job");
+        services.AddSingleton(ReplyQueue.Object);
         if (mockCache)
         {
             Cache.Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);

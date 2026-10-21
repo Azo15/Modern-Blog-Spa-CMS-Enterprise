@@ -24,6 +24,10 @@ namespace BusinessLayer.Container
             services.AddScoped<IContactEmailQueue, HangfireContactEmailQueue>();
             services.AddScoped<ContactEmailJob>();
             services.AddScoped<ContactEmailRecoveryJob>();
+            services.AddScoped<IContactReplyQueue, HangfireContactReplyQueue>();
+            services.AddScoped<IContactReplyMailService, ContactReplyMailService>();
+            services.AddScoped<ContactReplyEmailJob>();
+            services.AddScoped<ContactReplyRecoveryJob>();
             services.AddScoped<IAppointmentEmailQueue, HangfireAppointmentEmailQueue>();
             services.AddScoped<IAppointmentMailService, AppointmentMailService>();
             services.AddScoped<AppointmentEmailJob>();
