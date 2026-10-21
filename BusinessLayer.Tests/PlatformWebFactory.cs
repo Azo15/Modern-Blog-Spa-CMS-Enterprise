@@ -48,6 +48,9 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
             var notifier = new Mock<IManagerNotifier>();
             notifier.Setup(n => n.NotifyAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             services.AddSingleton(notifier.Object);
+            var replyMail = new Mock<IContactReplyMailService>();
+            replyMail.Setup(m => m.EnsureConfiguredAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            services.AddSingleton(replyMail.Object);
             services.AddSingleton(Mock.Of<IContactEmailQueue>());
             services.AddSingleton(Mock.Of<IContactReplyQueue>(q => q.Enqueue(It.IsAny<int>()) == "test-reply-job"));
             services.AddSingleton(Mock.Of<IAppointmentEmailQueue>());

@@ -5,7 +5,10 @@
     @foreach(var reply in Model.Replies)
     {
         var utc = DateTime.SpecifyKind(reply.RepliedAt, DateTimeKind.Utc);
-        <article class="card p-4 mb-3 reply-history-card" data-reply-id="@reply.Id"><header class="d-flex justify-content-between flex-wrap gap-2"><strong>@reply.RepliedByUserName</strong><time datetime="@utc.ToString("O")" class="small text-muted">@TimeZoneInfo.ConvertTimeFromUtc(utc, BusinessLayer.Concrete.VisitorAnalyticsCalendar.TimeZone).ToString("dd.MM.yyyy HH:mm") · Türkiye saati</time></header><p class="reply-body mt-3">@reply.ReplyMessage</p><span class="badge @(reply.IsMailSent ? "bg-label-success" : reply.AttemptCount >= 4 ? "bg-label-danger" : "bg-label-warning")">@(reply.IsMailSent ? "E-posta SMTP sunucusuna iletildi" : reply.AttemptCount >= 4 ? "Teslimat başarısız — SMTP / Hangfire kontrolü gerekli" : "E-posta teslimatı bekleniyor")</span></article>
+        <article class="card p-4 mb-3 reply-history-card" data-reply-id="@reply.Id"><header class="d-flex justify-content-between flex-wrap gap-2"><strong>@reply.RepliedByUserName</strong><time datetime="@utc.ToString("O")" class="small text-muted">@TimeZoneInfo.ConvertTimeFromUtc(utc, BusinessLayer.Concrete.VisitorAnalyticsCalendar.TimeZone).ToString("dd.MM.yyyy HH:mm") · Türkiye saati</time></header><p class="reply-body mt-3">@reply.ReplyMessage</p><span class="badge @(reply.IsMailSent ? "bg-label-success" : reply.LastError != null || reply.AttemptCount >= 4 ? "bg-label-danger" : "bg-label-warning")">@reply.DeliveryStatus</span>
+            @if (!reply.IsMailSent && reply.LastError != null)
+            { <p class="mt-3 mb-0 small"><a asp-controller="AdminSettings" asp-action="Smtp">E-posta &amp; SMTP ayarları</a> · <a href="/hangfire">Arka Plan İşleri</a></p> }
+        </article>
     }
     @if(Model.TotalReplies > 20){<nav class="d-flex gap-3" aria-label="Yanıt geçmişi sayfaları">@if(Model.Page > 1){<a asp-action="Details" asp-route-id="@Model.Message.Id" asp-route-page="@(Model.Page - 1)">← Önceki</a>}<span>@Model.Page / @((Model.TotalReplies + 19) / 20)</span>@if(Model.Page * 20 < Model.TotalReplies){<a asp-action="Details" asp-route-id="@Model.Message.Id" asp-route-page="@(Model.Page + 1)">Sonraki →</a>}</nav>}
 </section>

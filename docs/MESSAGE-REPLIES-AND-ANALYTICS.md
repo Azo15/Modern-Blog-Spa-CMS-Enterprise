@@ -31,3 +31,11 @@ Both Admin and Staff use the same AdminDashboard view and charts. Numeric fallba
 ## Verification
 
 Release solution builds and relevant tests were run before each of the five commits. Tests cover schema uniqueness/retention, SQL Server snapshot consistency, manager/customer authorization, CSRF, immutable recipients, duplicate submit handling, queue failure recovery, SMTP retry/success marking, encoded email/history content, bot/path filtering, daily hash rotation, timezone boundaries, idempotent aggregation, retained totals, chart data and failed AJAX submissions. Full .NET and JavaScript suites are run again for the final integration.
+
+## SMTP delivery troubleshooting
+
+New replies require complete, decryptable SMTP settings before they are stored or queued; an invalid setup returns a validation error and the AJAX draft remains intact. This preflight checks configuration only, not connectivity or Gmail acceptance. Existing failed replies show a safe explanation from the first failed attempt rather than remaining labeled as waiting. No raw exception messages or credentials are exposed.
+
+For Gmail use smtp.gmail.com, port 587 with STARTTLS, the full Gmail address as username/sender, and a Google app password with 2-Step Verification enabled. Enter credentials directly in the SMTP settings screen, never in source control or chat. Environment Smtp settings override saved database settings. When using database-protected credentials, configure DataProtection:KeysPath to a persistent private directory outside wwwroot so an application restart does not invalidate the encrypted password.
+
+After correcting settings, open the specific existing failed ContactReplyEmailJob in Background Jobs and requeue that job once. Do not create duplicate replies or bulk resend old jobs. The job checks IsMailSent and uses a lease to avoid normal duplicate execution. SMTP acceptance is distinct from actual inbox delivery; inspect spam/quota/provider results if acceptance succeeds but no message arrives.

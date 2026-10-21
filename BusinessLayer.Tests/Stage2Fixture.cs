@@ -25,6 +25,7 @@ internal sealed class Stage2Fixture : IDisposable
     public TestUser User { get; } = new();
     public Mock<ICacheService> Cache { get; } = new();
     public Mock<IManagerNotifier> Notifier { get; } = new();
+    public Mock<IContactReplyMailService> ReplyMail { get; } = new();
     public Mock<IContactReplyQueue> ReplyQueue { get; } = new();
     public sealed class TestUser : ICurrentUserService
     {
@@ -45,6 +46,8 @@ internal sealed class Stage2Fixture : IDisposable
         services.AddSingleton(Notifier.Object);
         ReplyQueue.Setup(q => q.Enqueue(It.IsAny<int>())).Returns("test-reply-job");
         services.AddSingleton(ReplyQueue.Object);
+        ReplyMail.Setup(m => m.EnsureConfiguredAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        services.AddSingleton(ReplyMail.Object);
         if (mockCache)
         {
             Cache.Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);

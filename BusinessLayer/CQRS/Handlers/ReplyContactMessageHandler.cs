@@ -15,7 +15,7 @@ namespace BusinessLayer.CQRS.Handlers;
 
 public sealed class ReplyContactMessageHandler(AppDbContext db, ICurrentUserService current,
     IActiveMemberService members, IAuthorizationService authorization, IContactReplyQueue queue,
-    ILogger<ReplyContactMessageHandler> logger) : IRequestHandler<ReplyContactMessageCommand, ContactReplyResult>
+    ILogger<ReplyContactMessageHandler> logger, IContactReplyMailService mail) : IRequestHandler<ReplyContactMessageCommand, ContactReplyResult>
 {
     public async Task<ContactReplyResult> Handle(ReplyContactMessageCommand request, CancellationToken ct)
     {
@@ -27,6 +27,9 @@ public sealed class ReplyContactMessageHandler(AppDbContext db, ICurrentUserServ
             throw new FluentValidation.ValidationException("Mesajın e-posta adresi geçersiz; yanıt gönderilemez.");
         var existing = await db.ContactReplies.SingleOrDefaultAsync(x => x.ClientRequestId == request.ClientRequestId, ct);
         if (existing is not null) return CheckRetry(existing, request, userId);
+        try { await mail.EnsureConfiguredAsync(ct); }
+        catch (BusinessLayer.Concrete.SmtpConfigurationException error)
+        { throw new FluentValidation.ValidationException(error.Message); }
         var user = await db.Users.AsNoTracking().SingleAsync(x => x.Id == userId, ct);
         var name = $"{user.FirstName} {user.LastName}".Trim();
         var reply = new ContactReply { ContactFormId = message.Id, ReplyMessage = request.ReplyMessage.Trim(),

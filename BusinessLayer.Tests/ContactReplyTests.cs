@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using BusinessLayer.CQRS.Commands;
@@ -56,6 +57,45 @@ public sealed class ContactReplyTests
         mail.Setup(m => m.SendAsync(It.IsAny<ContactReply>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         await job.SendAsync(result.Id, default); await job.SendAsync(result.Id, default); f.Db.ChangeTracker.Clear();
         Assert.True((await f.Db.ContactReplies.SingleAsync()).IsMailSent); mail.Verify(m => m.SendAsync(It.IsAny<ContactReply>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+    [Fact]
+    public async Task MissingSmtpDoesNotCreateReplyOrMarkMessageReplied()
+    {
+        using var f = new Stage2Fixture(); f.As(AppRoles.Admin); var message = await Message(f);
+        f.ReplyMail.Setup(m => m.EnsureConfiguredAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new SmtpConfigurationException("SMTP ayarları eksik."));
+        await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => f.Sender.Send(new ReplyContactMessageCommand(message.Id, "Keep my draft", Guid.NewGuid())));
+        f.Db.ChangeTracker.Clear();
+        Assert.Empty(await f.Db.ContactReplies.ToListAsync());
+        Assert.False((await f.Db.ContactForms.SingleAsync()).IsReplied);
+        f.ReplyQueue.Verify(q => q.Enqueue(It.IsAny<int>()), Times.Never);
+    }
+    [Theory]
+    [InlineData(null, 0, false, "kuyruğunda")]
+    [InlineData("InvalidOperationException", 1, false, "SMTP ayarlarını")]
+    [InlineData("AuthenticationException", 1, false, "uygulama şifresini")]
+    [InlineData("CryptographicException", 1, false, "okunamıyor")]
+    [InlineData("IOException", 4, false, "başarısız")]
+    [InlineData("AuthenticationException", 4, true, "SMTP sunucusuna iletildi")]
+    public void DeliveryStatusDistinguishesFailureFromPendingAndSent(string? error, int attempts, bool sent, string expected)
+    {
+        var reply = new BusinessLayer.Dtos.ContactReplyDto(1, "Hello", "Admin", DateTime.UtcNow, sent, attempts, error);
+        Assert.Contains(expected, reply.DeliveryStatus);
+        Assert.DoesNotContain(error ?? "private-secret", reply.DeliveryStatus);
+    }
+    [Fact]
+    public async Task SmtpPreflightUsesEffectiveSettingsWithoutSendingMail()
+    {
+        using var f = new Stage2Fixture();
+        var settings = new Mock<ISiteTableService>(); settings.Setup(x => x.GetQueryable()).Returns(f.Db.SiteTables);
+        var missing = new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build();
+        await Assert.ThrowsAsync<SmtpConfigurationException>(() => new ContactReplyMailService(settings.Object, missing).EnsureConfiguredAsync(default));
+        var values = new Dictionary<string, string?> { ["Smtp:Host"] = "smtp.gmail.com", ["Smtp:Port"] = "587", ["Smtp:Username"] = "sender@example.test", ["Smtp:SenderEmail"] = "sender@example.test", ["Smtp:Password"] = "test-only-not-a-real-password" };
+        var valid = new Microsoft.Extensions.Configuration.ConfigurationBuilder().AddInMemoryCollection(values).Build();
+        await new ContactReplyMailService(settings.Object, valid).EnsureConfiguredAsync(default);
+        values["Smtp:Port"] = "25";
+        var invalid = new Microsoft.Extensions.Configuration.ConfigurationBuilder().AddInMemoryCollection(values).Build();
+        await Assert.ThrowsAsync<SmtpConfigurationException>(() => new ContactReplyMailService(settings.Object, invalid).EnsureConfiguredAsync(default));
     }
     [Fact]
     public void EmailTemplateEncodesReplyAndSendsOnlyToMessageRecipient()

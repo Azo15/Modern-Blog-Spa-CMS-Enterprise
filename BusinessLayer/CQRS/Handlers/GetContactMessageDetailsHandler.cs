@@ -20,7 +20,7 @@ public sealed class GetContactMessageDetailsHandler(AppDbContext db, ICurrentUse
         var replies = db.ContactReplies.AsNoTracking().Where(x => x.ContactFormId == request.Id);
         var count = await replies.CountAsync(ct); var page = Math.Clamp(request.Page, 1, Math.Max(1, (count + 19) / 20));
         var items = await replies.OrderByDescending(x => x.RepliedAt).ThenByDescending(x => x.Id).Skip((page - 1) * 20).Take(20)
-            .Select(x => new ContactReplyDto(x.Id, x.ReplyMessage, x.RepliedByUserName, x.RepliedAt, x.IsMailSent, x.AttemptCount)).ToListAsync(ct);
+            .Select(x => new ContactReplyDto(x.Id, x.ReplyMessage, x.RepliedByUserName, x.RepliedAt, x.IsMailSent, x.AttemptCount, x.LastError)).ToListAsync(ct);
         return new(message, items, page, count);
     }
 }
