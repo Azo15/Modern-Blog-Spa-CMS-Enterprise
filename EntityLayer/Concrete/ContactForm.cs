@@ -6,6 +6,8 @@ namespace EntityLayer.Concrete
     public class ContactForm : BaseEntity
     {
         public bool IsRead { get; set; }
+        public bool IsReplied { get; set; }
+        public DateTime? LastRepliedAt { get; set; }
         [Display(Name = "Adınız Soyadınız")]
         public string? FullName { get; set; }
 

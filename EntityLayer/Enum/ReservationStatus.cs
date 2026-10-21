@@ -20,7 +20,10 @@
         MusteriOnayladi = 4,      // Müşteri aracı onayladı, artık yolda
 
         [Display(Name = "Araç Teslim Edildi")]
-        AracTeslimEdildi = 5      // Araç teslim edildi
+        AracTeslimEdildi = 5,     // Araç teslim edildi
+
+        [Display(Name = "Yanıtlandı")]
+        Replied = 6
     }
 
 }

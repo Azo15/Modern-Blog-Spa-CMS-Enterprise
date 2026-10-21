@@ -23,6 +23,9 @@ namespace DataAccesLayer.Concrete
         public DbSet<Service> Services { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ContactForm> ContactForms { get; set; }
+        public DbSet<ContactReply> ContactReplies { get; set; }
+        public DbSet<DailyVisitorStat> DailyVisitorStats { get; set; }
+        public DbSet<VisitorLog> VisitorLogs { get; set; }
         public DbSet<Galary> Galaries { get; set; }
         public DbSet<SiteTable> SiteTables { get; set; }
         public DbSet<Comment> Comments { get; set; }
