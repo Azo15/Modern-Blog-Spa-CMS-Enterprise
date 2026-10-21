@@ -1,10 +1,26 @@
 @model WebUI.Models.SmtpSettingsForm
 @{ Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "SMTP Yönetimi"; }
-<style>.smtp-panel{max-width:900px;margin:auto;background:#10291f;color:#f5efdd;border:1px solid #aa8756;border-radius:18px;padding:clamp(20px,4vw,48px)}.smtp-panel h1{color:#d6b66c}.smtp-panel label{display:block;margin:18px 0 8px}.smtp-panel input,.smtp-panel select{background:#081c15;color:#fff;border:1px solid #887346;width:100%;padding:12px;border-radius:8px}.smtp-panel button{background:#d6b66c;color:#10291f;padding:12px 24px;border:0;border-radius:8px;margin-top:24px}.smtp-panel .field-validation-error{color:#ffd09e}.smtp-panel small{color:#d1c7ac}</style>
+<style>
+/* This panel stays dark in both admin themes; keep inherited theme text readable. */
+.xspa-admin .smtp-panel{--xa-text:#f5efdd;--xa-muted:#d1c7ac;--xa-gold:#e4c77e;max-width:900px;margin:auto;background:#10291f;color:var(--xa-text);border:1px solid #aa8756;border-radius:18px;padding:clamp(20px,4vw,48px);color-scheme:dark}
+.xspa-admin .smtp-panel :is(h1,h2){color:#e4c77e}
+.xspa-admin .smtp-panel label{display:block;margin:18px 0 8px;color:#f5efdd;font-weight:600}
+.xspa-admin .smtp-panel :is(p,strong){color:#f5efdd}
+.xspa-admin .smtp-panel :is(input,select){background:#081c15;color:#fff;border:1px solid #aa8756;width:100%;padding:12px;border-radius:8px}
+.xspa-admin .smtp-panel input::placeholder{color:#c9c3b3;opacity:1}
+.xspa-admin .smtp-panel :is(input,select,button,a):focus-visible{outline:2px solid #f0d58d;outline-offset:3px}
+.xspa-admin .smtp-panel button{background:#d6b66c;color:#10291f;padding:12px 24px;border:1px solid #d6b66c;border-radius:8px;margin-top:24px;transition:background .2s,box-shadow .2s}
+.xspa-admin .smtp-panel button:hover:not(:disabled){background:#ead196;box-shadow:0 5px 18px #0003}
+.xspa-admin .smtp-panel button:disabled{opacity:.65;cursor:wait}
+.xspa-admin .smtp-panel :is(.field-validation-error,.validation-summary-errors){color:#ffd09e}
+.xspa-admin .smtp-panel small{color:#d1c7ac!important}
+.xspa-admin .smtp-panel a{color:#f0d58d;text-decoration:underline;text-underline-offset:3px}
+.xspa-admin .smtp-panel a:hover{color:#fff0bc}
+</style>
 <section class="smtp-panel"><span>XSPA · SİSTEM YÖNETİMİ</span><h1>E-posta &amp; SMTP</h1><p>Şifreli bağlantı ile güvenli teslimat. Ortam değişkenleri kayıtlı ayarların önüne geçer.</p>
 @if(TempData["SmtpStatus"] is string status){<p role="status">@status</p>}
 <form asp-action="Smtp" method="post"><div asp-validation-summary="All" role="alert"></div>
-<label asp-for="Host">SMTP Sunucusu</label><input asp-for="Host" autocomplete="off" placeholder="smtp.example.com" /><span asp-validation-for="Host"></span>
+<label asp-for="Host">SMTP Sunucusu</label><input asp-for="Host" autocomplete="off" placeholder="smtp.gmail.com" aria-describedby="smtp-host-help" /><span asp-validation-for="Host"></span><small id="smtp-host-help" class="d-block mt-1">Gmail için smtp.gmail.com yazın; buraya e-posta adresi yazılmaz.</small>
 <div class="row"><div class="col-md-6"><label asp-for="Port">Güvenli Port</label><select asp-for="Port"><option value="587">587 · STARTTLS</option><option value="465">465 · TLS</option></select></div><div class="col-md-6"><label asp-for="Username">Kullanıcı Adı</label><input asp-for="Username" autocomplete="off" /></div></div>
 <label asp-for="Mail">Gönderen E-posta</label><input asp-for="Mail" type="email" autocomplete="off" />
 <label asp-for="Password">SMTP Şifresi</label><input asp-for="Password" type="password" autocomplete="new-password" value="" /><small>@(Model.HasPassword ? "Parola kayıtlı. Değiştirmek istemiyorsanız boş bırakın." : "İlk kurulum için parola girin.") Parola tekrar görüntülenmez.</small>
