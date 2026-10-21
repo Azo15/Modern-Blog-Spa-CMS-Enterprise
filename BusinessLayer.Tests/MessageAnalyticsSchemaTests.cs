@@ -6,6 +6,13 @@ namespace BusinessLayer.Tests;
 public sealed class MessageAnalyticsSchemaTests
 {
     [Fact]
+    public void SqlServerMigrationSnapshotMatchesCurrentModel()
+    {
+        using var db = new DataAccesLayer.Concrete.AppDbContext(new DbContextOptionsBuilder<DataAccesLayer.Concrete.AppDbContext>()
+            .UseSqlServer("Server=localhost;Database=SchemaOnly;Integrated Security=true;TrustServerCertificate=true").Options);
+        Assert.False(db.Database.HasPendingModelChanges());
+    }
+    [Fact]
     public async Task ReplyHistorySurvivesSoftDeletionAndDuplicateRequestIsRejected()
     {
         using var f = new Stage2Fixture();

@@ -2,6 +2,7 @@
 @model BusinessLayer.Dtos.AdminDashboardDto
 @{ Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "XSPA Yönetim Özeti"; }
 <section class="xspa-dashboard"><header><span>XSPA · İŞLETME ÖZETİ</span><h1>Bugünün ritmi</h1><p>Türkiye saatine göre güncel randevu ve hizmet görünümü.</p></header>
+<partial name="_VisitorAnalytics" model="Model.Analytics" />
 <div class="card p-4 my-4"><h2 class="h5">Bu ay tahmini hizmet bedeli</h2><strong>@Model.EstimatedMonthlyRevenue.ToString("N2") ₺</strong><p>Onaylı randevular × güncel hizmet tarifesi. Tahsilat veya muhasebe raporu değildir.</p><span>@Model.Customers farklı müşteri · @Model.Guests toplam misafir</span></div>
 @if(Model.Pending > 0){<a class="alert alert-warning d-flex justify-content-between align-items-center" asp-controller="AdminAppointment" asp-action="Index" asp-route-status="Pending"><strong>@Model.Pending Adet Yeni Randevu Onay Bekliyor</strong><span>İncelemek için tıklayın →</span></a>}
 <div class="dashboard-metrics">

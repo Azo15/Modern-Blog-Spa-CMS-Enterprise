@@ -1,52 +1,73 @@
 using BusinessLayer.Abstract;
-using EntityLayer.Enum;
+using BusinessLayer.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebUI.Models;
+using Microsoft.EntityFrameworkCore;
+using MediatR;
+using BusinessLayer.CQRS.Commands;
+using BusinessLayer.CQRS.Queries;
+using WebUI.Infrastructure;
 
 namespace WebUI.Controllers
 {
-    [Authorize(Policy = "RequireModerator")]
+    [Authorize(Policy = AccessPolicies.AccountModerator)]
     public class AdminMessageController : BaseController
     {
         private readonly IContactFormService _contactFormService;
+        private readonly ISender _sender;
 
-        public AdminMessageController(IContactFormService contactFormService)
+        public AdminMessageController(IContactFormService contactFormService, ISender sender)
         {
             _contactFormService = contactFormService;
+            _sender = sender;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var data = await _contactFormService.GetListAsync(
-                filter: x => x.Status == ReservationStatus.SoforBeklemede,
-                orderBy: x => x.OrderByDescending(a => a.CreatedDate)
-            );
-
-            ViewBag.Count = data.Count();
-
+            var query = _contactFormService.GetQueryable().AsNoTracking();
+            var count = await query.CountAsync(HttpContext.RequestAborted);
+            page = Math.Clamp(page, 1, Math.Max(1, (count + 49) / 50));
+            var data = await query.OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.Id).Skip((page - 1) * 50).Take(50).ToListAsync(HttpContext.RequestAborted);
+            ViewBag.Count = count; ViewBag.Page = page; ViewBag.Pages = Math.Max(1, (count + 49) / 50);
             return View(data);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> Details(int id, int page = 1)
         {
-            if (id <= 0)
-            {
-                return NotFound("Geçersiz ID.");
-            }
-
-            var contactForm = await _contactFormService.GetByIDAsync(id);
-
-            if (contactForm == null)
-            {
-                return NotFound("İlgili kayıt bulunamadı.");
-            }
-
-            return View(contactForm);
+            var model = await _sender.Send(new GetContactMessageDetailsQuery(id, page), HttpContext.RequestAborted);
+            return model is null ? NotFound() : View(model);
         }
 
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ReplyHistory(int id, int page = 1)
+        {
+            var model = await _sender.Send(new GetContactMessageDetailsQuery(id, page), HttpContext.RequestAborted);
+            return model is null ? NotFound() : PartialView("_ReplyHistory", model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(32768)]
+        public async Task<IActionResult> Reply(int id, string? replyMessage, Guid clientRequestId)
+        {
+            try
+            {
+                if (!ModelState.IsValid) throw new FluentValidation.ValidationException("Yanıt bilgileri geçersiz.");
+                var result = await _sender.Send(new ReplyContactMessageCommand(id, replyMessage ?? "", clientRequestId), HttpContext.RequestAborted);
+                var message = result.Queued ? "Yanıt kaydedildi ve e-posta kuyruğuna alındı." : "Yanıt kaydedildi. E-posta kuyruğu geçici olarak erişilemiyor; otomatik yeniden denenecek.";
+                if (Request.WantsJson()) return Json(new { success = true, message, replyId = result.Id, nextRequestId = Guid.NewGuid() });
+                TempData["ReplyNotice"] = message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+            catch (FluentValidation.ValidationException error)
+            {
+                if (Request.WantsJson()) return BadRequest(new { success = false, message = error.Message });
+                ModelState.AddModelError("replyMessage", error.Message); ViewData["ReplyDraft"] = replyMessage;
+                return await Details(id);
+            }
+        }
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkRead(int id)
         {
@@ -54,61 +75,9 @@ namespace WebUI.Controllers
             if (message is null) return NotFound();
             message.IsRead = true;
             await _contactFormService.UpdateAsync(message);
+            if (Request.WantsJson()) return Json(new { success = true, message = "Mesaj okundu olarak işaretlendi." });
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null || id <= 0)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var data = await _contactFormService.GetByIDAsync(id.Value);
-
-        //    if (data == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var vm = new GenericDeleteViewModel
-        //    {
-        //        Id = data.Id,
-        //        Title = data.Title,
-        //        SubHeading = data.Descriptions,
-        //        Icon = "Gelen Mail"
-        //    };
-
-        //    return View("Views/Shared/Delete.cshtml", vm);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int? id)
-        //{
-        //    if (id == null || id <= 0)
-        //    {
-        //        return NotFound("ID bulunamadı");
-        //    }
-
-        //    var data = await _messageService.GetByIDAsync(id.Value);
-
-        //    if (data == null)
-        //    {
-        //        return NotFound("Veri bulunamadı");
-        //    }
-
-        //    var result = await _messageService.DeleteAsync(id.Value);
-
-        //    if (!result)
-        //    {
-        //        SetToastMessage("Silme işleminde bir sorun oldu!", "error");
-        //        return View(data);
-        //    }
-
-        //    SetToastMessage("Mail Kayıdı başarıyla silindi", "success");
-        //    return RedirectToAction(nameof(Index));
-        //}
     }
 }

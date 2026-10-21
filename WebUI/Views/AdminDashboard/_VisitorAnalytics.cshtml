@@ -1,0 +1,18 @@
+@model BusinessLayer.Dtos.VisitorDashboardDto
+<section aria-labelledby="visitor-heading" class="visitor-analytics">
+    <div class="d-flex justify-content-between flex-wrap gap-3 mt-4"><h2 id="visitor-heading" class="h4">Dijital misafir deneyimi</h2><span class="small">Türkiye saati · Yaklaşık günlük tekil ölçüm</span></div>
+    <div class="dashboard-metrics">
+        <article><span>Bugünkü ziyaretçiler</span><strong>@Model.TodayUniqueVisitors.ToString("N0")</strong><small>Dün: @Model.YesterdayUniqueVisitors.ToString("N0") · @(Model.UniqueVisitorChangePercent.HasValue ? Model.UniqueVisitorChangePercent.Value.ToString("+0.#;-0.#;0") + "%" : "İlk ziyaretler")</small></article>
+        <article><span>Sayfa görüntüleme</span><strong>@Model.TodayPageViews.ToString("N0")</strong><small>Bugün · Toplam @Model.TotalPageViews.ToString("N0")</small></article>
+        <article><span>Mesaj yanıtlama oranı</span><strong>%@Model.MessageReplyRate.ToString("0.#")</strong><small>@Model.RepliedMessages / @Model.TotalMessages mesaj · Kayıtlı yanıtlar</small></article>
+        <article><span>Randevu talep / ziyaretçi</span><strong>%@Model.AppointmentConversionRate.ToString("0.#")</strong><small>Bugün @Model.TodayAppointmentRequests talep</small></article>
+    </div>
+    <div class="visitor-chart-grid">
+        <section class="card p-4"><h3 class="h5">Son 14 gün · Ziyaretçi trendi</h3><p class="small">Günlük yaklaşık tekil ziyaretçi sayısı</p><div class="dashboard-chart"><canvas id="visitor-trend" role="img" aria-label="Son 14 günlük tekil ziyaretçi trendi"></canvas></div><details><summary>Grafiğin sayısal verileri</summary><ul>@foreach(var day in Model.Trend){<li>@day.Date: @day.Count</li>}</ul></details></section>
+        <section class="card p-4"><h3 class="h5">Cihaz dağılımı</h3><p class="small">Bugünkü sayfa görüntülemeleri</p>@if(Model.MobileVisits + Model.DesktopVisits == 0){<p class="visitor-empty">İlk ziyaretlerinizle cihaz dağılımı burada oluşacak.</p>}else{<div class="dashboard-chart"><canvas id="visitor-devices" role="img" aria-label="Mobil ve masaüstü görüntüleme oranları"></canvas></div>}<p class="mt-3 small">Mobil: @Model.MobileVisits (%@Model.MobilePercent.ToString("0.#")) · Masaüstü: @Model.DesktopVisits (%@Model.DesktopPercent.ToString("0.#"))</p></section>
+    </div>
+    <section class="card p-4 mt-4"><h3 class="h5">En çok ziyaret edilen 5 sayfa</h3><p class="small">Son 14 gün · Sayfa görüntüleme</p>@if(Model.TopPages.Count == 0){<p class="visitor-empty">Henüz görüntüleme kaydı yok. Bu ölçümler takip sistemi yayına alındıktan sonra oluşur.</p>}else{<ol class="visitor-top-pages">@foreach(var entry in Model.TopPages){<li><span>@entry.Path</span><strong>@entry.Count.ToString("N0")</strong></li>}</ol>}</section>
+    <details class="small mt-3"><summary>Bu ölçümler nasıl hesaplanıyor?</summary><p class="mt-2">Ham IP veya tam tarayıcı bilgisi saklanmaz. Tekillik, sunucu sırrıyla günlük değişen IP özeti üzerinden yaklaşık ölçülür; ortak ağlar birleştirilebilir. Bot, admin, API ve asenkron bölüm istekleri sayılmaz. Ham görüntüleme kayıtları 30 gün tutulur, günlük özetler korunur. Randevu oranı, bugünkü taleplerin tekil ölçüme oranıdır; aynı ziyaretçi birden fazla talep oluşturabilir. Yanıtlama oranı, kayıtlı yanıtları ölçer; e-posta teslimat oranı değildir.</p></details>
+    <script type="application/json" id="visitor-trend-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Trend))</script>
+    <script type="application/json" id="visitor-device-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new[] { Model.MobileVisits, Model.DesktopVisits }))</script>
+</section>

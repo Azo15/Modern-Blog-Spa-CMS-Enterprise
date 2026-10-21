@@ -36,7 +36,7 @@
                     <th>
                         @L["DateUtc"]
                     </th>
-                    <th>@L["Actions"]</th>
+                    <th>Yanıt durumu</th><th>@L["Actions"]</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -48,6 +48,7 @@
                         <td>@item.Email</td>
                         <td>@item.Subject</td>
                         <td>@item.CreatedDate.ToString("dd MMMM yyyy HH:mm")</td>
+                        <td><span class="badge @(item.IsReplied ? "bg-label-success" : "bg-label-warning")">@(item.IsReplied ? "Yanıtlandı" : "Yanıt bekliyor")</span></td>
                         <td>
                             <div class="dropdown">
                                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -68,6 +69,7 @@
         <hr class="mt-0" />
         <div class="px-5">
             <p><small>Tabloda</small><span class="mx-2">@ViewBag.Count</span><small>adet veri var</small></p>
+            <nav class="d-flex gap-3 pb-3" aria-label="Mesaj sayfaları">@if(ViewBag.Page > 1){<a asp-action="Index" asp-route-page="@(ViewBag.Page - 1)">← Önceki</a>}<span>@ViewBag.Page / @ViewBag.Pages</span>@if(ViewBag.Page < ViewBag.Pages){<a asp-action="Index" asp-route-page="@(ViewBag.Page + 1)">Sonraki →</a>}</nav>
         </div>
     </div>
 </div>

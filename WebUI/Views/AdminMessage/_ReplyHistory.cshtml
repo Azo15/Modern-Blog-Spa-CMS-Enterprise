@@ -1,0 +1,11 @@
+@model BusinessLayer.Dtos.ContactMessageDetailsDto
+<section id="contact-reply-history" data-pending-mail="@(Model.Replies.Any(x => !x.IsMailSent && x.AttemptCount < 4) ? "true" : "false")" aria-label="Önceki yanıtlar">
+    <h2 class="h4">Önceki yanıtlar <small class="text-muted">(@Model.TotalReplies)</small></h2>
+    @if(Model.Replies.Count == 0){<div class="card p-4 text-muted">Henüz yanıt yazılmadı. Misafirinize ilk notunuzu aşağıdan iletebilirsiniz.</div>}
+    @foreach(var reply in Model.Replies)
+    {
+        var utc = DateTime.SpecifyKind(reply.RepliedAt, DateTimeKind.Utc);
+        <article class="card p-4 mb-3 reply-history-card" data-reply-id="@reply.Id"><header class="d-flex justify-content-between flex-wrap gap-2"><strong>@reply.RepliedByUserName</strong><time datetime="@utc.ToString("O")" class="small text-muted">@TimeZoneInfo.ConvertTimeFromUtc(utc, BusinessLayer.Concrete.VisitorAnalyticsCalendar.TimeZone).ToString("dd.MM.yyyy HH:mm") · Türkiye saati</time></header><p class="reply-body mt-3">@reply.ReplyMessage</p><span class="badge @(reply.IsMailSent ? "bg-label-success" : reply.AttemptCount >= 4 ? "bg-label-danger" : "bg-label-warning")">@(reply.IsMailSent ? "E-posta SMTP sunucusuna iletildi" : reply.AttemptCount >= 4 ? "Teslimat başarısız — SMTP / Hangfire kontrolü gerekli" : "E-posta teslimatı bekleniyor")</span></article>
+    }
+    @if(Model.TotalReplies > 20){<nav class="d-flex gap-3" aria-label="Yanıt geçmişi sayfaları">@if(Model.Page > 1){<a asp-action="Details" asp-route-id="@Model.Message.Id" asp-route-page="@(Model.Page - 1)">← Önceki</a>}<span>@Model.Page / @((Model.TotalReplies + 19) / 20)</span>@if(Model.Page * 20 < Model.TotalReplies){<a asp-action="Details" asp-route-id="@Model.Message.Id" asp-route-page="@(Model.Page + 1)">Sonraki →</a>}</nav>}
+</section>

@@ -1,97 +1,26 @@
-@using EntityLayer.Enum
-@model ContactForm
-
-@{
-    ViewData["Title"] = L["Rezervasyon Detayı"];
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
-}
-
-@section Styles {
-    <link href="~/css/rezervationTime.css" rel="stylesheet" />
-}
-
-<div class="card">
-    <div class="card-header d-md-flex justify-content-between align-items-center">
-        <h5 class="mb-0">@ViewData["Title"]</h5>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-            <i class="fa-solid fa-arrow-left me-2"></i> @L["Geri Dön"]
-        </a>
+@model BusinessLayer.Dtos.ContactMessageDetailsDto
+@{ ViewData["Title"] = "Mesaj Detayı ve Yanıtlar"; Layout = "~/Views/Shared/_AdminLayout.cshtml"; }
+@section Styles { <link rel="stylesheet" href="~/css/message-replies.css" asp-append-version="true" /> }
+<section class="xspa-message-detail">
+    <header class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4"><div><span class="text-muted">XSPA · MİSAFİR İLETİŞİMİ</span><h1 class="h3 mt-2">Mesajınız, özenli bir yanıt.</h1></div><a asp-action="Index" class="btn btn-outline-secondary">← Gelen mesajlar</a></header>
+    @if (TempData["ReplyNotice"] is string notice) { <div class="alert alert-success" role="status">@notice</div> }
+    <div class="card p-4 mb-4"><div class="d-flex justify-content-between gap-3 flex-wrap"><div><h2 class="h5">@Model.Message.Subject</h2><p>@Model.Message.FullName · @Model.Message.Email</p></div><span class="badge @(Model.Message.IsReplied ? "bg-label-success" : "bg-label-warning")" data-message-reply-status>@(Model.Message.IsReplied ? "Yanıtlandı" : "Yanıt bekliyor")</span></div>
+        <p class="small text-muted">@Model.Message.CreatedDate.ToString("dd.MM.yyyy HH:mm") UTC @if(!string.IsNullOrWhiteSpace(Model.Message.Phone)){<span>· @Model.Message.Phone</span>}</p>
+        <p class="message-original">@Model.Message.Message</p>
+        @if(!Model.Message.IsRead){<form asp-action="MarkRead" method="post" data-mark-read><input type="hidden" name="id" value="@Model.Message.Id" /><button class="btn btn-outline-secondary" type="submit">Okundu olarak işaretle</button><p role="status"></p></form>}
     </div>
-
-    <div class="card-body">
-        <div class="mb-3 d-md-flex justify-content-between">
-            <div class="mb-2">
-                <strong>Gönderen:</strong> @Model.FullName &lt;@Model.Email&gt;
-            </div>
-            <div>
-                <strong>Tarih:</strong> @Model.CreatedDate.ToString("dd MMMM yyyy HH:mm")
-            </div>
-        </div>
-
-
-        @* <div class="mb-3">
-            <strong>Durumu:</strong>
-            @switch (Model.Status)
-            {
-                case ReservationStatus.SoforBeklemede:
-                    <span class="badge bg-warning text-dark">Şoför Beklemede</span>
-                    break;
-                case ReservationStatus.SoforYolda:
-                    <span class="badge bg-primary">Admin Onaylı</span>
-                    break;
-                case ReservationStatus.SoforAraciAldi:
-                    <span class="badge bg-info text-dark">Şoför Yolda</span>
-                    break;
-                case ReservationStatus.MusteriOnayBeklemede:
-                    <span class="badge bg-secondary">Müşteri Onay Bekliyor</span>
-                    break;
-                case ReservationStatus.MusteriOnayladi:
-                    <span class="badge bg-success">Onaylandı</span>
-                    break;
-            }
-        </div> *@
-
-        @* <div>
-            <strong>Bekleme Süresi:</strong>
-            <table class="mb-3 mt-1">
-                <tbody>
-                    <tr>
-                        <td data-created-date="@Model.CreatedDate.ToString("o")">
-                            @* ISO 8601 formatında tarih 
-                            <div class="reservation-timer-container">
-                                <div class="reservation-timer-progress" style="width: 0%; background-position: 0%;"></div>
-                                <span class="reservation-timer-text">Yükleniyor...</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div> *@
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <strong>Konu:</strong>
-                    <input type="text" class="form-control" value="@Model.Subject" readonly />
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <strong>Telefon:</strong>
-                    <input type="text" class="form-control" value="@Model.Phone" readonly />
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <strong>Mesaj:</strong>
-                <textarea class="form-control" rows="10" readonly>@Model.Message</textarea>
-            </div>
-        </div>
+    <partial name="_ReplyHistory" model="Model" />
+    <div class="card p-4 mt-4"><h2 class="h4">Yanıt yaz</h2><p class="text-muted">Alıcı: <strong>@Model.Message.Email</strong>. Yanıt kaydedildikten sonra e-posta arka planda gönderilir.</p>
+        <form asp-action="Reply" method="post" data-message-reply data-history-url="@Url.Action("ReplyHistory", new { id = Model.Message.Id })">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <input type="hidden" name="id" value="@Model.Message.Id" /><input type="hidden" name="clientRequestId" value="@Guid.NewGuid()" />
+            <label for="reply-template" class="form-label">Şablon seçimi <span class="text-muted">(isteğe bağlı)</span></label>
+            <select id="reply-template" class="form-select mb-3" data-reply-template><option value="">Kendi yanıtımı yazacağım</option><option value="Mesajınız için teşekkür ederiz. Size yardımcı olmaktan memnuniyet duyarız.">Karşılama</option><option value="Randevunuzu birlikte planlayabiliriz. Tercih ettiğiniz gün ve saat aralığını paylaşabilir misiniz?">Randevu planlama</option><option value="İlginiz için teşekkür ederiz. Sorunuzla ilgili bilgileri aşağıda paylaşıyoruz:">Bilgilendirme</option></select>
+            <label for="reply-message" class="form-label">Yanıtınız</label><textarea id="reply-message" name="replyMessage" rows="7" required maxlength="5000" class="form-control" aria-describedby="reply-help">@(ViewData["ReplyDraft"] as string ?? "")</textarea>
+            <p id="reply-help" class="small text-muted mt-2">En fazla 5000 karakter. Sağlık veya ödeme bilgisi istemeyin. Metin güvenli biçimde e-posta şablonuna yerleştirilir.</p>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-3"><span data-reply-length class="small text-muted" aria-live="polite">0 / 5000</span><button type="submit" class="btn btn-primary"><i class="fa-regular fa-paper-plane me-2" aria-hidden="true"></i>E-posta Olarak Gönder</button></div>
+            <p data-reply-result role="status" class="mt-3 mb-0"></p>
+        </form>
     </div>
-</div>
-
-@section Scripts {
-    <script src="~/js/rezervationTime.js"></script>
-}
-@if(!Model.IsRead){<form asp-action="MarkRead" method="post" class="my-3"><input type="hidden" name="id" value="@Model.Id" /><button type="submit" class="btn btn-success">Okundu Olarak İşaretle</button></form>}
+</section>
+@section Scripts { <script src="~/js/message-replies.js" asp-append-version="true"></script> }
