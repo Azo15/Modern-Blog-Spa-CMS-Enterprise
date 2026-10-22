@@ -53,6 +53,32 @@ public sealed class PasswordRecoveryTests
         Assert.DoesNotContain("secret", await response.Content.ReadAsStringAsync());
     }
     [Fact]
+    public async Task RecoveryViewsHaveCsrfAccessibleFieldsAndGenericConfirmation()
+    {
+        using var f = new PlatformWebFactory(); await f.InitializeAsync(); using var c = AjaxInteractionEndpointTests.Client(f);
+        Assert.Contains("/dashboard/sifremi-unuttum", await c.GetStringAsync("/dashboard/giris"));
+        var forgot = await c.GetStringAsync("/dashboard/sifremi-unuttum"); Assert.Contains("__RequestVerificationToken", forgot); Assert.Contains("autocomplete=\"email\"", forgot);
+        var missing = await c.GetAsync("/dashboard/sifre-sifirla"); Assert.Equal(HttpStatusCode.Redirect, missing.StatusCode);
+        var reset = await c.GetAsync("/dashboard/sifre-sifirla?userId=1&token=test");
+        Assert.Equal("no-referrer", Assert.Single(reset.Headers.GetValues("Referrer-Policy"))); Assert.True(reset.Headers.CacheControl!.NoStore);
+        var html = await reset.Content.ReadAsStringAsync(); Assert.Contains("autocomplete=\"new-password\"", html); Assert.Contains("name=\"Token\"", html);
+        var fields = new Dictionary<string,string> { ["Email"] = "missing@example.test", ["__RequestVerificationToken"] = await AjaxInteractionEndpointTests.Token(c) };
+        await c.PostAsync("/dashboard/sifremi-unuttum", new FormUrlEncodedContent(fields));
+        var notice = WebUtility.HtmlDecode(await c.GetStringAsync("/dashboard/sifremi-unuttum")); Assert.Contains("Eğer bu e-posta adresi sistemimizde kayıtlıysa", notice);
+    }
+    [Theory]
+    [InlineData("1", "not-a-token", "matching-password", "matching-password")]
+    [InlineData("not-an-id", "token", "matching-password", "matching-password")]
+    [InlineData("1", "token", "matching-password", "different-password")]
+    public async Task InvalidResetIsReadableAndDoesNotChangePassword(string id, string token, string password, string confirm)
+    {
+        using var f = new PlatformWebFactory(); await f.InitializeAsync(); using var c = AjaxInteractionEndpointTests.Client(f);
+        var fields = new Dictionary<string,string> { ["UserId"] = id, ["Token"] = token, ["Password"] = password, ["ConfirmPassword"] = confirm, ["__RequestVerificationToken"] = await AjaxInteractionEndpointTests.Token(c) };
+        var response = await c.PostAsync("/dashboard/sifre-sifirla", new FormUrlEncodedContent(fields)); Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("validation-summary-errors", await response.Content.ReadAsStringAsync());
+        using var scope = f.Services.CreateScope(); var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(); Assert.True(await users.CheckPasswordAsync((await users.FindByIdAsync("1"))!, PlatformWebFactory.Password));
+    }
+    [Fact]
     public void ResetEmailEncodesLinkAndHasOnlyIntendedRecipient()
     {
         using var mail = PasswordResetMailService.CreateMessage("owner@example.test", "https://example.test/reset?a=1&token='test'");

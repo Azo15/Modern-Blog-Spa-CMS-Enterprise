@@ -8,6 +8,7 @@
 <form method="post" id="loginForm"><div asp-validation-summary="All" role="alert"></div><input type="hidden" name="returnUrl" value="@Context.Request.Query["ReturnUrl"]" />
 <label asp-for="Email">@L["Email"]</label><input asp-for="Email" type="email" class="form-control" autocomplete="username" required /><span asp-validation-for="Email"></span>
 <label asp-for="Password">@L["Password"]</label><input asp-for="Password" type="password" class="form-control" autocomplete="current-password" required /><span asp-validation-for="Password"></span>
+<a asp-controller="Dashboard" asp-action="ForgotPassword" class="auth-forgot">@(en ? "Forgot your password?" : "Şifremi Unuttum?")</a>
 <label class="auth-check"><input asp-for="RememberMe" /> @L["RememberMe"]</label><button type="submit" id="loginBtn" class="auth-submit">@(en ? "Sign In" : "Giriş Yap") →</button>
 @if(TempData["RemainingSeconds"] is int seconds){<p class="auth-wait" role="status">@(en ? "Please wait before trying again:" : "Yeniden denemeden önce bekleyin:") <span id="auth-wait" data-seconds="@seconds">@seconds</span> @(en ? "seconds" : "saniye")</p>}
 </form>@await Html.PartialAsync("_GoogleSignIn")<a class="auth-home" href="/">← @(en ? "Return to XSPA" : "XSPA’ya dön")</a></section>

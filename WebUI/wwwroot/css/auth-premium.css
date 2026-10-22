@@ -12,3 +12,11 @@ body{background:radial-gradient(ellipse at top,#234737,#081810 75%);font-family:
 .auth-google:focus-visible{outline:3px solid #d6b66c;outline-offset:4px}
 @media(hover:hover){.auth-google:hover svg{transform:rotate(-6deg) scale(1.08)}}
 @media(prefers-reduced-motion:reduce){.auth-google,.auth-google svg{transition:none;transform:none!important}}
+
+.auth-forgot{display:block;width:fit-content;margin:12px 0 4px auto;color:#e4c77e;font-size:13px;text-underline-offset:4px;transition:color .2s ease}
+.auth-forgot:hover,.auth-home:hover{color:#fff0bc}
+.auth-forgot:focus-visible,.auth-home:focus-visible{outline:2px solid #e4c77e;outline-offset:4px;border-radius:3px}
+.xspa-auth-card .auth-recovery-note{display:block;margin-top:10px;color:#d1c7ac;font-size:13px;line-height:1.6}
+.xspa-auth-card .auth-error{color:#ffd0a9;border-left:2px solid #d6b66c;padding-left:14px}
+.auth-recovery .validation-summary-valid{display:none}
+@media(prefers-reduced-motion:reduce){.auth-forgot{transition:none}}

@@ -37,7 +37,7 @@ Google entegrasyonu `Microsoft.AspNetCore.Authentication.Google` 9.0.21 ile, yal
 
 User Secrets karşılıkları `Authentication:Google:ClientId` ve `Authentication:Google:ClientSecret` alanlarıdır. Google Cloud'da yerel yönlendirme adresi `http://localhost:5157/signin-google`; üretimde kendi HTTPS alan adınızın `/signin-google` adresini kaydedin.
 
-Akış: CSRF korumalı POST `/account/google/start` → sağlayıcı → `/signin-google` middleware → `/account/google/callback`. Yeni hesap için doğrulanmış Google e-postası, telefon ve KVKK okuma onayı gerekir; yalnızca Customer atanır. Eşleşen mevcut e-posta otomatik bağlanmaz. Bağlı hesaplarda pasiflik/kilit ve Identity oturum kontrolleri uygulanır. Harici tokenlar saklanmaz. ReturnUrl yalnızca yerel adreslere dönebilir. Anahtar yoksa sunucu hatası yerine açık bilgilendirme gösterilir.
+Akış: CSRF korumalı POST `/account/google/start` → sağlayıcı → `/signin-google` middleware → `/account/google/callback`. Yeni hesap için doğrulanmış Google e-postası, telefon ve KVKK okuma onayı gerekir; yalnızca Customer atanır. 22 Ekim güncellemesi: Google doğrulanmış e-posta sağlıyorsa eşleşen mevcut hesap otomatik bağlanır; rol ve parola korunur, pasiflik/kilit/Identity ek doğrulama kontrolleri uygulanır. Bağlı hesaplarda pasiflik/kilit ve Identity oturum kontrolleri uygulanır. Harici tokenlar saklanmaz. ReturnUrl yalnızca yerel adreslere dönebilir. Anahtar yoksa sunucu hatası yerine açık bilgilendirme gösterilir.
 
 ## Sidebar ve editör
 

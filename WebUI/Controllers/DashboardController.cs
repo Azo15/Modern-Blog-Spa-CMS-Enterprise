@@ -29,7 +29,7 @@ namespace WebUI.Controllers
         private readonly IPasswordResetMailService _resetMail;
         private readonly IConfiguration _configuration;
         private readonly ILogger<DashboardController> _logger;
-        private const string ResetNotice = "EÄŸer bu e-posta adresi sistemimizde kayÄ±tlÄ±ysa, ÅŸifre sÄ±fÄ±rlama baÄŸlantÄ±sÄ± gÃ¶nderilmiÅŸtir.";
+        private const string ResetNotice = "Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.";
 
         [AllowAnonymous, HttpGet("sifremi-unuttum"), ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
@@ -65,7 +65,7 @@ namespace WebUI.Controllers
         {
             Response.Headers["Referrer-Policy"] = "no-referrer";
             if (!int.TryParse(userId, out var id) || id <= 0 || string.IsNullOrWhiteSpace(token) || token.Length > 4096)
-            { TempData["ResetError"] = "BaÄŸlantÄ± geÃ§ersiz. Yeni bir sÄ±fÄ±rlama baÄŸlantÄ±sÄ± isteyin."; return RedirectToAction(nameof(ForgotPassword)); }
+            { TempData["ResetError"] = "Bağlantı geçersiz. Yeni bir sıfırlama bağlantısı isteyin."; return RedirectToAction(nameof(ForgotPassword)); }
             return View(new ResetPasswordViewModel { UserId = userId, Token = token });
         }
 
@@ -79,21 +79,21 @@ namespace WebUI.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString(System.Globalization.CultureInfo.InvariantCulture));
             string token;
             try { token = System.Text.Encoding.UTF8.GetString(Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlDecode(model.Token)); }
-            catch (FormatException) { ModelState.AddModelError("", "BaÄŸlantÄ± geÃ§ersiz veya sÃ¼resi dolmuÅŸ. Yeni baÄŸlantÄ± isteyin."); return View(model); }
+            catch (FormatException) { ModelState.AddModelError("", "Bağlantı geçersiz veya süresi dolmuş. Yeni bağlantı isteyin."); return View(model); }
             var result = user is { IsActive: true } ? await _userManager.ResetPasswordAsync(user, token, model.Password) : IdentityResult.Failed();
             if (!result.Succeeded)
-            { ModelState.AddModelError("", "BaÄŸlantÄ± geÃ§ersiz veya sÃ¼resi dolmuÅŸ; yeni baÄŸlantÄ± isteyin ve parola kurallarÄ±nÄ± kontrol edin."); return View(model); }
+            { ModelState.AddModelError("", "Bağlantı geçersiz veya süresi dolmuş; yeni bağlantı isteyin ve parola kurallarını kontrol edin."); return View(model); }
             user!.FailedLoginCount = 0; user.LastFailedLogin = null; await _userManager.UpdateAsync(user);
-            TempData["AccountSuccess"] = "ParolanÄ±z yenilendi. Yeni parolanÄ±zla giriÅŸ yapabilirsiniz.";
+            TempData["AccountSuccess"] = "Parolanız yenilendi. Yeni parolanızla giriş yapabilirsiniz.";
             return RedirectToAction(nameof(SignIn));
         }
 
-        // GiriÅŸ (GET)
+        // Giriş (GET)
         [AllowAnonymous]
         [HttpGet("giris")]
         public IActionResult SignIn() => View();
 
-        // GiriÅŸ (POST)
+        // Giriş (POST)
         [AllowAnonymous]
         [HttpPost("giris")]
         [ValidateAntiForgeryToken]
@@ -125,7 +125,7 @@ namespace WebUI.Controllers
                     }
                 }
 
-                // GiriÅŸ denemesi
+                // Giriş denemesi
                 var result = await _signInManager.PasswordSignInAsync(
                     user,
                     model.Password,
@@ -142,7 +142,7 @@ namespace WebUI.Controllers
                     return await LandingPage(user);
                 }
 
-                // BaÅŸarÄ±sÄ±z giriÅŸ
+                // Başarısız giriş
                 user.FailedLoginCount++;
                 user.LastFailedLogin = now;
                 await _userManager.UpdateAsync(user);
@@ -162,7 +162,7 @@ namespace WebUI.Controllers
             ModelState.AddModelError("", _text["InvalidCredentials"]);
             return View(model);
         }
-        // KayÄ±t (GET)
+        // Kayıt (GET)
 
         [AllowAnonymous]
         [HttpGet("kayit")]
@@ -203,10 +203,10 @@ namespace WebUI.Controllers
                 if (!roleResult.Succeeded)
                 {
                     await _userManager.DeleteAsync(user);
-                    ModelState.AddModelError("", "Hesap kaydÄ± tamamlanamadÄ±. LÃ¼tfen yeniden deneyin.");
+                    ModelState.AddModelError("", "Hesap kaydı tamamlanamadı. Lütfen yeniden deneyin.");
                     return View(model);
                 }
-                TempData["AccountSuccess"] = "XSPAâ€™ya hoÅŸ geldiniz. MÃ¼ÅŸteri hesabÄ±nÄ±z hazÄ±r; giriÅŸ yapabilirsiniz.";
+                TempData["AccountSuccess"] = "XSPA’ya hoş geldiniz. Müşteri hesabınız hazır; giriş yapabilirsiniz.";
                 return RedirectToAction(nameof(SignIn));
             }
 
