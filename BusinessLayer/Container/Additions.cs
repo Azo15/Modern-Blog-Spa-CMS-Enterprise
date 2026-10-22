@@ -26,6 +26,7 @@ namespace BusinessLayer.Container
             services.AddScoped<ContactEmailRecoveryJob>();
             services.AddScoped<IContactReplyQueue, HangfireContactReplyQueue>();
             services.AddScoped<IContactReplyMailService, ContactReplyMailService>();
+            services.AddScoped<IPasswordResetMailService, PasswordResetMailService>();
             services.AddScoped<ContactReplyEmailJob>();
             services.AddScoped<ContactReplyRecoveryJob>();
             services.AddMemoryCache();

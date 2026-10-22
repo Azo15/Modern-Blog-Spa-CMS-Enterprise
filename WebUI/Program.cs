@@ -124,6 +124,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
 .AddDefaultTokenProviders(); // Şifre yenileme vb. için gerekli token sağlayıcılar
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(1));
+
 // 4.1. Harici oturum açma (Google OAuth)
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientId"]) &&
     !string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:ClientSecret"]))

@@ -16,6 +16,7 @@ namespace BusinessLayer.Tests;
 
 internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQueries = false, bool googleEnabled = false) : WebApplicationFactory<Program>
 {
+    public Mock<IPasswordResetMailService> ResetMail { get; } = new();
     private readonly SqliteConnection connection = new("Data Source=:memory:");
     public const string Password = "P@ssword123!";
     public static readonly (int Id, string Email, string Role)[] Accounts =
@@ -51,6 +52,8 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
             var replyMail = new Mock<IContactReplyMailService>();
             replyMail.Setup(m => m.EnsureConfiguredAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             services.AddSingleton(replyMail.Object);
+            ResetMail.Setup(x => x.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            services.AddSingleton(ResetMail.Object);
             services.AddSingleton(Mock.Of<IContactEmailQueue>());
             services.AddSingleton(Mock.Of<IContactReplyQueue>(q => q.Enqueue(It.IsAny<int>()) == "test-reply-job"));
             services.AddSingleton(Mock.Of<IAppointmentEmailQueue>());

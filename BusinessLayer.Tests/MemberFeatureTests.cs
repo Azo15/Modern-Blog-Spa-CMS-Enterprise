@@ -282,7 +282,7 @@ public sealed class MemberFeatureTests
             NullLogger<SignInManager<AppUser>>.Instance, Mock.Of<IAuthenticationSchemeProvider>(), Mock.Of<IUserConfirmation<AppUser>>());
         var text = new Mock<IStringLocalizer<SharedResource>>();
         text.Setup(x => x["AccountDisabled"]).Returns(new LocalizedString("AccountDisabled", "Account is disabled."));
-        var controller = new DashboardController(users.Object, signIn.Object, text.Object);
+        var controller = new DashboardController(users.Object, signIn.Object, text.Object, Mock.Of<BusinessLayer.Abstract.IPasswordResetMailService>(), new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build(), NullLogger<DashboardController>.Instance);
         Assert.IsType<ViewResult>(await controller.SignIn(new SignInViewModel { Email = user.Email, Password = "P@ssword123!" }));
         Assert.False(controller.ModelState.IsValid); Assert.Equal(2, user.FailedLoginCount);
         signIn.Verify(x => x.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);

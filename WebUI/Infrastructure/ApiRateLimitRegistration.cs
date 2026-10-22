@@ -18,6 +18,9 @@ public static class ApiRateLimitRegistration
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
+                if (HttpMethods.IsPost(context.Request.Method) && (context.Request.Path.Equals("/dashboard/sifremi-unuttum", StringComparison.OrdinalIgnoreCase) || context.Request.Path.Equals("/dashboard/sifre-sifirla", StringComparison.OrdinalIgnoreCase)))
+                    return RateLimitPartition.GetFixedWindowLimiter("password-recovery:" + context.Request.Path + ":" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
+                        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15), QueueLimit = 0, AutoReplenishment = true });
                 if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path.Equals("/randevu", StringComparison.OrdinalIgnoreCase))
                     return RateLimitPartition.GetFixedWindowLimiter("appointment:" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
                         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0, AutoReplenishment = true });
