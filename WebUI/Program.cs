@@ -150,9 +150,7 @@ builder.Services.ConfigureExternalCookie(options =>
 builder.Services.AddPlatformApi(builder.Configuration);
 builder.Services.AddPlatformRateLimiting(builder.Configuration);
 
-var keysPath = builder.Configuration["DataProtection:KeysPath"];
-var dataProtection = builder.Services.AddDataProtection().SetApplicationName("ModernBlogPlatform");
-if (!string.IsNullOrWhiteSpace(keysPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(keysPath)));
+builder.Services.AddPersistentProtection(builder.Environment, builder.Configuration);
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;

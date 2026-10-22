@@ -366,3 +366,6 @@ FodyWeavers.xsd
 
 # Local chat attachments
 /.codex-remote-attachments/
+
+# Private ASP.NET Core key ring (never publish or commit)
+.xspa-data-protection/

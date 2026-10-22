@@ -19,13 +19,16 @@ public class AdminSettingsController(ISiteTableService settings, IDataProtection
     public async Task<IActionResult> Smtp(CancellationToken token)
     {
         var row = await settings.GetQueryable().AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(token);
-        return View(new SmtpSettingsForm { Host = row?.Host ?? "", Port = int.TryParse(row?.Port, out var port) ? port : 587, Username = row?.SmtpUsername ?? row?.Mail ?? "", Mail = row?.Mail ?? "", EnableSsl = true, HasPassword = !string.IsNullOrWhiteSpace(row?.Password) });
+        return View(new SmtpSettingsForm { Host = row?.Host ?? "", Port = int.TryParse(row?.Port, out var port) ? port : 587, Username = row?.SmtpUsername ?? row?.Mail ?? "", Mail = row?.Mail ?? "", EnableSsl = true, HasPassword = !string.IsNullOrWhiteSpace(row?.Password), PasswordNeedsReplacement = string.IsNullOrWhiteSpace(configuration["Smtp:Password"]) && !string.IsNullOrWhiteSpace(row?.Password) && !SmtpSecret.CanRead(protection, row.Password) });
     }
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Smtp(SmtpSettingsForm model, CancellationToken token)
     {
         var row = await settings.GetQueryable().AsNoTracking().OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(token);
         model.HasPassword = !string.IsNullOrWhiteSpace(row?.Password);
+        model.PasswordNeedsReplacement = string.IsNullOrWhiteSpace(configuration["Smtp:Password"]) && model.HasPassword && !SmtpSecret.CanRead(protection, row?.Password);
+        if (model.PasswordNeedsReplacement && string.IsNullOrWhiteSpace(model.Password))
+            ModelState.AddModelError("", "Kayıtlı SMTP şifresi okunamıyor. Google uygulama şifresini yeniden girip kaydedin.");
         if (!model.HasPassword && string.IsNullOrWhiteSpace(model.Password)) ModelState.AddModelError(nameof(model.Password), "İlk kurulum için parola gereklidir.");
         if (!ModelState.IsValid)
         {
@@ -39,7 +42,7 @@ public class AdminSettingsController(ISiteTableService settings, IDataProtection
         row.Host = model.Host.Trim(); row.Port = model.Port.ToString(System.Globalization.CultureInfo.InvariantCulture);
         row.Mail = model.Mail.Trim(); row.SmtpUsername = model.Username.Trim(); row.EnableSsl = true;
         if (!string.IsNullOrWhiteSpace(model.Password)) row.Password = SmtpSecret.Protect(protection, model.Password);
-        else if (row.Password is { } previous) row.Password = SmtpSecret.Protect(protection, SmtpSecret.Read(protection, previous)!);
+        // A blank password preserves the existing ciphertext; never re-encrypt it during unrelated edits.
         var saved = creating ? await settings.AddAsync(row) : await settings.UpdateAsync(row);
         TempData["SmtpStatus"] = saved ? "SMTP ayarları güvenli olarak kaydedildi." : "Ayarlar kaydedilemedi.";
         return RedirectToAction(nameof(Smtp));

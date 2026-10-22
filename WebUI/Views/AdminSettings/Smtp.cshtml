@@ -19,11 +19,13 @@
 </style>
 <section class="smtp-panel"><span>XSPA · SİSTEM YÖNETİMİ</span><h1>E-posta &amp; SMTP</h1><p>Şifreli bağlantı ile güvenli teslimat. Ortam değişkenleri kayıtlı ayarların önüne geçer.</p>
 @if(TempData["SmtpStatus"] is string status){<p role="status">@status</p>}
+@if (Model.PasswordNeedsReplacement)
+{ <p class="field-validation-error" role="alert">Kayıtlı SMTP şifresi mevcut anahtarla açılamıyor. Uygulama şifrenizi aşağıdaki SMTP Şifresi alanına yeniden girip kaydedin. Eski şifre geri görüntülenemez.</p> }
 <form asp-action="Smtp" method="post"><div asp-validation-summary="All" role="alert"></div>
 <label asp-for="Host">SMTP Sunucusu</label><input asp-for="Host" autocomplete="off" placeholder="smtp.gmail.com" aria-describedby="smtp-host-help" /><span asp-validation-for="Host"></span><small id="smtp-host-help" class="d-block mt-1">Gmail için smtp.gmail.com yazın; buraya e-posta adresi yazılmaz.</small>
 <div class="row"><div class="col-md-6"><label asp-for="Port">Güvenli Port</label><select asp-for="Port"><option value="587">587 · STARTTLS</option><option value="465">465 · TLS</option></select></div><div class="col-md-6"><label asp-for="Username">Kullanıcı Adı</label><input asp-for="Username" autocomplete="off" /></div></div>
 <label asp-for="Mail">Gönderen E-posta</label><input asp-for="Mail" type="email" autocomplete="off" />
-<label asp-for="Password">SMTP Şifresi</label><input asp-for="Password" type="password" autocomplete="new-password" value="" /><small>@(Model.HasPassword ? "Parola kayıtlı. Değiştirmek istemiyorsanız boş bırakın." : "İlk kurulum için parola girin.") Parola tekrar görüntülenmez.</small>
+<label asp-for="Password">SMTP Şifresi</label><input asp-for="Password" type="password" autocomplete="new-password" value="" /><small>@(Model.PasswordNeedsReplacement ? "Şifreyi yeniden girmeniz gerekiyor." : Model.HasPassword ? "Parola kayıtlı. Değiştirmek istemiyorsanız boş bırakın." : "İlk kurulum için parola girin.") Parola tekrar görüntülenmez.</small>
 <p class="mt-3"><strong>Gmail kurulumu:</strong> smtp.gmail.com · 587 STARTTLS. Kullanıcı adı ve gönderen tam Gmail adresiniz olmalı. Normal Google şifresi yerine 2 Adımlı Doğrulama açıkken oluşturduğunuz uygulama şifresini kullanın. <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer">Google uygulama şifreleri</a></p>
 <input type="hidden" name="EnableSsl" value="true" /><p class="mt-3">🔒 TLS bağlantısı zorunludur.</p><button type="submit">Ayarları Kaydet</button></form>
 </section>
