@@ -22,11 +22,30 @@ public sealed class GoogleAccountFlowTests
         client.DefaultRequestHeaders.Add("Cookie",options.Cookie.Name+"="+options.TicketDataFormat.Protect(ticket));return client;
     }
     [Fact]
-    public async Task ExistingEmailNeverAutomaticallyLinksGoogleToPrivilegedAccount()
+    public async Task VerifiedExistingEmailLinksOnceAndKeepsRoleAndLocalRedirect()
     {
         using var factory=new PlatformWebFactory();await factory.InitializeAsync();using var client=Client(factory,"admin@acceptance.test",true);
-        using var response=await client.GetAsync("/account/google/callback");Assert.Equal(HttpStatusCode.Redirect,response.StatusCode);Assert.Equal("/dashboard/giris",response.Headers.Location?.OriginalString);
-        using var scope=factory.Services.CreateScope();var users=scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();Assert.Null(await users.FindByLoginAsync("Google","google-test-subject"));
+        using var response=await client.GetAsync("/account/google/callback");Assert.Equal(HttpStatusCode.Redirect,response.StatusCode);Assert.Equal("/Profile",response.Headers.Location?.OriginalString);
+        using var scope=factory.Services.CreateScope();var users=scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();var linked = await users.FindByLoginAsync("Google","google-test-subject"); Assert.NotNull(linked);
+        Assert.True(linked.EmailConfirmed); Assert.True(await users.IsInRoleAsync(linked, AppRoles.Admin));
+        using var again = await client.GetAsync("/account/google/callback?returnUrl=https://evil.example");
+        Assert.Equal("/Profile", again.Headers.Location?.OriginalString); Assert.Single(await users.GetLoginsAsync(linked));
+    }
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, true, true)]
+    [InlineData(true, false, false)]
+    public async Task LinkingRejectsInactiveLockedOrUnverifiedAccounts(bool active, bool locked, bool verified)
+    {
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync();
+        using (var scope = factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(); var user = (await users.FindByEmailAsync("admin@acceptance.test"))!;
+            user.IsActive = active; user.LockoutEnabled = true; user.LockoutEnd = locked ? DateTimeOffset.UtcNow.AddHours(1) : null; await users.UpdateAsync(user);
+        }
+        using var client = Client(factory, "admin@acceptance.test", verified);
+        using var response = await client.GetAsync("/account/google/callback"); Assert.Equal("/dashboard/giris", response.Headers.Location?.OriginalString);
+        using var check = factory.Services.CreateScope(); Assert.Null(await check.ServiceProvider.GetRequiredService<UserManager<AppUser>>().FindByLoginAsync("Google", "google-test-subject"));
     }
     [Fact]
     public async Task UnverifiedGoogleEmailCannotStartRegistration()

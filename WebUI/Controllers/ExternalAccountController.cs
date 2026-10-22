@@ -29,17 +29,44 @@ public sealed class ExternalAccountController(UserManager<AppUser> users, SignIn
         if (linked is not null)
         {
             if (!linked.IsActive || await users.IsLockedOutAsync(linked)) return Failure("Hesabınız kullanıma kapalı.");
-            var result = await signIn.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, false);
+            var result = await signIn.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true, false);
             if (!result.Succeeded) return Failure("Bu hesap için ek doğrulama gerekiyor. E-posta ile giriş yapın.");
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/Profile");
         }
         var email = VerifiedEmail(info);
         if (email is null) return Failure("Google doğrulanmış bir e-posta adresi sağlamadı.");
-        if (await users.FindByEmailAsync(email) is not null) return Failure("Bu e-posta ile bir hesabınız var. Güvenliğiniz için mevcut parolanızla giriş yapın; hesaplar otomatik birleştirilmez.");
+        var existing = await users.FindByEmailAsync(email);
+        if (existing is not null)
+        {
+            if (!existing.IsActive || await users.IsLockedOutAsync(existing)) return Failure("Hesabınız kullanıma kapalı.");
+            // Keep Identity's pre-sign-in and two-factor checks for newly linked accounts too.
+            var added = await users.AddLoginAsync(existing, info);
+            if (!added.Succeeded)
+            {
+                var owner = await users.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                if (owner?.Id != existing.Id) return Failure("Google bağlantısı kurulamadı. Lütfen yeniden deneyin.");
+            }
+            if (!existing.EmailConfirmed)
+            {
+                existing.EmailConfirmed = true;
+                if (!(await users.UpdateAsync(existing)).Succeeded) return Failure("Hesap doğrulaması tamamlanamadı. Lütfen yeniden deneyin.");
+            }
+            var result = await signIn.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true, false);
+            if (!result.Succeeded) return Failure("Bu hesap için ek doğrulama gerekiyor. E-posta ile giriş yapın.");
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/Profile");
+        }
         ViewBag.GoogleEmail = email;
         return View("Register", new ExternalRegistrationModel { FirstName=info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "", LastName=info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "", ReturnUrl=Url.IsLocalUrl(returnUrl) ? returnUrl : "/Profile" });
     }
-    private static string? VerifiedEmail(ExternalLoginInfo info) => string.Equals(info.Principal.FindFirstValue("urn:xspa:email_verified"),"true",StringComparison.OrdinalIgnoreCase) ? info.Principal.FindFirstValue(ClaimTypes.Email) : null;
+    private static string? VerifiedEmail(ExternalLoginInfo? info)
+    {
+        var principal = info?.Principal;
+        var email = principal?.FindFirstValue(ClaimTypes.Email)?.Trim();
+        return string.Equals(principal?.FindFirstValue("urn:xspa:email_verified"), "true", StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(email) && new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email)
+            ? email : null;
+    }
     [HttpPost("register"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(ExternalRegistrationModel model)
     {
