@@ -15,6 +15,7 @@ public sealed class GoogleProfileMappingTests
     {
         using var factory=new PlatformWebFactory(googleEnabled:true);await factory.InitializeAsync();
         var options=factory.Services.GetRequiredService<IOptionsMonitor<GoogleOptions>>().Get("Google");
+        Assert.Contains("email", options.Scope); Assert.Contains("profile", options.Scope);
         Assert.EndsWith("/oauth2/v3/userinfo",options.UserInformationEndpoint);
         using var json=JsonDocument.Parse(profile);var identity=new ClaimsIdentity("Google");
         foreach(var action in options.ClaimActions)action.Run(json.RootElement,identity,"Google");

@@ -64,6 +64,13 @@ public sealed class GoogleAccountFlowTests
         using(var scope=factory.Services.CreateScope())Assert.Null(await scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>().FindByEmailAsync("google-new@example.test"));
         values["KvkkAccepted"]="true";using var accepted=await client.PostAsync("/account/google/register",new FormUrlEncodedContent(values));Assert.Equal(HttpStatusCode.Redirect,accepted.StatusCode);Assert.Equal("/Profile",accepted.Headers.Location?.OriginalString);
         using var verify=factory.Services.CreateScope();var users=verify.ServiceProvider.GetRequiredService<UserManager<AppUser>>();var user=(await users.FindByEmailAsync("google-new@example.test"))!;
+        using var repeat = Client(factory, "google-new@example.test", true);
+        using var returned = await repeat.GetAsync("/account/google/callback?returnUrl=/randevularim");
+        Assert.Equal("/randevularim", returned.Headers.Location?.OriginalString);
+        using var stale = Client(factory, "google-new@example.test", true);
+        var staleToken = await AjaxInteractionEndpointTests.Token(stale);
+        using var stalePost = await stale.PostAsync("/account/google/register", new FormUrlEncodedContent(new Dictionary<string,string> { ["__RequestVerificationToken"] = staleToken, ["ReturnUrl"] = "/Profile" }));
+        Assert.StartsWith("/account/google/callback", stalePost.Headers.Location?.OriginalString);
         Assert.Equal(AppRoles.Customer,Assert.Single(await users.GetRolesAsync(user)));Assert.True(user.EmailConfirmed);Assert.NotNull(user.PrivacyAcknowledgedAtUtc);Assert.Single(await users.GetLoginsAsync(user));
     }
 }

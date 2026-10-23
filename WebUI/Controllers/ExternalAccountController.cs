@@ -31,6 +31,7 @@ public sealed class ExternalAccountController(UserManager<AppUser> users, SignIn
             if (!linked.IsActive || await users.IsLockedOutAsync(linked)) return Failure("Hesabınız kullanıma kapalı.");
             var result = await signIn.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true, false);
             if (!result.Succeeded) return Failure("Bu hesap için ek doğrulama gerekiyor. E-posta ile giriş yapın.");
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/Profile");
         }
         var email = VerifiedEmail(info);
@@ -63,7 +64,7 @@ public sealed class ExternalAccountController(UserManager<AppUser> users, SignIn
     {
         var principal = info?.Principal;
         var email = principal?.FindFirstValue(ClaimTypes.Email)?.Trim();
-        return string.Equals(principal?.FindFirstValue("urn:xspa:email_verified"), "true", StringComparison.OrdinalIgnoreCase)
+        return bool.TryParse(principal?.FindFirstValue("urn:xspa:email_verified")?.Trim(), out var verified) && verified
             && !string.IsNullOrWhiteSpace(email) && new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email)
             ? email : null;
     }
@@ -73,8 +74,10 @@ public sealed class ExternalAccountController(UserManager<AppUser> users, SignIn
         var info=await signIn.GetExternalLoginInfoAsync(); var email=info is null ? null : VerifiedEmail(info);
         if(info is null || info.LoginProvider!="Google" || string.IsNullOrWhiteSpace(email)) return Failure("Google oturumunuzun süresi doldu. Yeniden başlayın.");
         ViewBag.GoogleEmail=email;
+        // A stale registration form must re-enter the same verified callback/linking path.
+        if(await users.FindByEmailAsync(email) is not null)
+            return RedirectToAction(nameof(Callback), new { returnUrl = Url.IsLocalUrl(model.ReturnUrl) ? model.ReturnUrl : "/Profile" });
         if(!ModelState.IsValid) return View(model);
-        if(await users.FindByEmailAsync(email) is not null) return Failure("Bu adres zaten kayıtlı. Mevcut hesabınıza giriş yapın.");
         var user=new AppUser {UserName=email,Email=email,EmailConfirmed=true,FirstName=model.FirstName.Trim(),LastName=model.LastName.Trim(),PhoneNumber=model.Phone.Trim(),PrivacyAcknowledgedAtUtc=DateTime.UtcNow,PrivacyNoticeVersion="2026-10-18"};
         var created=await users.CreateAsync(user);
         if(!created.Succeeded){ModelState.AddModelError("","Hesap oluşturulamadı. Bilgilerinizi kontrol edin.");return View(model);}

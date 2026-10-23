@@ -135,6 +135,9 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["Authentication:Google:Clie
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
         options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
         options.SaveTokens = false;
         options.CorrelationCookie.SameSite = SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
