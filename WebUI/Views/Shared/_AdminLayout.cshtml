@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="~/css/admin-sidebar.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/interactions.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/admin-theme.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/notification-bell.css" asp-append-version="true" />
 </head>
 
 <body class="xspa-admin">
@@ -40,6 +41,7 @@
 
     @await Html.PartialAsync("~/Views/Admin/_Script.cshtml")
 
+    <script src="~/js/notification-bell.js" asp-append-version="true"></script>
     <script src="~/js/admin-sidebar.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 <script src="~/js/interactions.js" asp-append-version="true"></script>

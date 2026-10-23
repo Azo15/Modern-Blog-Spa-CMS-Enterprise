@@ -58,6 +58,8 @@
             .withAutomaticReconnect()
             .build();
 
+        connection.on("NotificationsChanged", data => window.dispatchEvent(new CustomEvent('xspa:notifications-changed',{detail:data})));
+        connection.onreconnected(() => window.dispatchEvent(new CustomEvent('xspa:notifications-refresh')));
         connection.on("ReceiveNotification", function (title, message, type) {
             if (title === 'Yeni Rezervasyon') playReservationSound();
             if (typeof toastr !== "undefined") {

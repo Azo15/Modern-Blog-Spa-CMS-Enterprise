@@ -1,0 +1,14 @@
+@model BusinessLayer.Abstract.NotificationPage
+@{ Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "Bildirimler"; }
+<section class="card notification-page" data-notifications data-list-url="/admin/notifications/list?page=@Model.Page&amp;size=25" data-latest-id="@Model.LatestId">
+    <header class="notification-heading"><div><span class="text-muted small">XSPA · YÖNETİM</span><h1 class="h3 mt-2">Bildirimler</h1><p>Size ait sistem olayları ve takip edilmesi gereken işlemler.</p></div><button type="button" class="btn btn-primary" data-notification-all>Tümünü okundu işaretle</button></header>
+    <p class="notification-status" data-notification-status role="status" aria-live="polite"></p>
+    <ul class="notification-items" data-notification-list>
+    @if(Model.Items.Count == 0){<li class="notification-empty">Henüz bildiriminiz yok.</li>}
+    @foreach(var item in Model.Items)
+    {
+        <li class="notification-item @(item.IsRead ? "is-read" : "is-unread")"><a href="@item.Url" data-notification-link="@item.Id" data-read="@item.IsRead.ToString().ToLowerInvariant()"><strong>@item.Title</strong><span>@item.Content</span><time datetime="@DateTime.SpecifyKind(item.CreatedAtUtc,DateTimeKind.Utc).ToString("O")">@TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(item.CreatedAtUtc,DateTimeKind.Utc),BusinessLayer.Concrete.VisitorAnalyticsCalendar.TimeZone).ToString("dd.MM.yyyy HH:mm") · Türkiye saati</time></a>@if(!item.IsRead){<button type="button" class="btn btn-sm btn-outline-secondary" data-notification-read="@item.Id" aria-label="Bildirimi okundu işaretle">Okundu</button>}</li>
+    }
+    </ul>
+    <nav class="notification-heading" aria-label="Bildirim sayfaları">@if(Model.Page > 1){<a asp-action="Index" asp-route-page="@(Model.Page - 1)">← Önceki</a>}<span>Sayfa @Model.Page / @Math.Max(1,(Model.TotalCount + 24)/25)</span>@if(Model.Page * 25 < Model.TotalCount){<a asp-action="Index" asp-route-page="@(Model.Page + 1)">Sonraki →</a>}</nav>
+</section>
