@@ -266,6 +266,7 @@ using (var scope = app.Services.CreateScope())
     var timeZone = TimeZoneInfo.FindSystemTimeZoneById(OperatingSystem.IsWindows() ? "Turkey Standard Time" : "Europe/Istanbul");
     jobs.AddOrUpdate<TrashMaintenanceJob>("nightly-trash-maintenance", job => job.RunAsync(CancellationToken.None),
         Cron.Daily(2), new RecurringJobOptions { TimeZone = timeZone });
+    jobs.AddOrUpdate<NotificationMaintenanceJob>("recover-notifications", job => job.RunAsync(CancellationToken.None), Cron.Minutely());
     jobs.AddOrUpdate<ContactEmailRecoveryJob>("recover-contact-emails", job => job.RecoverAsync(CancellationToken.None),
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
     jobs.AddOrUpdate<ContactReplyRecoveryJob>("recover-contact-replies", job => job.RunAsync(CancellationToken.None),

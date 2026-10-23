@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 namespace BusinessLayer.CQRS.Handlers;
 
 public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQueue queue,
-    IManagerNotifier notifier, ILogger<CreateAppointmentHandler> logger, ICurrentUserService currentUser) : IRequestHandler<CreateAppointmentCommand, AppointmentReceiptDto>
+    IManagerNotifier notifier, ILogger<CreateAppointmentHandler> logger, ICurrentUserService currentUser, INotificationService notifications) : IRequestHandler<CreateAppointmentCommand, AppointmentReceiptDto>
 {
     public async Task<AppointmentReceiptDto> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
     {
@@ -58,6 +58,8 @@ public sealed class CreateAppointmentHandler(AppDbContext db, IAppointmentEmailQ
             return Replay(retry, request);
         }
 
+        try { await notifications.PublishAsync(new($"appointment:{appointment.Id}","Yeni randevu talebi","Yeni bir randevu talebi incelemenizi bekliyor.",EntityLayer.Enum.NotificationType.AppointmentRequest,appointment.Id),cancellationToken); }
+        catch (Exception error) when (error is not OperationCanceledException) { logger.LogWarning("Appointment notification will be recovered ({ErrorType}).",error.GetType().Name); }
         try
         {
             var jobId = queue.Enqueue(delivery.Id);
