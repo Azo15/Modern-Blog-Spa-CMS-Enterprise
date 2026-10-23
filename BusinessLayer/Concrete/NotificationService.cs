@@ -13,11 +13,7 @@ public sealed class NotificationService(DbContextOptions<AppDbContext> options, 
     {
         if (string.IsNullOrWhiteSpace(notification.EventKey) || notification.EventKey.Length > 200) throw new ArgumentException("Invalid event key.");
         await using var db = new AppDbContext(options);
-        var recipients = await (from user in db.Users where user.IsActive
-            join membership in db.UserRoles on user.Id equals membership.UserId
-            join role in db.Roles on membership.RoleId equals role.Id
-            where role.Name == AppRoles.Admin || role.Name == AppRoles.Staff
-            select user.Id).Distinct().ToListAsync(ct);
+        var recipients = await NotificationRecipients.Query(db).ToListAsync(ct);
         for (var attempt = 0; attempt < 3; attempt++)
         {
             var existing = await db.Notifications.Where(n => n.EventKey == notification.EventKey).Select(n => n.RecipientUserId).ToListAsync(ct);

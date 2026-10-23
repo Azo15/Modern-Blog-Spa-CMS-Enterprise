@@ -59,6 +59,8 @@ builder.Services.AddScoped<IBlogImageStorage, BlogImageStorage>();
 builder.Services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
 builder.Services.AddSingleton<PublicMediaService>();
 builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
+builder.Services.AddScoped<INotificationRealtime, NotificationRealtime>();
+builder.Services.AddSingleton<FailedJobNotificationFilter>();
 builder.Services.AddHttpClient<IReCaptchaVerifier, ReCaptchaVerifier>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
@@ -89,7 +91,8 @@ if (!testing)
 {
     if (string.IsNullOrWhiteSpace(connection)) throw new InvalidOperationException("Configure ConnectionStrings__DefaultConnection through secrets/environment.");
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
-    builder.Services.AddHangfire(config => config
+    builder.Services.AddHangfire((provider,config) => config
+    .UseFilter(provider.GetRequiredService<FailedJobNotificationFilter>())
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
