@@ -34,7 +34,7 @@ namespace WebUI.Controllers
         [AllowAnonymous, HttpGet("sifremi-unuttum"), ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
 
-        [AllowAnonymous, HttpPost("sifremi-unuttum"), ValidateAntiForgeryToken, RequestSizeLimit(16384)]
+        [AllowAnonymous, HttpPost("sifremi-unuttum"), ValidateAntiForgeryToken, RequestSizeLimit(16384), ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -51,7 +51,11 @@ namespace WebUI.Controllers
                     var path = Url.Action(nameof(ResetPassword), "Dashboard", new { userId = user.Id, token = encoded })!;
                     using var deadline = CancellationTokenSource.CreateLinkedTokenSource(HttpContext.RequestAborted);
                     deadline.CancelAfter(TimeSpan.FromSeconds(90));
-                    await _resetMail.SendAsync(user.Email!, new Uri(origin, path).AbsoluteUri, deadline.Token);
+                    var resetUrl = new Uri(origin, path).AbsoluteUri;
+                    var googleOnly = !await _userManager.HasPasswordAsync(user)
+                        && (await _userManager.GetLoginsAsync(user)).Any(login => login.LoginProvider == "Google");
+                    if (googleOnly) await _resetMail.SendGoogleAccountAsync(user.Email!, resetUrl, deadline.Token);
+                    else await _resetMail.SendAsync(user.Email!, resetUrl, deadline.Token);
                 }
                 catch (Exception error) when (!HttpContext.RequestAborted.IsCancellationRequested)
                 { _logger.LogWarning("Password reset delivery did not complete ({ErrorType}).", error.GetType().Name); }

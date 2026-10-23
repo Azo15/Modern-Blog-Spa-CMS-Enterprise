@@ -53,6 +53,7 @@ internal sealed class PlatformWebFactory(int permitLimit = 1000, bool failQuerie
             replyMail.Setup(m => m.EnsureConfiguredAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             services.AddSingleton(replyMail.Object);
             ResetMail.Setup(x => x.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            ResetMail.Setup(x => x.SendGoogleAccountAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             services.AddSingleton(ResetMail.Object);
             services.AddSingleton(Mock.Of<IContactEmailQueue>());
             services.AddSingleton(Mock.Of<IContactReplyQueue>(q => q.Enqueue(It.IsAny<int>()) == "test-reply-job"));

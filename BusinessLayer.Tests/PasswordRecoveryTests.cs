@@ -79,6 +79,37 @@ public sealed class PasswordRecoveryTests
         using var scope = f.Services.CreateScope(); var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(); Assert.True(await users.CheckPasswordAsync((await users.FindByIdAsync("1"))!, PlatformWebFactory.Password));
     }
     [Fact]
+    public async Task GoogleOnlyUserReceivesMeaningfulSetupMailAndCanSetPasswordWithoutLosingGoogleLogin()
+    {
+        using var f = new PlatformWebFactory(); await f.InitializeAsync(); using var c = AjaxInteractionEndpointTests.Client(f);
+        string userId;
+        using (var scope = f.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            var user = new AppUser { UserName = "google-only@example.test", Email = "google-only@example.test", EmailConfirmed = true, IsActive = true };
+            Assert.True((await users.CreateAsync(user)).Succeeded);
+            Assert.True((await users.AddLoginAsync(user, new UserLoginInfo("Google", "recovery-google-subject", "Google"))).Succeeded);
+            Assert.True((await users.AddToRoleAsync(user, BusinessLayer.Security.AppRoles.Customer)).Succeeded);
+            userId = user.Id.ToString(); Assert.False(await users.HasPasswordAsync(user));
+        }
+        var response = await c.PostAsync("/dashboard/sifremi-unuttum", new FormUrlEncodedContent(new Dictionary<string,string> { ["Email"] = "google-only@example.test", ["__RequestVerificationToken"] = await AjaxInteractionEndpointTests.Token(c) }));
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var call = Assert.Single(f.ResetMail.Invocations, x => x.Method.Name == nameof(BusinessLayer.Abstract.IPasswordResetMailService.SendGoogleAccountAsync));
+        Assert.Equal("google-only@example.test", call.Arguments[0]);
+        f.ResetMail.Verify(x => x.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        var setupUrl = Assert.IsType<string>(call.Arguments[1]);
+        var query = QueryHelpers.ParseQuery(new Uri(setupUrl).Query);
+        Assert.Equal(userId, query["userId"].ToString());
+        var reset = await c.PostAsync("/dashboard/sifre-sifirla", new FormUrlEncodedContent(new Dictionary<string,string> { ["UserId"] = userId, ["Token"] = query["token"].ToString(), ["Password"] = "My-first-password-123", ["ConfirmPassword"] = "My-first-password-123", ["__RequestVerificationToken"] = await AjaxInteractionEndpointTests.Token(c) }));
+        Assert.Equal("/dashboard/giris", reset.Headers.Location?.OriginalString);
+        using var check = f.Services.CreateScope(); var manager = check.ServiceProvider.GetRequiredService<UserManager<AppUser>>(); var saved = (await manager.FindByIdAsync(userId))!;
+        Assert.True(await manager.CheckPasswordAsync(saved, "My-first-password-123"));
+        Assert.Equal("recovery-google-subject", Assert.Single(await manager.GetLoginsAsync(saved)).ProviderKey);
+        Assert.Equal(BusinessLayer.Security.AppRoles.Customer, Assert.Single(await manager.GetRolesAsync(saved)));
+        using var mail = PasswordResetMailService.CreateGoogleAccountMessage("google-only@example.test", setupUrl);
+        Assert.Contains("henüz ayrı bir XSPA parolanız yok", mail.TextBody); Assert.Contains("Google ile Devam Et", mail.HtmlBody);
+    }
+    [Fact]
     public void ResetEmailEncodesLinkAndHasOnlyIntendedRecipient()
     {
         using var mail = PasswordResetMailService.CreateMessage("owner@example.test", "https://example.test/reset?a=1&token='test'");
