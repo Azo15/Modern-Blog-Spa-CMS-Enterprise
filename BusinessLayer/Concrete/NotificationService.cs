@@ -56,9 +56,12 @@ public sealed class NotificationService(DbContextOptions<AppDbContext> options, 
     }
     public static string Destination(NotificationType type, int? id) => type switch
     {
-        NotificationType.ContactMessage or NotificationType.MessageReminder => id > 0 ? $"/AdminMessage/Details/{id}" : "/AdminMessage",
-        NotificationType.AppointmentRequest => "/AdminAppointment",
-        NotificationType.EmailFailure or NotificationType.SystemFailure => "/hangfire",
+        NotificationType.ContactMessage or NotificationType.MessageReminder =>
+            id is > 0 ? $"/AdminMessage/Details/{id}" : "/AdminMessage",
+        NotificationType.AppointmentRequest =>
+            id is > 0 ? $"/AdminAppointment?highlight={id}" : "/AdminAppointment",
+        NotificationType.EmailFailure or NotificationType.SystemFailure =>
+            "/hangfire",
         _ => "/AdminDashboard"
     };
 }
