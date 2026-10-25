@@ -1,1 +1,186 @@
-.notification-bell{position:relative}.notification-toggle{position:relative;min-width:44px;min-height:44px;border-radius:50%!important;font-size:20px}.notification-count{position:absolute;right:-6px;top:-6px;min-width:21px;height:21px;line-height:21px;padding:0 5px;background:#a52c30;color:#fff;border:2px solid var(--xa-surface,#10291f);border-radius:20px;font-size:11px;font-weight:700}.notification-count[hidden]{display:none}.notification-dropdown{width:min(410px,calc(100vw - 32px));padding:0!important;overflow:hidden}.notification-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:18px}.notification-heading h2{color:var(--xa-text)!important}.notification-items{padding:0;margin:0;list-style:none}.notification-dropdown .notification-items{max-height:min(440px,calc(100dvh - 240px));overflow-y:auto;overscroll-behavior:contain}.notification-item{display:flex;align-items:center;gap:10px;border-top:1px solid var(--xa-border,#d6b66c44);padding:14px 18px;transition:background-color .2s ease}.notification-item.is-unread{border-left:3px solid #d6b66c;background:#d6b66c0d}.notification-item>a{display:flex;flex:1;min-width:0;flex-direction:column;gap:6px;color:var(--xa-text)!important;text-decoration:none;overflow-wrap:anywhere}.notification-item strong{color:var(--xa-text)}.notification-item span,.notification-item time{font-size:13px;color:var(--xa-muted,#bcc9bd)}.notification-item time{font-size:11px}.notification-item.is-read{opacity:.8}.notification-item:hover{background:#d6b66c14}.notification-item a:focus-visible,.notification-dropdown footer a:focus-visible{outline:2px solid #d6b66c;outline-offset:3px}.notification-empty{padding:28px;text-align:center;color:var(--xa-muted,#bcc9bd)}.notification-dropdown footer{padding:16px;border-top:1px solid var(--xa-border);text-align:center}.notification-dropdown footer a{color:var(--xa-gold,#e4c77e)}.notification-status{padding:0 18px;margin:0;font-size:13px;line-height:1.7;color:var(--xa-text)}.notification-page .notification-items{max-height:none}.notification-page{max-width:1100px;margin:auto}.notification-page .notification-item{padding:20px}.notification-bell.is-notifying .notification-toggle{animation:notification-ring .45s ease}@keyframes notification-ring{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@media(prefers-reduced-motion:reduce){.notification-item{transition:none}.notification-bell.is-notifying .notification-toggle{animation:none}}@media(max-width:575px){.notification-dropdown{position:fixed!important;top:86px!important;right:16px!important;left:auto!important;transform:none!important}.notification-heading{padding:14px}}
+/* =====================================================
+   Notification Bell — XSPA Admin Panel
+   ===================================================== */
+
+/* -- Çan butonu -- */
+.notification-bell { position: relative; }
+
+.notification-toggle {
+    position: relative;
+    min-width: 44px; min-height: 44px;
+    border-radius: 50% !important;
+    font-size: 20px;
+    transition: box-shadow .2s ease;
+}
+.notification-toggle:hover,
+.notification-toggle:focus-visible {
+    box-shadow: 0 0 0 3px rgba(214,182,108,.35) !important;
+}
+
+/* -- Okunmamış rozet -- */
+.notification-count {
+    position: absolute; right: -6px; top: -6px;
+    min-width: 21px; height: 21px; line-height: 21px;
+    padding: 0 5px;
+    background: #a52c30; color: #fff;
+    border: 2px solid var(--xa-surface, #10291f);
+    border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+}
+.notification-count[hidden] { display: none; }
+
+/* -- Dropdown panel -- */
+.notification-dropdown {
+    width: min(420px, calc(100vw - 24px));
+    padding: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--xa-border, #d6b66c44);
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,.28) !important;
+}
+
+/* -- Başlık -- */
+.notification-heading {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--xa-border, #d6b66c44);
+    background: var(--xa-surface, #10291f);
+}
+.notification-heading h2 {
+    color: var(--xa-gold, #d6b66c) !important;
+    font-size: 15px; letter-spacing: .5px;
+}
+
+/* -- Liste -- */
+.notification-items { padding: 0; margin: 0; list-style: none; }
+.notification-dropdown .notification-items {
+    max-height: min(460px, calc(100dvh - 220px));
+    overflow-y: auto; overscroll-behavior: contain;
+}
+
+/* -- Tek bildirim kartı -- */
+.notification-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    border-top: 1px solid var(--xa-border, #d6b66c22);
+    padding: 13px 16px;
+    transition: background-color .18s ease;
+}
+.notification-item.is-unread {
+    border-left: 3px solid #d6b66c;
+    background: rgba(214,182,108,.06);
+}
+.notification-item.is-read { opacity: .82; }
+.notification-item:hover { background: rgba(214,182,108,.1); }
+
+/* -- Tip ikonu çemberi -- */
+.notif-icon-wrap {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+}
+.notif-type-message     { background: rgba(59,130,246,.18); color: #60a5fa; }
+.notif-type-appointment { background: rgba(34,197,94,.15);  color: #4ade80; }
+.notif-type-reminder    { background: rgba(234,179,8,.15);  color: #facc15; }
+.notif-type-email-fail  { background: rgba(239,68,68,.15);  color: #f87171; }
+.notif-type-system      { background: rgba(168,85,247,.15); color: #c084fc; }
+
+/* -- Tip rozeti (küçük etiket) -- */
+.notif-type-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: .4px;
+    padding: 1px 7px; border-radius: 20px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.notif-type-tag.notif-type-message     { background: rgba(59,130,246,.2);  color: #93c5fd; }
+.notif-type-tag.notif-type-appointment { background: rgba(34,197,94,.2);   color: #86efac; }
+.notif-type-tag.notif-type-reminder    { background: rgba(234,179,8,.2);   color: #fde047; }
+.notif-type-tag.notif-type-email-fail  { background: rgba(239,68,68,.2);   color: #fca5a5; }
+.notif-type-tag.notif-type-system      { background: rgba(168,85,247,.2);  color: #d8b4fe; }
+
+/* -- İçerik alanı -- */
+.notif-body {
+    display: flex; flex: 1; min-width: 0;
+    flex-direction: column; gap: 4px;
+    color: var(--xa-text) !important; text-decoration: none;
+    overflow-wrap: anywhere;
+}
+.notif-title-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.notif-title { font-size: 13px; font-weight: 600; color: var(--xa-text); }
+.notif-content { font-size: 12.5px; color: var(--xa-muted, #bcc9bd); line-height: 1.45; }
+.notif-time { font-size: 11px; color: var(--xa-muted, #bcc9bd); margin-top: 2px; }
+
+/* -- Okundu butonu (checkmark) -- */
+.notif-read-btn {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--xa-border, #d6b66c44);
+    background: transparent;
+    color: var(--xa-muted, #bcc9bd);
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .18s, color .18s;
+    margin-top: 2px;
+}
+.notif-read-btn:hover { background: rgba(34,197,94,.18); color: #4ade80; border-color: #4ade80; }
+
+/* -- Boş durum -- */
+.notification-empty {
+    padding: 36px 24px; text-align: center;
+    color: var(--xa-muted, #bcc9bd); font-size: 13px;
+}
+
+/* -- Durum mesajı -- */
+.notification-status {
+    padding: 0 18px; margin: 0;
+    font-size: 12.5px; line-height: 1.7;
+    color: var(--xa-text);
+}
+
+/* -- Footer -- */
+.notification-dropdown footer {
+    padding: 14px 18px;
+    border-top: 1px solid var(--xa-border, #d6b66c22);
+    text-align: center;
+    background: var(--xa-surface, #10291f);
+}
+.notification-dropdown footer a {
+    color: var(--xa-gold, #e4c77e);
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    letter-spacing: .3px;
+}
+.notification-dropdown footer a:hover { text-decoration: underline; }
+
+/* -- Tüm bildirimler sayfası -- */
+.notification-page .notification-items { max-height: none; }
+.notification-page { max-width: 1100px; margin: auto; }
+.notification-page .notification-item { padding: 18px 20px; }
+
+/* -- Çan sallama animasyonu -- */
+.notification-bell.is-notifying .notification-toggle { animation: notification-ring .45s ease; }
+@keyframes notification-ring {
+    25% { transform: rotate(-12deg); }
+    75% { transform: rotate(12deg); }
+}
+
+/* -- Erişilebilirlik: azaltılmış hareket -- */
+@media (prefers-reduced-motion: reduce) {
+    .notification-item { transition: none; }
+    .notification-bell.is-notifying .notification-toggle { animation: none; }
+}
+
+/* -- Küçük ekran -- */
+@media (max-width: 575px) {
+    .notification-dropdown {
+        position: fixed !important;
+        top: 80px !important; right: 12px !important;
+        left: auto !important; transform: none !important;
+    }
+    .notification-heading { padding: 13px 14px; }
+}
