@@ -25,6 +25,8 @@ public class NotificationHubTests
     {
         var groups = new Mock<IGroupManager>(); groups.Setup(g => g.AddToGroupAsync("connection-1", "Managers", It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         var context = new Mock<HubCallerContext>(); context.SetupGet(c => c.ConnectionId).Returns("connection-1"); context.SetupGet(c => c.User).Returns(AuthorizationTests.Principal(AppRoles.Staff));
-        var hub = new NotificationHub { Groups = groups.Object, Context = context.Object }; await hub.OnConnectedAsync(); groups.Verify(g => g.AddToGroupAsync("connection-1", "Managers", It.IsAny<CancellationToken>()), Times.Once);
+        using var factory = new PlatformWebFactory(); await factory.InitializeAsync(); using var scope = factory.Services.CreateScope();
+        var hub = new NotificationHub(scope.ServiceProvider.GetRequiredService<DataAccesLayer.Concrete.AppDbContext>()) { Groups = groups.Object, Context = context.Object }; await hub.OnConnectedAsync(); groups.Verify(g => g.AddToGroupAsync("connection-1", "Managers", It.IsAny<CancellationToken>()), Times.Once);
+        groups.Verify(g => g.AddToGroupAsync("connection-1",NotificationHub.RecipientGroup(1),It.IsAny<CancellationToken>()),Times.Once);
     }
 }

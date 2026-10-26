@@ -10,7 +10,7 @@ using Microsoft.Extensions.Localization;
 namespace BusinessLayer.Concrete;
 
 public sealed class ContactSubmissionService(AppDbContext db, IContactEmailQueue queue,
-    ILogger<ContactSubmissionService> logger, IStringLocalizer<SharedResource>? localizer = null) : IContactSubmissionService
+    ILogger<ContactSubmissionService> logger, IStringLocalizer<SharedResource>? localizer = null, INotificationService? notifications = null) : IContactSubmissionService
 {
     public async Task<ContactSubmissionResult> SubmitAsync(ContactForm form, CancellationToken cancellationToken = default)
     {
@@ -26,6 +26,11 @@ public sealed class ContactSubmissionService(AppDbContext db, IContactEmailQueue
         db.Set<ContactEmailDelivery>().Add(delivery);
         // EF writes the message and intent atomically. SMTP and Hangfire are outside this transaction.
         await db.SaveChangesAsync(cancellationToken);
+        if (notifications is not null)
+        {
+            try { await notifications.PublishAsync(new($"contact:{message.Id}","Yeni iletişim mesajı","Yeni bir mesaj incelemenizi bekliyor.",EntityLayer.Enum.NotificationType.ContactMessage,message.Id),cancellationToken); }
+            catch (Exception error) when (error is not OperationCanceledException) { logger.LogWarning("Contact notification will be recovered ({ErrorType}).",error.GetType().Name); }
+        }
         try
         {
             var jobId = queue.Enqueue(delivery.Id);

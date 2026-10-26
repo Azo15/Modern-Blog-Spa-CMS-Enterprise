@@ -1,0 +1,49 @@
+<li class="nav-item dropdown me-3 notification-bell" data-notifications data-list-url="/admin/notifications/list">
+    <button type="button"
+            class="btn btn-sm btn-outline-secondary notification-toggle"
+            id="notification-bell"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"
+            aria-expanded="false"
+            aria-controls="notification-dropdown"
+            aria-label="Bildirimler">
+        <i class="fa-solid fa-bell" aria-hidden="true"></i>
+        <span class="notification-count" data-notification-count hidden>0</span>
+    </button>
+
+    <section class="dropdown-menu dropdown-menu-end notification-dropdown"
+             id="notification-dropdown"
+             aria-labelledby="notification-bell">
+
+        <header class="notification-heading">
+            <h2 class="h6 mb-0">
+                <i class="fa-solid fa-bell me-2" aria-hidden="true"></i>Bildirimler
+            </h2>
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-notification-all
+                    title="Tümünü okundu işaretle">
+                <i class="fa-solid fa-check-double me-1" aria-hidden="true"></i>Tümünü oku
+            </button>
+        </header>
+
+        <p class="notification-status" data-notification-status role="status" aria-live="polite"></p>
+
+        <ul class="notification-items"
+            data-notification-list
+            aria-label="Son 10 bildirim">
+            <li class="notification-empty">
+                <i class="fa-regular fa-bell-slash fa-lg mb-2 d-block" aria-hidden="true"></i>
+                Bildirimler yükleniyor…
+            </li>
+        </ul>
+
+        <footer>
+            <a href="/admin/notifications">
+                Tüm bildirimlere git <i class="fa-solid fa-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        </footer>
+    </section>
+
+    <noscript><a href="/admin/notifications">Bildirimler</a></noscript>
+</li>

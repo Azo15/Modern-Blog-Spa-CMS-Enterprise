@@ -59,6 +59,8 @@ builder.Services.AddScoped<IBlogImageStorage, BlogImageStorage>();
 builder.Services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
 builder.Services.AddSingleton<PublicMediaService>();
 builder.Services.AddScoped<IManagerNotifier, ManagerNotifier>();
+builder.Services.AddScoped<INotificationRealtime, NotificationRealtime>();
+builder.Services.AddSingleton<FailedJobNotificationFilter>();
 builder.Services.AddHttpClient<IReCaptchaVerifier, ReCaptchaVerifier>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // 📌 Serilog Yapılandırması (Konsol & Günlük Dosya Loglama)
@@ -89,7 +91,8 @@ if (!testing)
 {
     if (string.IsNullOrWhiteSpace(connection)) throw new InvalidOperationException("Configure ConnectionStrings__DefaultConnection through secrets/environment.");
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
-    builder.Services.AddHangfire(config => config
+    builder.Services.AddHangfire((provider,config) => config
+    .UseFilter(provider.GetRequiredService<FailedJobNotificationFilter>())
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
@@ -266,6 +269,7 @@ using (var scope = app.Services.CreateScope())
     var timeZone = TimeZoneInfo.FindSystemTimeZoneById(OperatingSystem.IsWindows() ? "Turkey Standard Time" : "Europe/Istanbul");
     jobs.AddOrUpdate<TrashMaintenanceJob>("nightly-trash-maintenance", job => job.RunAsync(CancellationToken.None),
         Cron.Daily(2), new RecurringJobOptions { TimeZone = timeZone });
+    jobs.AddOrUpdate<NotificationMaintenanceJob>("recover-notifications", job => job.RunAsync(CancellationToken.None), Cron.Minutely());
     jobs.AddOrUpdate<ContactEmailRecoveryJob>("recover-contact-emails", job => job.RecoverAsync(CancellationToken.None),
         Cron.MinuteInterval(10), new RecurringJobOptions { TimeZone = timeZone });
     jobs.AddOrUpdate<ContactReplyRecoveryJob>("recover-contact-replies", job => job.RunAsync(CancellationToken.None),

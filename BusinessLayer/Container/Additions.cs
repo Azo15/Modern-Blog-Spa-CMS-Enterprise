@@ -29,6 +29,9 @@ namespace BusinessLayer.Container
             services.AddScoped<IPasswordResetMailService, PasswordResetMailService>();
             services.AddScoped<ContactReplyEmailJob>();
             services.AddScoped<ContactReplyRecoveryJob>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<INotificationRealtime, NoNotificationRealtime>();
+            services.AddScoped<NotificationMaintenanceJob>();
             services.AddMemoryCache();
             services.AddScoped<IVisitorAnalytics, VisitorAnalytics>();
             services.AddScoped<DailyVisitorAggregationJob>();

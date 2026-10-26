@@ -1,4 +1,4 @@
-﻿@model TopHeaderViewModel
+@model TopHeaderViewModel
 
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService HeaderAuthorization
@@ -14,6 +14,7 @@
             <ul class="navbar-nav flex-row align-items-center ms-md-auto">
                 @if ((await HeaderAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
                 {
+                    @await Html.PartialAsync("_NotificationBell")
                     <li class="nav-item me-3"><button type="button" class="btn btn-sm btn-outline-secondary" id="notification-sound" aria-pressed="false">@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "Enable notification sound" : "Bildirim sesini aç")</button></li>
                 }
                 <!-- Theme Toggle -->
