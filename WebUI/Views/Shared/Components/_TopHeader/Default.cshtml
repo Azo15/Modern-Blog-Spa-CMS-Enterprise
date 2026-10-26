@@ -15,7 +15,6 @@
                 @if ((await HeaderAuthorization.AuthorizeAsync(User, BusinessLayer.Security.AccessPolicies.Moderator)).Succeeded)
                 {
                     @await Html.PartialAsync("_NotificationBell")
-                    <li class="nav-item me-3"><button type="button" class="btn btn-sm btn-outline-secondary" id="notification-sound" aria-pressed="false">@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "Enable notification sound" : "Bildirim sesini aç")</button></li>
                 }
                 <!-- Theme Toggle -->
                 <li class="nav-item me-4">

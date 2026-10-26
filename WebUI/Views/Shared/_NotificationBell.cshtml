@@ -19,12 +19,23 @@
             <h2 class="h6 mb-0">
                 <i class="fa-solid fa-bell me-2" aria-hidden="true"></i>Bildirimler
             </h2>
-            <button type="button"
-                    class="btn btn-sm btn-outline-secondary"
-                    data-notification-all
-                    title="Tümünü okundu işaretle">
-                <i class="fa-solid fa-check-double me-1" aria-hidden="true"></i>Tümünü oku
-            </button>
+            <div class="notification-actions">
+                <button type="button"
+                        class="notification-sound-toggle"
+                        id="notification-sound"
+                        aria-pressed="false"
+                        aria-label="Bildirim sesini aç"
+                        title="Bildirim sesini aç">
+                    <i class="fa-solid fa-volume-xmark" aria-hidden="true" data-sound-icon></i>
+                    <span class="notification-sound-track" aria-hidden="true"><span class="notification-sound-thumb"></span></span>
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        data-notification-all
+                        title="Tümünü okundu işaretle">
+                    <i class="fa-solid fa-check-double me-1" aria-hidden="true"></i>Tümünü oku
+                </button>
+            </div>
         </header>
 
         <p class="notification-status" data-notification-status role="status" aria-live="polite"></p>

@@ -52,6 +52,43 @@
     font-size: 15px; letter-spacing: .5px;
 }
 
+/* -- Başlık aksiyonları + ses anahtarı -- */
+.notification-actions { display: flex; align-items: center; gap: 8px; }
+.notification-sound-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 31px; padding: 0 10px;
+    border: 1px solid var(--xa-border, #d6b66c44);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--xa-muted, #bcc9bd);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+.notification-sound-toggle i { width: 16px; text-align: center; }
+.notification-sound-toggle:hover { border-color: var(--xa-gold, #d6b66c); color: var(--xa-gold, #d6b66c); }
+.notification-sound-toggle:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(214,182,108,.35); }
+.notification-sound-track {
+    position: relative; width: 28px; height: 16px;
+    border-radius: 999px;
+    background: rgba(188,201,189,.25);
+    transition: background-color .2s ease;
+}
+.notification-sound-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.35);
+    transition: transform .2s ease;
+}
+.notification-sound-toggle.is-on {
+    border-color: rgba(214,182,108,.7);
+    color: var(--xa-gold, #d6b66c);
+    background: rgba(214,182,108,.1);
+}
+.notification-sound-toggle.is-on .notification-sound-track { background: var(--xa-gold, #d6b66c); }
+.notification-sound-toggle.is-on .notification-sound-thumb { transform: translateX(12px); }
+
 /* -- Liste -- */
 .notification-items { padding: 0; margin: 0; list-style: none; }
 .notification-dropdown .notification-items {

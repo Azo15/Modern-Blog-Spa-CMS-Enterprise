@@ -28,20 +28,33 @@
     document.addEventListener("DOMContentLoaded", function () {
         const soundButton = document.getElementById('notification-sound');
         const english = document.documentElement.lang.startsWith('en');
+        const SOUND_KEY = 'xspa:notification-sound';
         let audio;
-        let soundOn = false;
+        let soundOn = localStorage.getItem(SOUND_KEY) === 'on';
         const updateSoundButton = () => {
             if (!soundButton) return;
+            const label = soundOn ? (english ? 'Notification sound on' : 'Bildirim sesi açık') : (english ? 'Enable notification sound' : 'Bildirim sesini aç');
             soundButton.setAttribute('aria-pressed', String(soundOn));
-            soundButton.textContent = soundOn ? (english ? 'Notification sound on' : 'Bildirim sesi açık') : (english ? 'Enable notification sound' : 'Bildirim sesini aç');
+            soundButton.setAttribute('aria-label', label);
+            soundButton.title = label;
+            soundButton.classList.toggle('is-on', soundOn);
+            const icon = soundButton.querySelector('[data-sound-icon]');
+            if (icon) icon.className = 'fa-solid ' + (soundOn ? 'fa-volume-high' : 'fa-volume-xmark');
         };
+        const ensureAudio = async () => {
+            if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+            await audio.resume();
+        };
+        updateSoundButton();
+        // Tarayıcılar sesi yalnızca kullanıcı etkileşiminden sonra açar; kayıtlı tercih ilk tıklamada etkinleşir.
+        if (soundOn) document.addEventListener('pointerdown', () => { ensureAudio().catch(() => {}); }, { once: true });
         soundButton?.addEventListener('click', async () => {
             try {
-                if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
-                await audio.resume();
+                await ensureAudio();
                 soundOn = !soundOn;
-                updateSoundButton();
-            } catch { soundOn = false; updateSoundButton(); }
+            } catch { soundOn = false; }
+            localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off');
+            updateSoundButton();
         });
         const playReservationSound = () => {
             if (!soundOn || audio?.state !== 'running') return;
